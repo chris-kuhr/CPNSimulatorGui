@@ -1,0 +1,14 @@
+#TeXlipse project settings
+#Fri May 06 17:48:32 CEST 2016
+markTmpDer=true
+builderNum=2
+outputDir=
+makeIndSty=
+bibrefDir=
+outputFormat=pdf
+tempDir=tmp
+mainTexFile=ColoredPetrinetsSimulatorGui.tex
+outputFile=ColoredPetrinetsSimulatorGui.pdf
+langSpell=en
+markDer=true
+srcDir=

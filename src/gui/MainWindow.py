@@ -163,9 +163,9 @@ class MainWindow(QtGui.QMainWindow):
         '''
         self.editorwidgets.append( SubnetDialog(mainWindow=self, parent=self, subnet=subnet) )
         self.editors.append( self.editorwidgets[-1].editor )
-        self.editors[-1].tokenListItems = []
+        self.editors[-1].colorListItems = []
         self.editors[-1].colorListWidget.clear()
-        for item in reversed( self.editors[0].tokenListItems ):
+        for item in reversed( self.editors[0].colorListItems ):
             self.editors[-1].colorListWidget.addItem( QtGui.QListWidgetItem( str( item ) ) )
     #------------------------------------------------------------------------------------------------
     

@@ -75,7 +75,7 @@ class CPNSimulator():
             self.colourSets.add( str( colName ) )
             for editor in self.mainWindow.editors:
                 editor.colorListWidget.insertItem( editor.colorListWidget.count()-1, QtGui.QListWidgetItem( str( colName ) ) )
-                editor.tokenListItems.insert( len( editor.tokenListItems), str( colName ) )
+                editor.colorListItems.insert( len( editor.colorListItems), str( colName ) )
         else:
             errorString = str( "Colour Set already defined!" )
             item = QtGui.QListWidgetItem( errorString )
