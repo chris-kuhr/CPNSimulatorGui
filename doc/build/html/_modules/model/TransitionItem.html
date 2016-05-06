@@ -1,0 +1,324 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>model.TransitionItem &mdash; Colored Petrinets Simulator Gui alpha 2 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     'alpha 2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Colored Petrinets Simulator Gui alpha 2 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for model.TransitionItem</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">PyQt4</span> <span class="kn">import</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtCore</span>
+<span class="kn">from</span> <span class="nn">PyQt4.QtGui</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">PyQt4.QtCore</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">deque</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">snakes.plugins</span>
+<span class="kn">from</span> <span class="nn">snakes.nets</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">from</span> <span class="nn">gui.NameDialog</span> <span class="kn">import</span> <span class="n">NameDialog</span>
+<span class="kn">from</span> <span class="nn">gui.TokenDialog</span> <span class="kn">import</span> <span class="n">TokenDialog</span>
+<span class="kn">from</span> <span class="nn">gui.ParameterDialog</span> <span class="kn">import</span> <span class="n">ParameterDialog</span>
+
+
+
+<span class="kn">from</span> <span class="nn">model.AbstractItem</span> <span class="kn">import</span> <span class="n">AbstractItem</span>
+
+<div class="viewcode-block" id="TransitionItem"><a class="viewcode-back" href="../../model_link.html#model.TransitionItem.TransitionItem">[docs]</a><span class="k">class</span> <span class="nc">TransitionItem</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QGraphicsRectItem</span><span class="p">,</span> <span class="n">AbstractItem</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;CPN Transition element.</span>
+<span class="sd">    </span>
+<span class="sd">        :member editor: `gui.DiagramEditor`. Editor to show in.</span>
+<span class="sd">        :member name: Name of the CPN element assigned by the user.</span>
+<span class="sd">        :member substitutionTransition: Flag indication a substitutaion transition. </span>
+<span class="sd">        :member uniqueName: Unique name of this transition used by the simulator.</span>
+<span class="sd">        :member transition: SNAKES transition node with id `uniqueName`, only if `substitutionTransition` is `False` else None.</span>
+<span class="sd">        :member subnet: Name of the subnet this transition is contained in.</span>
+<span class="sd">        :member position: Position of this item in the `gui.DiagramScene`.</span>
+<span class="sd">        :member enabled: Flag determining if this transition is enabled.</span>
+<span class="sd">        :member guardExpression: The guard expression for this transition.</span>
+<span class="sd">        :member subnetBorder: Second border indicating a substitution transition. </span>
+<span class="sd">        :member exceptionString: Exception string containing simulator errors.</span>
+<span class="sd">        :member modeString: Mode string containing the enabled modes for this transition</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+<div class="viewcode-block" id="TransitionItem.__init__"><a class="viewcode-back" href="../../model_link.html#model.TransitionItem.TransitionItem.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">editor</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">guardExpression</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">uniqueName</span><span class="o">=</span><span class="s2">&quot;t0&quot;</span><span class="p">,</span> <span class="n">loadFromFile</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">substitutionTransition</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">subnet</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Create transition item.</span>
+<span class="sd">        </span>
+<span class="sd">        :param editor: `gui.DiagramEditor`. Editor to show in.</span>
+<span class="sd">        :param name: Name of the CPN element assigned by the user. </span>
+<span class="sd">        :param position: Position of this item in the `gui.DiagramScene`.</span>
+<span class="sd">        :param guardExpression: The guard expression for this transition.</span>
+<span class="sd">        :param uniqueName: Unique name of this transition used by the simulator.</span>
+<span class="sd">        :param loadFromFile: Flag determining, whether the transition is loaded from file.</span>
+<span class="sd">        :param substitutionTransition: Flag indication a substitutaion transition.</span>
+<span class="sd">        :param subnet: Name of the subnet this transition is contained in.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TransitionItem</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span> <span class="o">=</span> <span class="n">editor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">substitutionTransition</span> <span class="o">=</span> <span class="n">substitutionTransition</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subnet</span> <span class="o">=</span> <span class="n">subnet</span>
+<span class="c1">#         self.superNet = editor.subnet</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">position</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uniqueName</span> <span class="o">=</span> <span class="n">uniqueName</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enabled</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">guardExpression</span> <span class="o">=</span> <span class="n">guardExpression</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subnetBorder</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exceptionString</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modeString</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QBrush</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">white</span><span class="p">))</span>
+        
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;-------Create----Transition-------------------</span><span class="si">%s</span><span class="s2">---------</span><span class="si">%s</span><span class="s2">----------&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">uniqueName</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span> <span class="s2">&quot;editor </span><span class="si">%s</span><span class="s2"> position </span><span class="si">%s</span><span class="s2"> Guard Expression </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">editor</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">guardExpression</span><span class="p">))</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span> <span class="s2">&quot;loadFromFile </span><span class="si">%s</span><span class="s2"> substitution Transition </span><span class="si">%s</span><span class="s2"> subnet </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">loadFromFile</span><span class="p">,</span> <span class="n">substitutionTransition</span><span class="p">,</span> <span class="n">subnet</span><span class="p">))</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;-----------------------------------------------------------------------------------&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">substitutionTransition</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">loadFromFile</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">guardDiag</span> <span class="o">=</span> <span class="n">NameDialog</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Enter Guard Expression&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;True&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">guardDiag</span><span class="o">.</span><span class="n">accepted</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">acceptEditGuard</span> <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">guardDiag</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>    
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">transition</span> <span class="o">=</span> <span class="n">Transition</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">uniqueName</span><span class="p">,</span> <span class="n">Expression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">guardExpression</span><span class="p">)</span> <span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">add_transition</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">transition</span> <span class="p">)</span> 
+                    <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">transitions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+                <span class="k">except</span> <span class="ne">SyntaxError</span><span class="p">:</span>
+                    <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span>
+                    <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initTransition</span><span class="p">(</span><span class="n">loadFromFile</span><span class="p">)</span></div>
+    <span class="c1">#-------------------------------------------------------------------------------------------------</span>
+    
+    
+    
+    
+<div class="viewcode-block" id="TransitionItem.initTransition"><a class="viewcode-back" href="../../model_link.html#model.TransitionItem.TransitionItem.initTransition">[docs]</a>    <span class="k">def</span> <span class="nf">initTransition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loadFromFile</span><span class="p">):</span>  
+        <span class="sd">&#39;&#39;&#39;Initialize transition.</span>
+<span class="sd">        </span>
+<span class="sd">        :param loadFromFile: Flag determining, whether the transition is loaded from file.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">createItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">nodeType</span><span class="o">=</span><span class="s2">&quot;transition&quot;</span><span class="p">)</span>   
+        <span class="n">rect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span>    
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">substitutionTransition</span><span class="p">:</span>    
+            <span class="bp">self</span><span class="o">.</span><span class="n">guardLabel</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QGraphicsTextItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">guardExpression</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">guardLabel</span><span class="o">.</span><span class="n">setFlags</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">ItemIsSelectable</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">ItemIsMovable</span> <span class="p">)</span>   
+            <span class="bp">self</span><span class="o">.</span><span class="n">guardLabel</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">pos</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">+</span> <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">()</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">pos</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">-</span> <span class="mi">20</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">guardLabel</span><span class="o">.</span><span class="n">setPlainText</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">guardExpression</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>            
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">loadFromFile</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">addSubnetEditor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">subnetBorder</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QGraphicsRectItem</span><span class="p">(</span> <span class="n">pos</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">-</span> <span class="mi">5</span><span class="p">,</span> <span class="n">pos</span><span class="o">.</span><span class="n">y</span><span class="p">()</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">()</span><span class="o">+</span><span class="mi">9</span><span class="p">,</span> <span class="n">rect</span><span class="o">.</span><span class="n">height</span><span class="p">()</span><span class="o">+</span><span class="mi">9</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">subnetBorder</span><span class="o">.</span><span class="n">setFlag</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">ItemStacksBehindParent</span><span class="p">,</span> <span class="bp">True</span> <span class="p">)</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">subnetBorder</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">subnetBorder</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QBrush</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">white</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">subnetBorder</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">guardExpression</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                
+        <span class="bp">self</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">visualTransitions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+     
+        
+<div class="viewcode-block" id="TransitionItem.editGuard"><a class="viewcode-back" href="../../model_link.html#model.TransitionItem.TransitionItem.editGuard">[docs]</a>    <span class="k">def</span> <span class="nf">editGuard</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>       
+        <span class="sd">&#39;&#39;&#39;Callback function to modify the guard expression.&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">substitutionTransition</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">guardDiag</span> <span class="o">=</span> <span class="n">NameDialog</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Enter Guard Expression&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">guardExpression</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">guardDiag</span><span class="o">.</span><span class="n">accepted</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">acceptEditGuard</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">guardDiag</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>  </div>
+            
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="TransitionItem.setInfoString"><a class="viewcode-back" href="../../model_link.html#model.TransitionItem.TransitionItem.setInfoString">[docs]</a>    <span class="k">def</span> <span class="nf">setInfoString</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stringInfo</span><span class="p">):</span> 
+        <span class="sd">&#39;&#39;&#39;Set the string for the `gui.AbstractItem.DescritionCanvas`</span>
+<span class="sd">        </span>
+<span class="sd">        :param stringInfo: String appended to the first line of its `gui.AbstractItem.DescritionCanvas`.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toolTipString</span> <span class="o">=</span> <span class="n">stringInfo</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setToolTip</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toolTipString</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">descCanvas</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">descCanvas</span><span class="o">.</span><span class="n">setCanvasString</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toolTipString</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">descCanvas</span> <span class="p">)</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="TransitionItem.renameModifications"><a class="viewcode-back" href="../../model_link.html#model.TransitionItem.TransitionItem.renameModifications">[docs]</a>    <span class="k">def</span> <span class="nf">renameModifications</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Make neccessary modification and renaming.</span>
+<span class="sd">        </span>
+<span class="sd">        :param name: Name of the CPN element assigned by the user. </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">substitutionTransition</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">editor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">editors</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span> <span class="n">editor</span><span class="o">.</span><span class="n">subnet</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="p">):</span>
+                    <span class="n">editor</span><span class="o">.</span><span class="n">subnet</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="n">name</span> <span class="p">)</span>
+<span class="c1">#                     for place in editor.visualPlaces:</span>
+<span class="c1">#                         place.subnet = name</span>
+<span class="c1">#                     for transition in editor.visualTransitions:</span>
+<span class="c1">#                         if not transition.substitutionTransition:</span>
+<span class="c1">#                             transition.subnet = name                                   </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>        
+<span class="c1">#         self.subnet = self.name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setPlainText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+
+
+<div class="viewcode-block" id="TransitionItem.acceptEditGuard"><a class="viewcode-back" href="../../model_link.html#model.TransitionItem.TransitionItem.acceptEditGuard">[docs]</a>    <span class="k">def</span> <span class="nf">acceptEditGuard</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Apply modified guard expression, after `gui.NameDialog`.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">guardExpression</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">guardDiag</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">guardExpression</span> <span class="o">=</span> <span class="n">guardExpression</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">guardLabel</span><span class="o">.</span><span class="n">setPlainText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">guardExpression</span><span class="p">)</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">transition</span><span class="o">.</span><span class="n">guard</span> <span class="o">=</span> <span class="n">Expression</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">guardExpression</span> <span class="p">)</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">guardDiag</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="TransitionItem.openSubnet"><a class="viewcode-back" href="../../model_link.html#model.TransitionItem.TransitionItem.openSubnet">[docs]</a>    <span class="k">def</span> <span class="nf">openSubnet</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Forward menu action `Open Subnet` to `gui.DiagramEditor`.&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">openSubnet</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="TransitionItem.importSubnet"><a class="viewcode-back" href="../../model_link.html#model.TransitionItem.TransitionItem.importSubnet">[docs]</a>    <span class="k">def</span> <span class="nf">importSubnet</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Forward menu action `Import Subnet` to `gui.DiagramEditor`.&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">importSubnet</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="TransitionItem.mousePressEvent"><a class="viewcode-back" href="../../model_link.html#model.TransitionItem.TransitionItem.mousePressEvent">[docs]</a>    <span class="k">def</span> <span class="nf">mousePressEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>        
+        <span class="sd">&#39;&#39;&#39;Prevents the movement of this item, when connections are drawn.</span>
+<span class="sd">        </span>
+<span class="sd">        :param event: `QtGui.mousePressEvent`</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">modifiers</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ShiftModifier</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">startArc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">QtGui</span><span class="o">.</span><span class="n">QGraphicsRectItem</span><span class="o">.</span><span class="n">mousePressEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+         
+             
+<div class="viewcode-block" id="TransitionItem.mouseMoveEvent"><a class="viewcode-back" href="../../model_link.html#model.TransitionItem.TransitionItem.mouseMoveEvent">[docs]</a>    <span class="k">def</span> <span class="nf">mouseMoveEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Prevents the movement of this item, when connections are drawn.</span>
+<span class="sd">        </span>
+<span class="sd">        :param event: `QtGui.mouseMoveEvent`</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">event</span><span class="o">.</span><span class="n">modifiers</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ShiftModifier</span><span class="p">:</span>
+            <span class="n">QtGui</span><span class="o">.</span><span class="n">QGraphicsRectItem</span><span class="o">.</span><span class="n">mouseMoveEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="TransitionItem.mouseReleaseEvent"><a class="viewcode-back" href="../../model_link.html#model.TransitionItem.TransitionItem.mouseReleaseEvent">[docs]</a>    <span class="k">def</span> <span class="nf">mouseReleaseEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Forward `QtGui.mouseReleaseEvent`.</span>
+<span class="sd">        </span>
+<span class="sd">        :param event: `QtGui.mouseReleaseEvent`</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">QtGui</span><span class="o">.</span><span class="n">QGraphicsRectItem</span><span class="o">.</span><span class="n">mouseReleaseEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+<div class="viewcode-block" id="TransitionItem.deleteItemLocal"><a class="viewcode-back" href="../../model_link.html#model.TransitionItem.TransitionItem.deleteItemLocal">[docs]</a>    <span class="k">def</span> <span class="nf">deleteItemLocal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Capture delete event and call editor delete function.&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">deleteItems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="p">])</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="TransitionItem.contextMenuEvent"><a class="viewcode-back" href="../../model_link.html#model.TransitionItem.TransitionItem.contextMenuEvent">[docs]</a>    <span class="k">def</span> <span class="nf">contextMenuEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Generate Context menu on context menu event.</span>
+<span class="sd">        </span>
+<span class="sd">        :param event: QContextMenuEvent. </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">menu</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMenu</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">substitutionTransition</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">contextMenuOpen</span> <span class="o">=</span> <span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s1">&#39;Open Subnet&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">contextMenuOpen</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">openSubnet</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">contextMenuImport</span> <span class="o">=</span> <span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s1">&#39;Import Subnet&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">contextMenuImport</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">importSubnet</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">contextMenuGurad</span> <span class="o">=</span> <span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s1">&#39;Edit Guard Expression&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">contextMenuGurad</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">editGuard</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delete</span> <span class="o">=</span> <span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s1">&#39;Delete Item&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delete</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deleteItemLocal</span><span class="p">)</span>
+        <span class="n">menu</span><span class="o">.</span><span class="n">exec_</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">screenPos</span><span class="p">())</span></div></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+
+<span class="c1">#========================================================================================================================</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Christoph Kuhr.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,430 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>inout.XMLIO &mdash; Colored Petrinets Simulator Gui alpha 2 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     'alpha 2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Colored Petrinets Simulator Gui alpha 2 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for inout.XMLIO</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">PyQt4</span> <span class="kn">import</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtCore</span>
+<span class="kn">from</span> <span class="nn">PyQt4.QtGui</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">PyQt4.QtCore</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">etree</span> <span class="k">as</span> <span class="n">et</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">deque</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+
+<span class="c1"># from model.PlaceItem import PlaceItem</span>
+<span class="c1"># from model.TransitionItem import TransitionItem</span>
+<span class="c1"># from model.TokenItem import TokenItem</span>
+<span class="c1"># from model.ArcItem import ArcItem</span>
+<span class="c1"># from model.PortItem import PortItem</span>
+<span class="c1"># from model.VisualNodes import *</span>
+
+
+<div class="viewcode-block" id="XMLIO"><a class="viewcode-back" href="../../inout_link.html#inout.XMLIO.XMLIO">[docs]</a><span class="k">class</span> <span class="nc">XMLIO</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;XML Input and Output&#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span> <span class="n">rootElementName</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Init XML parser.</span>
+<span class="sd">        </span>
+<span class="sd">        :param simulator: Simulator to import to or export from.</span>
+<span class="sd">        :param rootElementName: XML root element.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span> <span class="o">=</span> <span class="n">simulator</span>
+        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span> <span class="n">rootElementName</span> <span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cpn</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="n">rootElementName</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cpn</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">simulator</span><span class="o">.</span><span class="n">net</span><span class="p">)</span>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+        
+<div class="viewcode-block" id="XMLIO.loadNet"><a class="viewcode-back" href="../../inout_link.html#inout.XMLIO.XMLIO.loadNet">[docs]</a>    <span class="k">def</span> <span class="nf">loadNet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Parse XML file and prepare data for object creation.</span>
+<span class="sd">        </span>
+<span class="sd">        :param filename: Filepath to XML file which shall be loaded.</span>
+<span class="sd">        :return [ netName, subnets, serConnections, serPlaces, serTransitions ]: A list containing lists for object creation.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">XMLParser</span><span class="p">(</span><span class="n">dtd_validation</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">serPlaces</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">serTransitions</span> <span class="o">=</span> <span class="p">[]</span>        
+        <span class="n">serConnections</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">subnets</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">lastConnection</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">netName</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">foundPlace</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">foundTransition</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">foundConnection</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">foundPos</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">foundInitMark</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">foundLog</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">initMark</span> <span class="o">=</span> <span class="p">[]</span>  
+            
+            <span class="n">cpnTree</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">parser</span><span class="p">)</span>    
+            
+            <span class="n">place</span> <span class="o">=</span> <span class="bp">None</span>
+            
+            <span class="n">actualSubnet</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">element</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="n">cpnTree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span><span class="o">.</span><span class="n">iter</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">)</span> <span class="p">)</span> <span class="p">:</span>                
+<span class="c1">#                 print(element, element.tag, element.text)</span>
+                <span class="k">if</span> <span class="n">lastConnection</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">serConnections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span><span class="n">actualSubnet</span><span class="p">,</span> <span class="n">lastConnection</span><span class="p">]</span> <span class="p">)</span>                     
+                    <span class="n">lastConnection</span> <span class="o">=</span> <span class="bp">None</span>
+                
+                <span class="k">if</span> <span class="n">idx</span> <span class="ow">is</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">netName</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">text</span> 
+                                    
+                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;SubnetName&quot;</span><span class="p">):</span>
+                    <span class="n">actualSubnet</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">text</span>
+                        
+                    <span class="n">subnets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">actualSubnet</span> <span class="p">)</span>
+                
+                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;Place&quot;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">foundPlace</span><span class="p">:</span>  
+                        <span class="n">foundPlace</span> <span class="o">=</span> <span class="bp">True</span>
+                        <span class="n">place</span> <span class="o">=</span> <span class="p">[]</span>         
+                    <span class="k">else</span><span class="p">:</span>                  
+                        <span class="n">foundInitMark</span> <span class="o">=</span> <span class="bp">False</span>
+                        <span class="n">place</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">initMark</span><span class="p">)</span>
+                        <span class="n">serPlaces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span><span class="n">actualSubnet</span><span class="p">,</span> <span class="n">place</span><span class="p">]</span> <span class="p">)</span>
+                        <span class="n">place</span> <span class="o">=</span> <span class="p">[]</span>         
+                        
+                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;Transition&quot;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">foundPlace</span><span class="p">:</span>  
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">foundTransition</span><span class="p">:</span>  
+                            <span class="n">foundTransition</span> <span class="o">=</span> <span class="bp">True</span>
+                            <span class="n">transition</span> <span class="o">=</span> <span class="p">[]</span>                          
+                        <span class="k">else</span><span class="p">:</span>   
+                            <span class="n">serTransitions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span><span class="n">actualSubnet</span><span class="p">,</span> <span class="n">transition</span><span class="p">]</span> <span class="p">)</span>
+                            <span class="n">transition</span> <span class="o">=</span> <span class="p">[]</span>      
+                    <span class="k">else</span><span class="p">:</span>       
+                        <span class="n">foundPlace</span> <span class="o">=</span> <span class="bp">False</span>
+                        <span class="n">foundInitMark</span> <span class="o">=</span> <span class="bp">False</span>
+                        <span class="n">place</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">initMark</span><span class="p">)</span>
+                        <span class="n">serPlaces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span><span class="n">actualSubnet</span><span class="p">,</span> <span class="n">place</span><span class="p">]</span> <span class="p">)</span>
+                        <span class="n">foundTransition</span> <span class="o">=</span> <span class="bp">True</span>
+                        <span class="n">transition</span> <span class="o">=</span> <span class="p">[]</span> 
+                        
+                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;Connection&quot;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">foundTransition</span><span class="p">:</span>  
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">foundConnection</span><span class="p">:</span>  
+                            <span class="n">foundConnection</span> <span class="o">=</span> <span class="bp">True</span>
+                            <span class="n">connection</span> <span class="o">=</span> <span class="p">[]</span>                          
+                        <span class="k">else</span><span class="p">:</span>   
+                            <span class="n">serConnections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span><span class="n">actualSubnet</span><span class="p">,</span> <span class="n">connection</span><span class="p">]</span> <span class="p">)</span>  
+                            <span class="n">connection</span> <span class="o">=</span> <span class="p">[]</span>                      
+                    <span class="k">else</span><span class="p">:</span>   
+                        <span class="n">foundTransition</span> <span class="o">=</span> <span class="bp">False</span>
+                        <span class="n">serTransitions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span><span class="n">actualSubnet</span><span class="p">,</span> <span class="n">transition</span><span class="p">]</span> <span class="p">)</span>
+                        <span class="n">foundConnection</span> <span class="o">=</span> <span class="bp">True</span>
+                        <span class="n">connection</span> <span class="o">=</span> <span class="p">[]</span>         
+                    
+                <span class="k">if</span> <span class="s2">&quot;uniqueName&quot;</span> <span class="ow">in</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">foundConnection</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">foundTransition</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">foundPlace</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="s2">&quot;SRC&quot;</span> <span class="ow">in</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span><span class="p">:</span>
+                            <span class="n">connection</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">text</span> <span class="p">)</span>
+                        <span class="k">elif</span> <span class="s2">&quot;DST&quot;</span> <span class="ow">in</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span><span class="p">:</span>
+                            <span class="n">connection</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">text</span> <span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">foundPlace</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">foundTransition</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">foundConnection</span><span class="p">:</span>
+                            <span class="n">place</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">text</span> <span class="p">)</span>
+                        <span class="k">if</span> <span class="n">foundTransition</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">foundPlace</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">foundConnection</span><span class="p">:</span>
+                            <span class="n">transition</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">text</span> <span class="p">)</span>
+                        
+                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">foundPlace</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">foundTransition</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">foundConnection</span><span class="p">:</span>
+                        <span class="n">place</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">text</span> <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">foundTransition</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">foundPlace</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">foundConnection</span><span class="p">:</span>
+                        <span class="n">transition</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">text</span> <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">foundConnection</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">foundPlace</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">foundTransition</span><span class="p">:</span>
+                        <span class="n">connection</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">text</span> <span class="p">)</span>
+                        
+                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;sourceConnector&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">foundConnection</span><span class="p">:</span>
+                    <span class="n">connection</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">text</span> <span class="p">)</span>
+                        
+                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;destinationConnector&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">foundConnection</span><span class="p">:</span>
+                    <span class="n">connection</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">text</span> <span class="p">)</span>
+                    <span class="n">lastConnection</span> <span class="o">=</span> <span class="n">connection</span>
+                    <span class="n">foundConnection</span> <span class="o">=</span> <span class="bp">False</span>
+                                        
+                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;portClone&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">foundPlace</span><span class="p">:</span>
+                    <span class="n">place</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">text</span> <span class="p">)</span>
+                    
+                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;port&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">foundPlace</span><span class="p">:</span>
+                    <span class="n">place</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">text</span> <span class="p">)</span>
+                    
+                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;pos&quot;</span><span class="p">):</span>
+                    <span class="n">pos</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">foundPos</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">foundPos</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">foundPlace</span> <span class="ow">or</span> <span class="n">foundTransition</span><span class="p">:</span>
+                        <span class="n">pos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">text</span> <span class="p">)</span>
+                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">foundPos</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">foundPlace</span> <span class="ow">or</span> <span class="n">foundTransition</span><span class="p">:</span>
+                        <span class="n">pos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">text</span> <span class="p">)</span>
+                        <span class="k">if</span> <span class="n">foundPlace</span><span class="p">:</span>
+                            <span class="n">place</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">foundTransition</span><span class="p">:</span>
+                            <span class="n">transition</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+                        <span class="n">foundPos</span> <span class="o">=</span> <span class="bp">False</span>
+                    
+                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;initMarking&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">foundPlace</span><span class="p">:</span>
+                    <span class="n">foundInitMark</span> <span class="o">=</span> <span class="bp">True</span>
+                    <span class="n">initMark</span> <span class="o">=</span> <span class="p">[]</span>                    
+                <span class="k">if</span> <span class="s2">&quot;token&quot;</span> <span class="ow">in</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="ow">and</span> <span class="n">foundInitMark</span> <span class="ow">and</span> <span class="n">foundPlace</span><span class="p">:</span>
+                    <span class="n">initMark</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">text</span> <span class="p">)</span>   
+                       
+                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;guardExpression&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">foundTransition</span><span class="p">:</span>
+                    <span class="n">transition</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">text</span> <span class="p">)</span>
+                    
+                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;subnet&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">foundTransition</span><span class="p">:</span>
+                    <span class="n">transition</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">text</span> <span class="p">)</span>
+                    
+                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;Log&quot;</span><span class="p">):</span>
+                    <span class="n">foundLog</span> <span class="o">=</span> <span class="bp">True</span>
+                    
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">foundLog</span><span class="p">:</span>            
+                <span class="n">serConnections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span><span class="n">actualSubnet</span><span class="p">,</span> <span class="n">lastConnection</span><span class="p">]</span> <span class="p">)</span>
+            <span class="k">return</span> <span class="p">[</span> <span class="n">netName</span><span class="p">,</span> <span class="n">subnets</span><span class="p">,</span> <span class="n">serConnections</span><span class="p">,</span> <span class="n">serPlaces</span><span class="p">,</span> <span class="n">serTransitions</span> <span class="p">]</span>
+            
+        <span class="k">except</span> <span class="n">et</span><span class="o">.</span><span class="n">XMLSyntaxError</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span> <span class="s2">&quot;XML Parse Error </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">return</span> <span class="p">[</span> <span class="n">netName</span><span class="p">,</span> <span class="n">subnets</span><span class="p">,</span> <span class="n">serConnections</span><span class="p">,</span> <span class="n">serPlaces</span><span class="p">,</span> <span class="n">serTransitions</span> <span class="p">]</span></div>
+                
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+<div class="viewcode-block" id="XMLIO.netToXML"><a class="viewcode-back" href="../../inout_link.html#inout.XMLIO.XMLIO.netToXML">[docs]</a>    <span class="k">def</span> <span class="nf">netToXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subnet</span><span class="p">,</span> <span class="n">placesS</span><span class="p">,</span> <span class="n">transitionsS</span><span class="p">,</span> <span class="n">connectionsS</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Save Colored Petrinet **Subnet** to XML tree. </span>
+<span class="sd">        </span>
+<span class="sd">        :param subnet: Subnet name.</span>
+<span class="sd">        :param placesS: Place contained in `subnet`.</span>
+<span class="sd">        :param transitionsS: Transitions contained in `subnet`.</span>
+<span class="sd">        :param connectionsS: Connections contained in `subnet`.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="n">subnetName</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cpn</span><span class="p">,</span> <span class="s2">&quot;SubnetName&quot;</span><span class="p">)</span>
+        <span class="n">subnetName</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="n">subnet</span> <span class="p">)</span>
+        
+        <span class="n">serPlaces</span> <span class="o">=</span> <span class="p">[]</span>  
+            
+        <span class="k">for</span> <span class="n">place</span> <span class="ow">in</span> <span class="n">placesS</span><span class="p">:</span> 
+            
+            <span class="k">if</span> <span class="n">place</span><span class="o">.</span><span class="n">portClone</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">str</span><span class="p">(</span><span class="n">place</span><span class="o">.</span><span class="n">portDirection</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;None&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;i&quot;</span> <span class="ow">in</span> <span class="n">place</span><span class="o">.</span><span class="n">portDirection</span> <span class="ow">or</span> <span class="s2">&quot;o&quot;</span> <span class="ow">in</span> <span class="n">place</span><span class="o">.</span><span class="n">portDirection</span><span class="p">):</span>
+                <span class="n">place</span><span class="o">.</span><span class="n">portClone</span> <span class="o">=</span> <span class="n">place</span><span class="o">.</span><span class="n">uniqueName</span>
+                <span class="n">marking</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">place</span><span class="o">.</span><span class="n">initMarking</span><span class="p">,</span> <span class="n">deque</span> <span class="p">):</span>
+                    <span class="n">marking</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span> <span class="n">place</span><span class="o">.</span><span class="n">initMarking</span> <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>                          
+                    <span class="n">marking</span> <span class="o">=</span> <span class="n">place</span><span class="o">.</span><span class="n">initMarking</span> 
+                <span class="n">place</span><span class="o">.</span><span class="n">portClone</span> <span class="o">=</span> <span class="bp">None</span>
+                                 
+                
+            <span class="n">serPlaces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> 
+                                 <span class="p">[</span>
+                                 <span class="n">place</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> 
+                                 <span class="p">[</span><span class="n">place</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="n">place</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">()],</span> 
+                                 <span class="n">marking</span><span class="p">,</span>
+                                 <span class="n">place</span><span class="o">.</span><span class="n">uniqueName</span><span class="p">,</span>
+                                 <span class="n">place</span><span class="o">.</span><span class="n">portDirection</span><span class="p">,</span>
+                                 <span class="n">place</span><span class="o">.</span><span class="n">portClone</span>
+                                 <span class="p">]</span>
+                             <span class="p">)</span>
+      
+        <span class="n">serTransitions</span> <span class="o">=</span> <span class="p">[]</span>   
+        <span class="k">for</span> <span class="n">transition</span> <span class="ow">in</span> <span class="n">transitionsS</span><span class="p">:</span>
+            <span class="n">serTransitions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> 
+                                    <span class="p">[</span>
+                                     <span class="n">transition</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> 
+                                     <span class="p">[</span><span class="n">transition</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="n">transition</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">()],</span> 
+                                     <span class="n">transition</span><span class="o">.</span><span class="n">guardExpression</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">transition</span><span class="o">.</span><span class="n">substitutionTransition</span> <span class="k">else</span> <span class="s2">&quot;None&quot;</span><span class="p">,</span>
+                                     <span class="n">transition</span><span class="o">.</span><span class="n">uniqueName</span><span class="p">,</span>
+                                     <span class="n">transition</span><span class="o">.</span><span class="n">subnet</span> <span class="k">if</span> <span class="n">transition</span><span class="o">.</span><span class="n">substitutionTransition</span> <span class="k">else</span> <span class="s2">&quot;None&quot;</span>
+                                     <span class="p">]</span>
+                                  <span class="p">)</span>
+            
+        <span class="n">serConnections</span> <span class="o">=</span> <span class="p">[]</span>        
+        <span class="k">for</span> <span class="n">connection</span> <span class="ow">in</span> <span class="n">connectionsS</span><span class="p">:</span>
+            <span class="n">serConnections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                                    <span class="p">[</span>
+                                     <span class="n">connection</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">uniqueName</span><span class="p">,</span>
+                                     <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">uniqueName</span><span class="p">,</span>
+                                     <span class="n">connection</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                                     <span class="n">connection</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+                                     <span class="n">connection</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>               
+                                     <span class="p">]</span>
+                                  <span class="p">)</span>
+            
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">serPlaces</span><span class="p">:</span>
+            <span class="n">place</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">subnetName</span><span class="p">,</span> <span class="s2">&quot;Place&quot;</span><span class="p">)</span>
+            <span class="n">uN</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">place</span><span class="p">,</span> <span class="s2">&quot;uniqueName&quot;</span><span class="p">)</span>
+            <span class="n">uN</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">na</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">place</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">)</span>
+            <span class="n">na</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">nc</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">place</span><span class="p">,</span> <span class="s2">&quot;portClone&quot;</span><span class="p">)</span>
+            <span class="n">nc</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="n">p</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="p">)</span>
+            <span class="n">nc</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">place</span><span class="p">,</span> <span class="s2">&quot;port&quot;</span><span class="p">)</span>
+            <span class="n">nc</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="n">p</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="p">)</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">place</span><span class="p">,</span> <span class="s2">&quot;pos&quot;</span><span class="p">)</span>
+            <span class="n">posx</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
+            <span class="n">posx</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">posy</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span>
+            <span class="n">posy</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">inMark</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">place</span><span class="p">,</span> <span class="s2">&quot;initMarking&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">iM</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span>
+                    <span class="k">if</span> <span class="nb">str</span><span class="p">(</span> <span class="n">iM</span> <span class="p">)</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;None&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">iM</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                        <span class="n">_iM</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">inMark</span><span class="p">,</span> <span class="s2">&quot;token</span><span class="si">%d</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">idx</span><span class="p">)</span>
+                        <span class="n">_iM</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">iM</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">_iM</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">inMark</span><span class="p">,</span> <span class="s2">&quot;token0&quot;</span><span class="p">)</span>
+                    <span class="n">_iM</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>                
+            
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">serTransitions</span><span class="p">:</span>
+            <span class="n">transition</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">subnetName</span><span class="p">,</span> <span class="s2">&quot;Transition&quot;</span><span class="p">)</span>
+            <span class="n">uN</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">transition</span><span class="p">,</span> <span class="s2">&quot;uniqueName&quot;</span><span class="p">)</span>
+            <span class="n">uN</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">na</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">transition</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">)</span>
+            <span class="n">na</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">transition</span><span class="p">,</span> <span class="s2">&quot;pos&quot;</span><span class="p">)</span>
+            <span class="n">posx</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
+            <span class="n">posx</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">posy</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span>
+            <span class="n">posy</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">guEx</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">transition</span><span class="p">,</span> <span class="s2">&quot;guardExpression&quot;</span><span class="p">)</span>
+            <span class="n">guEx</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>            
+            <span class="n">guEx</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">transition</span><span class="p">,</span> <span class="s2">&quot;subnet&quot;</span><span class="p">)</span>
+            <span class="n">guEx</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="n">t</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="p">)</span>
+                        
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">serConnections</span><span class="p">:</span>
+            <span class="n">connection</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">subnetName</span><span class="p">,</span> <span class="s2">&quot;Connection&quot;</span><span class="p">)</span>
+            <span class="n">src</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">connection</span><span class="p">,</span> <span class="s2">&quot;uniqueNameSRC&quot;</span><span class="p">)</span>
+            <span class="n">src</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">dst</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">connection</span><span class="p">,</span> <span class="s2">&quot;uniqueNameDST&quot;</span><span class="p">)</span>
+            <span class="n">dst</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">na</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">connection</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">)</span>
+            <span class="n">na</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">na</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">connection</span><span class="p">,</span> <span class="s2">&quot;sourceConnector&quot;</span><span class="p">)</span>
+            <span class="n">na</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">c</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">na</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">connection</span><span class="p">,</span> <span class="s2">&quot;destinationConnector&quot;</span><span class="p">)</span>
+            <span class="n">na</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">c</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>            </div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+<div class="viewcode-block" id="XMLIO.saveLog"><a class="viewcode-back" href="../../inout_link.html#inout.XMLIO.XMLIO.saveLog">[docs]</a>    <span class="k">def</span> <span class="nf">saveLog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logList</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Save Log Entries to XML tree.</span>
+<span class="sd">        </span>
+<span class="sd">        :param logList: List of log entries from the log widget.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="n">subnetName</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cpn</span><span class="p">,</span> <span class="s2">&quot;Log&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">logItem</span> <span class="ow">in</span> <span class="n">logList</span><span class="p">:</span>
+            <span class="n">na</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">subnetName</span><span class="p">,</span> <span class="s2">&quot;Line&quot;</span><span class="p">)</span>
+            <span class="n">na</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">logItem</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+        
+    
+<div class="viewcode-block" id="XMLIO.saveNet"><a class="viewcode-back" href="../../inout_link.html#inout.XMLIO.XMLIO.saveNet">[docs]</a>    <span class="k">def</span> <span class="nf">saveNet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>        
+        <span class="sd">&#39;&#39;&#39;Save XML tree to file.</span>
+<span class="sd">        </span>
+<span class="sd">        :param filename: Filepath where the XML tree is saved. </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">doctype</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;&lt;!DOCTYPE ColouredPetriNet SYSTEM &quot;ColouredPetriNet.dtd&quot;&gt;&quot;&quot;&quot;</span>        
+        <span class="k">with</span> <span class="n">et</span><span class="o">.</span><span class="n">xmlfile</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">xf</span><span class="p">:</span>
+            <span class="n">xf</span><span class="o">.</span><span class="n">write_declaration</span><span class="p">(</span><span class="n">standalone</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="n">xf</span><span class="o">.</span><span class="n">write_doctype</span><span class="p">(</span><span class="n">doctype</span><span class="p">)</span>
+            <span class="n">tree</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">ElementTree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cpn</span><span class="p">)</span>
+            <span class="n">xf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">())</span>
+        
+        <span class="k">pass</span></div></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Christoph Kuhr.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

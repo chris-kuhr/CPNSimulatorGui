@@ -1,0 +1,668 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>model.ArcItem &mdash; Colored Petrinets Simulator Gui alpha 2 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     'alpha 2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Colored Petrinets Simulator Gui alpha 2 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for model.ArcItem</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">PyQt4</span> <span class="kn">import</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtCore</span>
+<span class="kn">from</span> <span class="nn">PyQt4.QtGui</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">PyQt4.QtCore</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">import</span> <span class="nn">snakes.plugins</span>
+<span class="kn">from</span> <span class="nn">snakes.nets</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">from</span> <span class="nn">gui.NameDialog</span> <span class="kn">import</span> <span class="n">NameDialog</span>
+<span class="kn">from</span> <span class="nn">model.PlaceItem</span> <span class="kn">import</span> <span class="n">PlaceItem</span>
+<span class="kn">from</span> <span class="nn">model.TransitionItem</span> <span class="kn">import</span> <span class="n">TransitionItem</span>
+
+            
+<div class="viewcode-block" id="LineItem"><a class="viewcode-back" href="../../model_link.html#model.ArcItem.LineItem">[docs]</a><span class="k">class</span> <span class="nc">LineItem</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QGraphicsLineItem</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Visual representation of the line itself.</span>
+<span class="sd">    </span>
+<span class="sd">    :member parent: Parent `model.ArcItem`.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+<div class="viewcode-block" id="LineItem.__init__"><a class="viewcode-back" href="../../model_link.html#model.ArcItem.LineItem.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Create line.</span>
+<span class="sd">        </span>
+<span class="sd">        :param parent: Parent `model.ArcItem`.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LineItem</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setFlag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ItemIsSelectable</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+            
+<div class="viewcode-block" id="LineItem.mouseDoubleClickEvent"><a class="viewcode-back" href="../../model_link.html#model.ArcItem.LineItem.mouseDoubleClickEvent">[docs]</a>    <span class="k">def</span> <span class="nf">mouseDoubleClickEvent</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Edit arc annotation on `QtGui.mouseDoubleClickEvent`.</span>
+<span class="sd">        </span>
+<span class="sd">        :param event: `QtGui.mouseDoubleClickEvent`.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+<span class="c1">#         pos = event.pos()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">diag</span> <span class="o">=</span> <span class="n">NameDialog</span><span class="p">(</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">editor</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Rename </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span> <span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">accepted</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">rename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="n">QtGui</span><span class="o">.</span><span class="n">QGraphicsLineItem</span><span class="o">.</span><span class="n">mouseDoubleClickEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span></div></div>
+    <span class="c1">#-----------------------------------------------------------------------------------------------</span>
+    
+<span class="c1">#========================================================================================================================</span>
+    
+    
+<div class="viewcode-block" id="ArcItem"><a class="viewcode-back" href="../../model_link.html#model.ArcItem.ArcItem">[docs]</a><span class="k">class</span> <span class="nc">ArcItem</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QGraphicsItem</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;CPN arc connection element.</span>
+<span class="sd">    </span>
+<span class="sd">    :member editor: `gui.DiagramEditor`. Editor to show in.</span>
+<span class="sd">    :member srcConnector: Source `model.AbstractItem.Connector`.</span>
+<span class="sd">    :member dstConnector: Destination `model.AbstractItem.Connector`.</span>
+<span class="sd">    :member isPortConnection: Flag that determines, whether the arc represents the connection between a substitution transition and a port place..</span>
+<span class="sd">    :member name: Expression of the CPN arc assigned by the user. </span>
+<span class="sd">    :member arcDefined: Flag that determines, whether an arc creation was successful (internal).</span>
+<span class="sd">    :member variable: SNAKES Variable. </span>
+<span class="sd">    :member expression: SNAKES Expression.  </span>
+<span class="sd">    :member pos1: Point of origin of the arc.</span>
+<span class="sd">    :member pos2: Point of destination of the arc.</span>
+<span class="sd">    :member arrowPolygon: `QtGui.QPolygonF` showing the direction of the arc.        </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+<div class="viewcode-block" id="ArcItem.__init__"><a class="viewcode-back" href="../../model_link.html#model.ArcItem.ArcItem.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">editor</span><span class="p">,</span> <span class="n">srcConnector</span><span class="p">,</span> <span class="n">dstConnector</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;undefined&quot;</span><span class="p">,</span> <span class="n">isPortConnection</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        </span>
+<span class="sd">        :param editor: `gui.DiagramEditor`. Editor to show in.</span>
+<span class="sd">        :param srcConnector: Source `model.AbstractItem.Connector`.</span>
+<span class="sd">        :param dstConnector: Destination `model.AbstractItem.Connector`.</span>
+<span class="sd">        :param name: Expression of the CPN arc assigned by the user. </span>
+<span class="sd">        :param isPortConnection: Flag that determines, whether the arc represents the connection between a substitution transition and a port place..</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">QtGui</span><span class="o">.</span><span class="n">QGraphicsItem</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span> <span class="o">=</span> <span class="n">editor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">srcConnector</span> <span class="o">=</span> <span class="n">srcConnector</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dstConnector</span> <span class="o">=</span> <span class="n">dstConnector</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">isPortConnection</span> <span class="o">=</span> <span class="n">isPortConnection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">arcDefined</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">variable</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expression</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diag</span> <span class="o">=</span> <span class="bp">None</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">pos1</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pos2</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">arrowPolygon</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="c1">#         self.subnet = subnet</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">srcConnector</span><span class="p">:</span>            
+            <span class="n">rect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">srcConnector</span><span class="o">.</span><span class="n">rect</span><span class="p">()</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapFromItem</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">srcConnector</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">srcConnector</span><span class="o">.</span><span class="n">position</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pos1</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QPointF</span><span class="p">(</span><span class="n">pos</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">+</span> <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">()</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">pos</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">+</span> <span class="n">rect</span><span class="o">.</span><span class="n">height</span><span class="p">()</span><span class="o">/</span><span class="mi">2</span>  <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">srcConnector</span><span class="o">.</span><span class="n">posCallbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setBeginPos</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">srcConnector</span><span class="o">.</span><span class="n">connectionArc</span> <span class="o">=</span> <span class="bp">self</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span> <span class="o">=</span> <span class="n">LineItem</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="p">)</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">arrowPolygon</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPolygonF</span><span class="p">(</span> <span class="p">[</span> 
+                                         <span class="n">QtCore</span><span class="o">.</span><span class="n">QPointF</span><span class="p">(</span>  <span class="mf">0.0</span><span class="p">,</span>  <span class="mf">0.0</span><span class="p">),</span>
+                                         <span class="n">QtCore</span><span class="o">.</span><span class="n">QPointF</span><span class="p">(</span>  <span class="mf">0.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">),</span> 
+                                         <span class="n">QtCore</span><span class="o">.</span><span class="n">QPointF</span><span class="p">(</span> <span class="mf">10.0</span><span class="p">,</span>  <span class="mf">5.0</span><span class="p">)</span>
+                                         <span class="p">]</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">arrowPolygonObject</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">addPolygon</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">arrowPolygon</span> <span class="p">)</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QGraphicsTextItem</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setFlags</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ItemIsSelectable</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">ItemIsMovable</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>   </div>
+        
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+        
+<div class="viewcode-block" id="ArcItem.setPolygon"><a class="viewcode-back" href="../../model_link.html#model.ArcItem.ArcItem.setPolygon">[docs]</a>    <span class="k">def</span> <span class="nf">setPolygon</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Calculate position and rotation of the arc arrow head.&#39;&#39;&#39;</span>
+        <span class="n">rotDeg</span> <span class="o">=</span> <span class="mi">0</span>            
+        <span class="n">xlength</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos1</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos2</span><span class="o">.</span><span class="n">x</span><span class="p">()</span>
+        <span class="n">ylength</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos1</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos2</span><span class="o">.</span><span class="n">y</span><span class="p">()</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span> <span class="n">xlength</span> <span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span> <span class="n">ylength</span> <span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="p">)</span>        
+        <span class="k">if</span> <span class="n">d</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">beta</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">acos</span><span class="p">(</span> <span class="n">xlength</span> <span class="o">/</span> <span class="n">d</span> <span class="p">)</span>
+            <span class="n">rotDeg</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span> <span class="n">beta</span> <span class="p">)</span> 
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">arrowPolygonObject</span><span class="o">.</span><span class="n">setPolygon</span><span class="p">(</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPolygonF</span><span class="p">(</span> <span class="p">[</span>
+                                                 <span class="n">QtCore</span><span class="o">.</span><span class="n">QPointF</span><span class="p">(</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos2</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">-</span><span class="mi">10</span><span class="p">),</span>  <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos2</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">+</span><span class="mi">5</span><span class="p">)),</span> 
+                                                 <span class="n">QtCore</span><span class="o">.</span><span class="n">QPointF</span><span class="p">(</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos2</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">-</span><span class="mi">10</span><span class="p">)</span> <span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos2</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">-</span><span class="mi">5</span><span class="p">)),</span> 
+                                                 <span class="n">QtCore</span><span class="o">.</span><span class="n">QPointF</span><span class="p">(</span>       <span class="bp">self</span><span class="o">.</span><span class="n">pos2</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="p">,</span>      <span class="bp">self</span><span class="o">.</span><span class="n">pos2</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+                                                 <span class="p">]</span> <span class="p">)</span> <span class="p">)</span> 
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">arrowPolygonObject</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QBrush</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">)</span> <span class="p">)</span>
+        
+        <span class="sd">&quot;&quot;&quot; self.angle()!!!!!!!!!&quot;&quot;&quot;</span></div>
+<span class="c1">#         self.arcLinePolygon.angle()</span>
+<span class="c1">#         self.arcLinePolygon.rotate(rotDeg)</span>
+<span class="c1">#         self.arcLinePolygon.setPos( self.pos2 ) </span>
+
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+        
+<div class="viewcode-block" id="ArcItem.getName"><a class="viewcode-back" href="../../model_link.html#model.ArcItem.ArcItem.getName">[docs]</a>    <span class="k">def</span> <span class="nf">getName</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Return the annotation of this arc.&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+<div class="viewcode-block" id="ArcItem.setName"><a class="viewcode-back" href="../../model_link.html#model.ArcItem.ArcItem.setName">[docs]</a>    <span class="k">def</span> <span class="nf">setName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Set the annotation of this arc.</span>
+<span class="sd">        </span>
+<span class="sd">        :param name: New annotation.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="n">rect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">rect</span><span class="o">.</span><span class="n">center</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">+</span> <span class="mi">10</span><span class="p">,</span> <span class="n">rect</span><span class="o">.</span><span class="n">center</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">-</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setPlainText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>       
+        <span class="bp">self</span><span class="o">.</span><span class="n">setPolygon</span><span class="p">()</span> </div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+            
+<div class="viewcode-block" id="ArcItem.setDestination"><a class="viewcode-back" href="../../model_link.html#model.ArcItem.ArcItem.setDestination">[docs]</a>    <span class="k">def</span> <span class="nf">setDestination</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dstConnector</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Sets the destination `model.AbstractItem.Connector`.</span>
+<span class="sd">        </span>
+<span class="sd">        :param dstConnector: Destination `model.AbstractItem.Connector`.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dstConnector</span> <span class="o">=</span> <span class="n">dstConnector</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dstConnector</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isPortConnection</span><span class="p">:</span> 
+                
+<span class="c1">#                 self.editor.mainWindow.simulator.connectionList.append( [ self.srcConnector.parent, self, self.dstConnector.parent, self.srcConnector.idx, self.dstConnector.idx ] )</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">visualConnectionList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">srcConnector</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dstConnector</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">srcConnector</span><span class="o">.</span><span class="n">idx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dstConnector</span><span class="o">.</span><span class="n">idx</span> <span class="p">]</span> <span class="p">)</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">dstConnector</span><span class="o">.</span><span class="n">connectionArc</span> <span class="o">=</span> <span class="bp">self</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">dstConnector</span><span class="o">.</span><span class="n">posCallbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setEndPos</span><span class="p">)</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+        
+<div class="viewcode-block" id="ArcItem.setEndPos"><a class="viewcode-back" href="../../model_link.html#model.ArcItem.ArcItem.setEndPos">[docs]</a>    <span class="k">def</span> <span class="nf">setEndPos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpos</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Callback method to keep `pos2` up to date.</span>
+<span class="sd">        </span>
+<span class="sd">        :param endpos: `QtCore.QPointF()`.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">rect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">srcConnector</span><span class="o">.</span><span class="n">rect</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dstConnector</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapFromItem</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">dstConnector</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dstConnector</span><span class="o">.</span><span class="n">position</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pos2</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QPointF</span><span class="p">(</span><span class="n">pos</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">+</span> <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">()</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">pos</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">+</span> <span class="n">rect</span><span class="o">.</span><span class="n">height</span><span class="p">()</span><span class="o">/</span><span class="mi">2</span>  <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pos2</span> <span class="o">=</span> <span class="n">endpos</span>
+                
+        <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setLine</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QLineF</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos2</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>        </div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+        
+<div class="viewcode-block" id="ArcItem.setBeginPos"><a class="viewcode-back" href="../../model_link.html#model.ArcItem.ArcItem.setBeginPos">[docs]</a>    <span class="k">def</span> <span class="nf">setBeginPos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos1</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Callback method to keep `pos1` up to date.</span>
+<span class="sd">        </span>
+<span class="sd">        :param pos1: `QtCore.QPointF()`.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">rect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">srcConnector</span><span class="o">.</span><span class="n">rect</span><span class="p">()</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapFromItem</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">srcConnector</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">srcConnector</span><span class="o">.</span><span class="n">position</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pos1</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QPointF</span><span class="p">(</span><span class="n">pos</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">+</span> <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">()</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">pos</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">+</span> <span class="n">rect</span><span class="o">.</span><span class="n">height</span><span class="p">()</span><span class="o">/</span><span class="mi">2</span>  <span class="p">)</span>
+<span class="c1">#         self.pos1 = pos1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>                    
+        <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setLine</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QLineF</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos2</span><span class="p">))</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+        
+    
+<div class="viewcode-block" id="ArcItem.checkForExpression"><a class="viewcode-back" href="../../model_link.html#model.ArcItem.ArcItem.checkForExpression">[docs]</a>    <span class="k">def</span> <span class="nf">checkForExpression</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Check whether the annotation is intended to be an expression or a variable.</span>
+<span class="sd">        </span>
+<span class="sd">        :param text: Annotation text.</span>
+<span class="sd">        :return ret: True/False.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="s2">&quot;&lt;&quot;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="s2">&quot;&gt;&quot;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="s2">&quot;=&quot;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="s2">&quot;+&quot;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="s2">&quot;-&quot;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="s2">&quot;*&quot;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="s2">&quot;/&quot;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="s2">&quot;!&quot;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="s2">&quot; if &quot;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="s2">&quot; else &quot;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="bp">True</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="ArcItem.rename"><a class="viewcode-back" href="../../model_link.html#model.ArcItem.ArcItem.rename">[docs]</a>    <span class="k">def</span> <span class="nf">rename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Rename arc and apply changes to simulator and visual representation.&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">diag</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isPortConnection</span><span class="p">:</span>
+            <span class="n">multiArc</span> <span class="o">=</span> <span class="bp">False</span>
+            
+            <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getName</span><span class="p">())</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;(&quot;</span><span class="p">)</span> <span class="ow">and</span>  <span class="s2">&quot;,&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="ow">and</span>  <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getName</span><span class="p">())</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;)&quot;</span><span class="p">):</span>
+                <span class="n">multiArc</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="n">multiArcAnnotations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;(&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;)&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+                    
+                
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">dstConnector</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="n">TransitionItem</span> <span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">remove_input</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">srcConnector</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">uniqueName</span> <span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dstConnector</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">uniqueName</span> <span class="p">)</span>
+                
+                <span class="k">if</span> <span class="n">multiArc</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">multiInput</span><span class="p">(</span> <span class="n">multiArcAnnotations</span> <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkForExpression</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="p">):</span>  
+                        <span class="k">try</span><span class="p">:</span>   
+                            <span class="n">infoString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;Expression </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="p">)</span>
+                            <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">infoString</span> <span class="p">)</span>
+                            <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                            <span class="n">expression</span> <span class="o">=</span> <span class="n">Expression</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="p">)</span> <span class="p">)</span>   
+                            <span class="bp">self</span><span class="o">.</span><span class="n">singleInput</span><span class="p">(</span><span class="n">expression</span><span class="p">)</span>    
+                            <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+                        <span class="k">except</span> <span class="ne">SyntaxError</span><span class="p">:</span>
+                            <span class="n">errorString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;Expression must contain a conditional expression </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span><span class="p">(</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span>
+                            <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">errorString</span> <span class="p">)</span>
+                            <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>  
+                        <span class="n">infoString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;Variable </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="p">)</span>
+                        <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">infoString</span> <span class="p">)</span>
+                        <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                        <span class="n">variable</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="p">)</span> <span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">singleInput</span><span class="p">(</span> <span class="n">variable</span> <span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+                    
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">dstConnector</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="n">PlaceItem</span> <span class="p">):</span>                      
+                <span class="k">if</span> <span class="n">multiArc</span><span class="p">:</span>
+                    <span class="n">errorString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;Multiarc is not defined for Transition Outputs: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="p">)</span>
+                    <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">errorString</span> <span class="p">)</span>
+                    <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+                    <span class="k">return</span>  
+                <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">remove_output</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">dstConnector</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">uniqueName</span> <span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">srcConnector</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">uniqueName</span> <span class="p">)</span>
+                
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkForExpression</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="p">):</span> 
+                    <span class="k">try</span><span class="p">:</span>   
+                        <span class="n">infoString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;Expression </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="p">)</span>
+                        <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">infoString</span> <span class="p">)</span>
+                        <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                        <span class="n">expression</span> <span class="o">=</span> <span class="n">Expression</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="p">)</span> <span class="p">)</span> 
+                        <span class="bp">self</span><span class="o">.</span><span class="n">singleOutput</span><span class="p">(</span><span class="n">expression</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+                    <span class="k">except</span> <span class="ne">SyntaxError</span><span class="p">:</span>
+                        <span class="n">errorString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;Expression must contain a conditional expression </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span><span class="p">(</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span>
+                        <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">errorString</span> <span class="p">)</span>
+                        <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>  
+                    <span class="n">infoString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;Variable </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="p">)</span>
+                    <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">infoString</span> <span class="p">)</span>
+                    <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                    <span class="n">variable</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="p">)</span> <span class="p">)</span>   
+                    <span class="bp">self</span><span class="o">.</span><span class="n">singleOutput</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+                    
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setPlainText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">diag</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+    
+<div class="viewcode-block" id="ArcItem.singleInput"><a class="viewcode-back" href="../../model_link.html#model.ArcItem.ArcItem.singleInput">[docs]</a>    <span class="k">def</span> <span class="nf">singleInput</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variableExpression</span><span class="p">):</span>          
+        <span class="sd">&#39;&#39;&#39;Register a single input arc in the simulator.</span>
+<span class="sd">        </span>
+<span class="sd">        :param variableExpression: SNAKES Variable or Expression.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>      
+            <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">add_input</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">srcConnector</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">uniqueName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dstConnector</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">uniqueName</span><span class="p">,</span> <span class="n">variableExpression</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="n">errorString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;ValueError must contain valid Python Syntax: e.g. x&gt;1, </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span><span class="p">(</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">errorString</span> <span class="p">)</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+            <span class="k">del</span> <span class="bp">self</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">except</span> <span class="ne">SyntaxError</span><span class="p">:</span>
+            <span class="n">errorString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;Expression must contain valid Python Syntax: e.g. x&gt;1, </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span><span class="p">(</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">errorString</span> <span class="p">)</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+            <span class="k">del</span> <span class="bp">self</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">except</span> <span class="n">snakes</span><span class="o">.</span><span class="n">ConstraintError</span><span class="p">:</span>
+            <span class="n">errorString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;ConstraintError: already connected to </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dstConnector</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="p">)</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">errorString</span> <span class="p">)</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+            <span class="k">del</span> <span class="bp">self</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="bp">True</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="ArcItem.multiInput"><a class="viewcode-back" href="../../model_link.html#model.ArcItem.ArcItem.multiInput">[docs]</a>    <span class="k">def</span> <span class="nf">multiInput</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiArcAnnotations</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Register a multi input arc in the simulator.</span>
+<span class="sd">        </span>
+<span class="sd">        :param multiArcAnnotations: SNAKES MultiArc annotation.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">multiArcExpressions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">annotation</span> <span class="ow">in</span> <span class="n">multiArcAnnotations</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkForExpression</span><span class="p">(</span> <span class="n">annotation</span> <span class="p">):</span>      
+                <span class="n">multiArcExpressions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">Expression</span><span class="p">(</span> <span class="n">annotation</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">multiArcExpressions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">Variable</span><span class="p">(</span> <span class="n">annotation</span> <span class="p">)</span> <span class="p">)</span>
+                
+        <span class="bp">self</span><span class="o">.</span><span class="n">singleInput</span><span class="p">(</span> <span class="n">MultiArc</span><span class="p">(</span> <span class="n">multiArcExpressions</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">True</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+<div class="viewcode-block" id="ArcItem.singleOutput"><a class="viewcode-back" href="../../model_link.html#model.ArcItem.ArcItem.singleOutput">[docs]</a>    <span class="k">def</span> <span class="nf">singleOutput</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variableExpression</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Register a multi input arc in the simulator.</span>
+<span class="sd">        </span>
+<span class="sd">        :param variableExpression: SNAKES Variable or Expression.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>           
+            <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">add_output</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">dstConnector</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">uniqueName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">srcConnector</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">uniqueName</span><span class="p">,</span> <span class="n">variableExpression</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="n">errorString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;ValueError: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span> <span class="p">)</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">errorString</span> <span class="p">)</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+            <span class="k">del</span> <span class="bp">self</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">except</span> <span class="ne">SyntaxError</span><span class="p">:</span>
+            <span class="n">errorString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;SyntaxError: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span> <span class="p">)</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">errorString</span> <span class="p">)</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+            <span class="k">del</span> <span class="bp">self</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">except</span> <span class="n">snakes</span><span class="o">.</span><span class="n">ConstraintError</span><span class="p">:</span>
+            <span class="n">errorString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;ConstraintError: already connected to </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dstConnector</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="p">)</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">errorString</span> <span class="p">)</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+            <span class="k">del</span> <span class="bp">self</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="bp">True</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="ArcItem.setArcAnnotation"><a class="viewcode-back" href="../../model_link.html#model.ArcItem.ArcItem.setArcAnnotation">[docs]</a>    <span class="k">def</span> <span class="nf">setArcAnnotation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annotationText</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Finalize arc creation and set annotation.</span>
+<span class="sd">        </span>
+<span class="sd">        :param annotationText: String arc annotation.</span>
+<span class="sd">        :return self.arcDefined: Flag that determines, whether an arc creation was successful (internal).</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">arcDefined</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isPortConnection</span><span class="p">:</span>
+            <span class="n">multiArc</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">annotationText</span>
+            <span class="k">if</span> <span class="n">text</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot;(&quot;</span> <span class="ow">in</span> <span class="n">text</span> <span class="ow">and</span>  <span class="s2">&quot;,&quot;</span> <span class="ow">in</span> <span class="n">text</span> <span class="ow">and</span>  <span class="s2">&quot;)&quot;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+                    <span class="n">multiArc</span> <span class="o">=</span> <span class="bp">True</span>
+                    <span class="n">multiArcAnnotations</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;(&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;)&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dstConnector</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span> <span class="ow">is</span> <span class="n">TransitionItem</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">multiArc</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">multiInput</span><span class="p">(</span> <span class="n">multiArcAnnotations</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkForExpression</span><span class="p">(</span> <span class="n">text</span> <span class="p">):</span>      
+                        <span class="k">if</span> <span class="s2">&quot;==[]&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span> <span class="n">text</span> <span class="p">):</span>
+                            <span class="n">inhibitString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="n">text</span> <span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;==&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                            <span class="n">infoString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;Inhibitor </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">text</span> <span class="p">)</span>
+                            
+                            <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">infoString</span> <span class="p">)</span>
+                            <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                            <span class="n">inhibitor</span> <span class="o">=</span> <span class="n">Inhibitor</span><span class="p">(</span> <span class="n">Variable</span><span class="p">(</span> <span class="n">inhibitString</span> <span class="p">)</span> <span class="p">)</span>
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">singleInput</span><span class="p">(</span> <span class="n">inhibitor</span> <span class="p">):</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setPlainText</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">text</span> <span class="p">)</span> <span class="p">)</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">errorString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;Annotation </span><span class="si">%s</span><span class="s2"> could not be applied!&quot;</span><span class="o">%</span><span class="n">text</span> <span class="p">)</span>
+                                <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">errorString</span> <span class="p">)</span>
+                                <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+                            
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">infoString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;Expression </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">text</span> <span class="p">)</span>
+                            <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">infoString</span> <span class="p">)</span>
+                            <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                            <span class="n">expression</span> <span class="o">=</span> <span class="n">Expression</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">text</span> <span class="p">)</span> <span class="p">)</span>   
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">singleInput</span><span class="p">(</span> <span class="n">expression</span> <span class="p">):</span>    
+                                <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setPlainText</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">text</span> <span class="p">)</span> <span class="p">)</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">errorString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;Annotation </span><span class="si">%s</span><span class="s2"> could not be applied!&quot;</span><span class="o">%</span><span class="n">text</span> <span class="p">)</span>
+                                <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">errorString</span> <span class="p">)</span>
+                                <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+                    
+                    <span class="k">else</span><span class="p">:</span>  
+                        <span class="n">infoString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;Variable </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">text</span> <span class="p">)</span>
+                        <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">infoString</span> <span class="p">)</span>
+                        <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                        <span class="n">variable</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">text</span> <span class="p">)</span> <span class="p">)</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">singleInput</span><span class="p">(</span> <span class="n">variable</span> <span class="p">):</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setPlainText</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">text</span> <span class="p">)</span> <span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">errorString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;Annotation </span><span class="si">%s</span><span class="s2"> could not be applied!&quot;</span><span class="o">%</span><span class="n">text</span> <span class="p">)</span>
+                            <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">errorString</span> <span class="p">)</span>
+                            <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+                            
+            <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dstConnector</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span> <span class="ow">is</span> <span class="n">PlaceItem</span><span class="p">:</span>                            
+                <span class="k">if</span> <span class="n">multiArc</span><span class="p">:</span>
+                    <span class="n">errorString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;Multiarc is not defined for Transition Outputs: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="nb">str</span><span class="p">(</span> <span class="n">text</span> <span class="p">)</span> <span class="p">)</span>
+                    <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">errorString</span> <span class="p">)</span>
+                    <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+                    <span class="k">del</span> <span class="bp">self</span>
+                    <span class="k">return</span> <span class="bp">False</span> 
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkForExpression</span><span class="p">(</span> <span class="n">text</span> <span class="p">):</span>    
+                        <span class="n">infoString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;Expression </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">text</span> <span class="p">)</span>
+                        <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">infoString</span> <span class="p">)</span>
+                        <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                        <span class="n">expression</span> <span class="o">=</span> <span class="n">Expression</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">text</span> <span class="p">)</span> <span class="p">)</span>  
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">singleOutput</span><span class="p">(</span> <span class="n">expression</span><span class="p">):</span>    
+                            <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setPlainText</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">text</span> <span class="p">)</span> <span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">errorString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;Annotation </span><span class="si">%s</span><span class="s2"> could not be applied!&quot;</span><span class="o">%</span><span class="n">text</span> <span class="p">)</span>
+                            <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">errorString</span> <span class="p">)</span>
+                            <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>  
+                        <span class="n">infoString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;Variable </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">text</span> <span class="p">)</span>
+                        <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">infoString</span> <span class="p">)</span>
+                        <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                        <span class="n">variable</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">text</span> <span class="p">)</span> <span class="p">)</span>   
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">singleOutput</span><span class="p">(</span> <span class="n">variable</span><span class="p">):</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setPlainText</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">text</span> <span class="p">)</span> <span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">errorString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;Annotation </span><span class="si">%s</span><span class="s2"> could not be applied!&quot;</span><span class="o">%</span><span class="n">text</span> <span class="p">)</span>
+                            <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">errorString</span> <span class="p">)</span>
+                            <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+                        
+                    <span class="n">enabled</span> <span class="o">=</span> <span class="bp">False</span>
+                    <span class="k">for</span> <span class="n">connection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">connectionList</span><span class="p">:</span> 
+                        <span class="k">if</span> <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">srcConnector</span><span class="o">.</span><span class="n">parent</span><span class="p">:</span>
+                            <span class="k">try</span><span class="p">:</span>
+                                <span class="k">for</span> <span class="n">mode</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">transition</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">srcConnector</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">uniqueName</span> <span class="p">)</span><span class="o">.</span><span class="n">modes</span><span class="p">():</span>
+                                    <span class="k">if</span> <span class="ow">not</span> <span class="n">enabled</span><span class="p">:</span> 
+                                            <span class="n">enabled</span> <span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">transition</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">srcConnector</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">uniqueName</span> <span class="p">)</span><span class="o">.</span><span class="n">enabled</span><span class="p">(</span> <span class="n">mode</span> <span class="p">)</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+                            <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+                                <span class="n">errorString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;Name Error: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span><span class="p">(</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span>
+                                <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">errorString</span> <span class="p">)</span>
+                                <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+                                <span class="k">del</span> <span class="bp">self</span>
+                                <span class="k">return</span> <span class="bp">False</span>
+                            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                                <span class="n">errorString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;Value Error: must contain valid Python Syntax: e.g. x&gt;1, </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span><span class="p">(</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span>
+                                <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">errorString</span> <span class="p">)</span>
+                                <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+                                <span class="k">del</span> <span class="bp">self</span>
+                                <span class="k">return</span> <span class="bp">False</span>
+                            <span class="k">except</span> <span class="ne">SyntaxError</span><span class="p">:</span>
+                                <span class="n">errorString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;Syntax Error: Expression must contain valid Python Syntax: e.g. x&gt;1, </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span><span class="p">(</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span>
+                                <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">errorString</span> <span class="p">)</span>
+                                <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+                                <span class="k">del</span> <span class="bp">self</span>
+                                <span class="k">return</span> <span class="bp">False</span>
+                            <span class="k">except</span> <span class="n">snakes</span><span class="o">.</span><span class="n">ConstraintError</span><span class="p">:</span>
+                                <span class="n">errorString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>  <span class="s2">&quot;Constraint Error: already connected to </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dstConnector</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>  <span class="p">)</span>
+                                <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">errorString</span> <span class="p">)</span>
+                                <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+                                <span class="k">del</span> <span class="bp">self</span>
+                                <span class="k">return</span> <span class="bp">False</span>
+                            <span class="k">except</span> <span class="n">snakes</span><span class="o">.</span><span class="n">DomainError</span><span class="p">:</span> 
+                                <span class="n">errorString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;Domain Error: unbound variable </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span> <span class="p">)</span>
+                                <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">errorString</span> <span class="p">)</span>
+                                <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">arcLine</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+                                <span class="k">del</span> <span class="bp">self</span>
+                                <span class="k">return</span> <span class="bp">False</span>
+                    <span class="k">if</span> <span class="n">enabled</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">srcConnector</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">green</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+                        
+                    <span class="bp">self</span><span class="o">.</span><span class="n">srcConnector</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">enabled</span> <span class="o">=</span> <span class="n">enabled</span>
+                    
+            <span class="bp">self</span><span class="o">.</span><span class="n">arcDefined</span> <span class="o">=</span> <span class="bp">True</span>
+            
+        
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;-------Create----Arc----------------------------</span><span class="si">%s</span><span class="s2">----------&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span> <span class="s2">&quot;editor </span><span class="si">%s</span><span class="s2"> Start Pos: </span><span class="si">%s</span><span class="s2"> End Pos: </span><span class="si">%s</span><span class="s2"> Source </span><span class="si">%s</span><span class="s2"> Destination </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">srcConnector</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">uniqueName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dstConnector</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">uniqueName</span><span class="p">))</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span> <span class="s2">&quot;is a Port Connection </span><span class="si">%s</span><span class="s2"> Variable </span><span class="si">%s</span><span class="s2"> Expression </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">isPortConnection</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">variable</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">expression</span><span class="p">))</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;-----------------------------------------------------------------------------------&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">arcDefined</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">arrowPolygon</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">arcDefined</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="ArcItem.deleteItemLocal"><a class="viewcode-back" href="../../model_link.html#model.ArcItem.ArcItem.deleteItemLocal">[docs]</a>    <span class="k">def</span> <span class="nf">deleteItemLocal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Capture delete event and call editor delete function.&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">deleteItems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="p">])</span></div></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+<span class="c1">#========================================================================================================================</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Christoph Kuhr.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,12 @@
+
+
+#### Requirements
+	"SNAKES >= 0.9.17",
+	"lxml >= 3.3.3",
+	"PyQt4 >= 4.10.4",
+	"PIL >= 2.3.0",
+
+
+#### Installation
+
+   	sudo python3 setup.py install

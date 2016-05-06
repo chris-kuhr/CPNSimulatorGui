@@ -1,0 +1,625 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>model.CPNSimulator &mdash; Colored Petrinets Simulator Gui alpha 2 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     'alpha 2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Colored Petrinets Simulator Gui alpha 2 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for model.CPNSimulator</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">PyQt4</span> <span class="kn">import</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtCore</span><span class="p">,</span> <span class="n">QtSvg</span><span class="p">,</span> <span class="n">uic</span>
+<span class="kn">from</span> <span class="nn">PyQt4.QtGui</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">PyQt4.QtCore</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">deque</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+
+<span class="kn">import</span> <span class="nn">snakes.plugins</span>
+<span class="kn">from</span> <span class="nn">snakes.nets</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">from</span> <span class="nn">gui.NameDialog</span> <span class="kn">import</span> <span class="n">NameDialog</span>
+<span class="c1"># </span>
+<span class="kn">from</span> <span class="nn">model.PlaceItem</span> <span class="kn">import</span> <span class="n">PlaceItem</span>
+<span class="kn">from</span> <span class="nn">model.TransitionItem</span> <span class="kn">import</span> <span class="n">TransitionItem</span>
+<span class="kn">from</span> <span class="nn">model.TokenItem</span> <span class="kn">import</span> <span class="n">TokenItem</span>
+<span class="kn">from</span> <span class="nn">model.PortItem</span> <span class="kn">import</span> <span class="n">PortItem</span>
+<span class="kn">from</span> <span class="nn">model.ArcItem</span> <span class="kn">import</span> <span class="n">ArcItem</span>
+
+
+<div class="viewcode-block" id="CPNSimulator"><a class="viewcode-back" href="../../model_link.html#model.CPNSimulator.CPNSimulator">[docs]</a><span class="k">class</span> <span class="nc">CPNSimulator</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;CPN Simulator.</span>
+<span class="sd">    </span>
+<span class="sd">    :member mainWindow: `gui.MainWindow`. Main application window.</span>
+<span class="sd">    :member net: SNAKES Colored Petrinet.  </span>
+<span class="sd">    :member markingHistory: SNAKES Marking stored for every ` simulationStep`.</span>
+<span class="sd">    :member simulationStep: Steps calculated for the Petrinet `net`</span>
+<span class="sd">    :member displayStep: Step displayed in editors.</span>
+<span class="sd">    :member simulatorSpeed: The speed with which the simulator progresses. </span>
+<span class="sd">    :member enabledTransitions: Number of enabled transitions.</span>
+<span class="sd">    :member uniqueNameBase: Unique integer for the creation of new CPN elements. </span>
+<span class="sd">    :member initialMarking: SNAKES Marking at step 0. </span>
+<span class="sd">    :member colourSets: Set of defined string colors.  </span>
+<span class="sd">    :member connectionList: List of all `model.ArcItem` s, except port substitution transition connections.   </span>
+<span class="sd">    :member transitions: All `model.TransitionItem` except substitution transitions.  </span>
+<span class="sd">    :member places: All `model.PlaceItem` except port places.  </span>
+<span class="sd">    :member subnets: List of all subnets.  </span>
+<span class="sd">    </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+<div class="viewcode-block" id="CPNSimulator.__init__"><a class="viewcode-back" href="../../model_link.html#model.CPNSimulator.CPNSimulator.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mainWindow</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Create CPN Simulator.</span>
+<span class="sd">        </span>
+<span class="sd">        :param mainWindow: `gui.MainWindow`. Main application window.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span> <span class="o">=</span> <span class="n">mainWindow</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">markingHistory</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulationStep</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">displayStep</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulatorSpeed</span> <span class="o">=</span> <span class="mi">2000</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">enabledTransitions</span> <span class="o">=</span> <span class="mi">0</span>    
+        <span class="bp">self</span><span class="o">.</span><span class="n">uniqueNameBase</span> <span class="o">=</span> <span class="mi">0</span>   
+                
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span> <span class="o">=</span> <span class="n">PetriNet</span><span class="p">(</span><span class="s2">&quot;init&quot;</span><span class="p">)</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">initialMarking</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">colourSets</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connectionList</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">places</span> <span class="o">=</span> <span class="p">[]</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">subnets</span> <span class="o">=</span> <span class="p">[]</span></div>
+    <span class="c1">#--------------------------------------------------------------------------</span>
+            
+        
+<div class="viewcode-block" id="CPNSimulator.tokenAdded"><a class="viewcode-back" href="../../model_link.html#model.CPNSimulator.CPNSimulator.tokenAdded">[docs]</a>    <span class="k">def</span> <span class="nf">tokenAdded</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>    
+        <span class="sd">&#39;&#39;&#39;Called when a `model.TokenItem` was added to the `net`.&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">markingHistory</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">displayStep</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">get_marking</span><span class="p">()</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">getActualMarking</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">markingHistory</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">displayStep</span><span class="p">]</span> <span class="p">)</span> </div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="CPNSimulator.defineNewColour"><a class="viewcode-back" href="../../model_link.html#model.CPNSimulator.CPNSimulator.defineNewColour">[docs]</a>    <span class="k">def</span> <span class="nf">defineNewColour</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">colName</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Define a new Color.</span>
+<span class="sd">        </span>
+<span class="sd">        :param colName: String color.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span> <span class="n">colName</span> <span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">colourSets</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">colourSets</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">colName</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">for</span> <span class="n">editor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">editors</span><span class="p">:</span>
+                <span class="n">editor</span><span class="o">.</span><span class="n">colorListWidget</span><span class="o">.</span><span class="n">insertItem</span><span class="p">(</span> <span class="n">editor</span><span class="o">.</span><span class="n">colorListWidget</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">colName</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="n">editor</span><span class="o">.</span><span class="n">tokenListItems</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">editor</span><span class="o">.</span><span class="n">tokenListItems</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span> <span class="n">colName</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">errorString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;Colour Set already defined!&quot;</span> <span class="p">)</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">errorString</span> <span class="p">)</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">yellow</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span></div>
+            
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+<div class="viewcode-block" id="CPNSimulator.setNetName"><a class="viewcode-back" href="../../model_link.html#model.CPNSimulator.CPNSimulator.setNetName">[docs]</a>    <span class="k">def</span> <span class="nf">setNetName</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>   
+        <span class="sd">&#39;&#39;&#39;Set the name of the `net`.&#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">editor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">editors</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">editor</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">editors</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">editors</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">editor</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>                    
+                <span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+                
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span> <span class="o">=</span> <span class="n">PetriNet</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="p">)</span>
+        <span class="n">actualMarking</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">get_marking</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">markingHistory</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">actualMarking</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="s2">&quot;pyPetriNets - </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">diag</span>  </div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="CPNSimulator.resetSimulator"><a class="viewcode-back" href="../../model_link.html#model.CPNSimulator.CPNSimulator.resetSimulator">[docs]</a>    <span class="k">def</span> <span class="nf">resetSimulator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Reset simulator history to step 0.</span>
+<span class="sd">        </span>
+<span class="sd">        :param init: Initialization on startup/load</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulationStep</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">displayStep</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">markingHistory</span> <span class="o">=</span> <span class="p">[]</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">set_marking</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialMarking</span> <span class="p">)</span>                
+                
+        <span class="n">actualMarking</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">get_marking</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">markingHistory</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">actualMarking</span> <span class="p">)</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">init</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">lineEdit</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayStep</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulationStep</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">back2beginning</span><span class="p">()</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="CPNSimulator.startSim"><a class="viewcode-back" href="../../model_link.html#model.CPNSimulator.CPNSimulator.startSim">[docs]</a>    <span class="k">def</span> <span class="nf">startSim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Start simulator with the speed chosen with the radio edit.&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">pushButton_4</span><span class="o">.</span><span class="n">isDown</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">pushButton_4</span><span class="o">.</span><span class="n">isChecked</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">pushButton_4</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>  
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">radioButton</span><span class="o">.</span><span class="n">isChecked</span><span class="p">()</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">simulatorSpeed</span> <span class="o">=</span> <span class="mi">5000</span>         
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">radioButton_2</span><span class="o">.</span><span class="n">isChecked</span><span class="p">()</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">simulatorSpeed</span> <span class="o">=</span> <span class="mi">2000</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">radioButton_3</span><span class="o">.</span><span class="n">isChecked</span><span class="p">()</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">simulatorSpeed</span> <span class="o">=</span> <span class="mi">500</span>       
+                <span class="bp">self</span><span class="o">.</span><span class="n">getActualMarking</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">markingHistory</span><span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayStep</span> <span class="p">]</span> <span class="p">)</span>  
+                <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">simulatorSpeed</span><span class="p">)</span></div>
+    <span class="c1">#-------------------------------------------------------------------</span>
+        
+        
+<div class="viewcode-block" id="CPNSimulator.stopSim"><a class="viewcode-back" href="../../model_link.html#model.CPNSimulator.CPNSimulator.stopSim">[docs]</a>    <span class="k">def</span> <span class="nf">stopSim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Stop simulator.&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">pushButton_4</span><span class="o">.</span><span class="n">isChecked</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">pushButton_4</span><span class="o">.</span><span class="n">isDown</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">pushButton_4</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div>
+    <span class="c1">#-------------------------------------------------------------------</span>
+              
+            
+<div class="viewcode-block" id="CPNSimulator.back2beginning"><a class="viewcode-back" href="../../model_link.html#model.CPNSimulator.CPNSimulator.back2beginning">[docs]</a>    <span class="k">def</span> <span class="nf">back2beginning</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Return to step 0.&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">displayStep</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">set_marking</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">markingHistory</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">displayStep</span><span class="p">]</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">getActualMarking</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">markingHistory</span><span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayStep</span> <span class="p">]</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">lineEdit</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayStep</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulationStep</span> <span class="p">)</span> <span class="p">)</span></div>
+    <span class="c1">#-------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="CPNSimulator.backStep"><a class="viewcode-back" href="../../model_link.html#model.CPNSimulator.CPNSimulator.backStep">[docs]</a>    <span class="k">def</span> <span class="nf">backStep</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Go one step back in history.&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayStep</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>            
+            <span class="bp">self</span><span class="o">.</span><span class="n">displayStep</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">set_marking</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">markingHistory</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">displayStep</span><span class="p">]</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">getActualMarking</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">markingHistory</span><span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayStep</span> <span class="p">]</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">lineEdit</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayStep</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulationStep</span> <span class="p">)</span> <span class="p">)</span></div>
+    <span class="c1">#-------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="CPNSimulator.forward2lastStep"><a class="viewcode-back" href="../../model_link.html#model.CPNSimulator.CPNSimulator.forward2lastStep">[docs]</a>    <span class="k">def</span> <span class="nf">forward2lastStep</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>        
+        <span class="sd">&#39;&#39;&#39;Go forward to last step in history, given at ` simulationStep`.&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">displayStep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulationStep</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">set_marking</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">markingHistory</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">displayStep</span><span class="p">]</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">getActualMarking</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">markingHistory</span><span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayStep</span> <span class="p">]</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">lineEdit</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayStep</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulationStep</span> <span class="p">)</span> <span class="p">)</span></div>
+    <span class="c1">#-------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="CPNSimulator.forwardStep"><a class="viewcode-back" href="../../model_link.html#model.CPNSimulator.CPNSimulator.forwardStep">[docs]</a>    <span class="k">def</span> <span class="nf">forwardStep</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Go step forward in history or claculate new step.&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayStep</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulationStep</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">displayStep</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">set_marking</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">markingHistory</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">displayStep</span><span class="p">]</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">getActualMarking</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">markingHistory</span><span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayStep</span> <span class="p">]</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">simulationStep</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fireEnabledTransitions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">simulationStep</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">markingHistory</span><span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulationStep</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">get_marking</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">enabledTransitions</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">set_marking</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">markingHistory</span><span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulationStep</span> <span class="o">-</span><span class="mi">1</span> <span class="p">]</span> <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">getActualMarking</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">markingHistory</span><span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulationStep</span> <span class="o">-</span><span class="mi">1</span> <span class="p">]</span> <span class="p">)</span>  
+                <span class="bp">self</span><span class="o">.</span><span class="n">stopSim</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">simulationStep</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">displayStep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulationStep</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">displayStep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulationStep</span>                
+                <span class="bp">self</span><span class="o">.</span><span class="n">markingHistory</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">get_marking</span><span class="p">()</span> <span class="p">)</span>  
+                <span class="bp">self</span><span class="o">.</span><span class="n">getActualMarking</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">markingHistory</span><span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayStep</span> <span class="p">]</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">lineEdit</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayStep</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulationStep</span> <span class="p">)</span> <span class="p">)</span></div>
+    <span class="c1">#-------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="CPNSimulator.checkTranistionActivation"><a class="viewcode-back" href="../../model_link.html#model.CPNSimulator.CPNSimulator.checkTranistionActivation">[docs]</a>    <span class="k">def</span> <span class="nf">checkTranistionActivation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transition</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">currentStep</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Check whether a SNAKES transition is activated.</span>
+<span class="sd">        </span>
+<span class="sd">        :param transition: SNAKES transition to check.</span>
+<span class="sd">        :param mode: SNAKES mode to check for activation. </span>
+<span class="sd">        :param currentStep: Step for which to calculate the activation</span>
+<span class="sd">        :return activated: Activated True or False.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">activated</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">transition</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QBrush</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">white</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>       
+            <span class="n">activated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">transition</span><span class="p">(</span> <span class="n">transition</span><span class="o">.</span><span class="n">uniqueName</span> <span class="p">)</span><span class="o">.</span><span class="n">activated</span><span class="p">(</span> <span class="n">mode</span> <span class="p">)</span>
+            <span class="n">transition</span><span class="o">.</span><span class="n">exceptionString</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">transition</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+            <span class="n">transition</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QBrush</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">white</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span> 
+            <span class="n">transition</span><span class="o">.</span><span class="n">exceptionString</span> <span class="o">=</span> <span class="s2">&quot;Step </span><span class="si">%d</span><span class="s2"> transition </span><span class="si">%s</span><span class="s2"> ACTIVATE Name Error </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span> <span class="n">currentStep</span><span class="p">,</span>  <span class="n">transition</span><span class="o">.</span><span class="n">uniqueName</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">transition</span><span class="o">.</span><span class="n">exceptionString</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+            <span class="n">transition</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QBrush</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">darkRed</span><span class="p">))</span>
+            <span class="k">pass</span>
+        <span class="k">except</span> <span class="n">snakes</span><span class="o">.</span><span class="n">DomainError</span><span class="p">:</span> 
+            <span class="n">transition</span><span class="o">.</span><span class="n">exceptionString</span> <span class="o">=</span> <span class="s2">&quot;Step </span><span class="si">%d</span><span class="s2"> transition </span><span class="si">%s</span><span class="s2"> ACTIVATE Domain Error </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span> <span class="n">currentStep</span><span class="p">,</span>  <span class="n">transition</span><span class="o">.</span><span class="n">uniqueName</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">transition</span><span class="o">.</span><span class="n">exceptionString</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+            <span class="n">transition</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QBrush</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">darkRed</span><span class="p">))</span>
+            <span class="k">pass</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span> 
+            <span class="n">transition</span><span class="o">.</span><span class="n">exceptionString</span> <span class="o">=</span> <span class="s2">&quot;Step </span><span class="si">%d</span><span class="s2"> transition </span><span class="si">%s</span><span class="s2"> ACTIVATE Type Error </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span> <span class="n">currentStep</span><span class="p">,</span>  <span class="n">transition</span><span class="o">.</span><span class="n">uniqueName</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">transition</span><span class="o">.</span><span class="n">exceptionString</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>  
+            <span class="n">transition</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QBrush</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">darkRed</span><span class="p">))</span>              
+            <span class="k">pass</span>
+        
+        <span class="k">return</span> <span class="n">activated</span></div>
+    <span class="c1">#-------------------------------------------------------------------</span>
+        
+        
+<div class="viewcode-block" id="CPNSimulator.checkTransitionEnabled"><a class="viewcode-back" href="../../model_link.html#model.CPNSimulator.CPNSimulator.checkTransitionEnabled">[docs]</a>    <span class="k">def</span> <span class="nf">checkTransitionEnabled</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transition</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">currentStep</span><span class="p">,</span> <span class="n">activated</span><span class="p">,</span> <span class="n">transitions2Fire</span><span class="p">):</span>    
+        <span class="sd">&#39;&#39;&#39;Check whether a SNAKES transition is enabled.</span>
+<span class="sd">        </span>
+<span class="sd">        :param transition: SNAKES transition to check.</span>
+<span class="sd">        :param mode: SNAKES mode to check for activation. </span>
+<span class="sd">        :param currentStep: Step for which to calculate the enabling.</span>
+<span class="sd">        :param activated: Flag that determines, whether `transition` is activated.</span>
+<span class="sd">        :param transitions2Fire: List of SNAKES transitions enabled to fire.</span>
+<span class="sd">        :return enabled: Enabled True or False.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">enabled</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="n">activated</span><span class="p">:</span>
+            <span class="n">transition</span><span class="o">.</span><span class="n">exceptionString</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">enabled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">transition</span><span class="p">(</span> <span class="n">transition</span><span class="o">.</span><span class="n">uniqueName</span> <span class="p">)</span><span class="o">.</span><span class="n">enabled</span><span class="p">(</span> <span class="n">mode</span> <span class="p">)</span> 
+                <span class="n">transition</span><span class="o">.</span><span class="n">exceptionString</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">transition</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">green</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span> 
+                <span class="n">transition</span><span class="o">.</span><span class="n">exceptionString</span> <span class="o">=</span> <span class="s2">&quot;Step </span><span class="si">%d</span><span class="s2"> transition </span><span class="si">%s</span><span class="s2"> ENABLE Name Error </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span> <span class="n">currentStep</span><span class="p">,</span>  <span class="n">transition</span><span class="o">.</span><span class="n">uniqueName</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">transition</span><span class="o">.</span><span class="n">exceptionString</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                <span class="n">transition</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+                <span class="k">pass</span>
+            <span class="k">except</span> <span class="n">snakes</span><span class="o">.</span><span class="n">DomainError</span><span class="p">:</span> 
+                <span class="n">transition</span><span class="o">.</span><span class="n">exceptionString</span> <span class="o">=</span> <span class="s2">&quot;Step </span><span class="si">%d</span><span class="s2"> transition </span><span class="si">%s</span><span class="s2"> ENABLE Domain Error </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span> <span class="n">currentStep</span><span class="p">,</span>  <span class="n">transition</span><span class="o">.</span><span class="n">uniqueName</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">transition</span><span class="o">.</span><span class="n">exceptionString</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                <span class="n">transition</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+                <span class="k">pass</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span> 
+                <span class="n">transition</span><span class="o">.</span><span class="n">exceptionString</span> <span class="o">=</span> <span class="s2">&quot;Step </span><span class="si">%d</span><span class="s2"> transition </span><span class="si">%s</span><span class="s2"> ENABLE Type Error </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span> <span class="n">currentStep</span><span class="p">,</span>  <span class="n">transition</span><span class="o">.</span><span class="n">uniqueName</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">transition</span><span class="o">.</span><span class="n">exceptionString</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                <span class="n">transition</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+                <span class="k">pass</span>
+            
+            <span class="k">if</span> <span class="n">enabled</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="p">[</span><span class="n">transition</span><span class="o">.</span><span class="n">uniqueName</span><span class="p">,</span> <span class="n">mode</span><span class="p">]</span> <span class="ow">in</span> <span class="n">transitions2Fire</span><span class="p">:</span> 
+                    <span class="n">transitions2Fire</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span><span class="n">transition</span><span class="o">.</span><span class="n">uniqueName</span><span class="p">,</span> <span class="n">mode</span><span class="p">]</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">enabled</span></div>
+    <span class="c1">#-------------------------------------------------------------------</span>
+        
+        
+<div class="viewcode-block" id="CPNSimulator.fireEnabledTransitions"><a class="viewcode-back" href="../../model_link.html#model.CPNSimulator.CPNSimulator.fireEnabledTransitions">[docs]</a>    <span class="k">def</span> <span class="nf">fireEnabledTransitions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">currentStep</span><span class="p">):</span>  
+        <span class="sd">&#39;&#39;&#39;Fire transitions in list `transitions2Fire`.</span>
+<span class="sd">        </span>
+<span class="sd">        :param currentStep: Step for which to calculate the firing.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transitions2Fire</span> <span class="o">=</span> <span class="p">[]</span>         
+                
+        <span class="k">for</span> <span class="n">transition</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="p">:</span>     
+            <span class="n">enabled</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">activated</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">transition</span><span class="o">.</span><span class="n">exceptionString</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">transition</span><span class="o">.</span><span class="n">modeString</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">try</span><span class="p">:</span>       
+                <span class="k">for</span> <span class="n">mode</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">transition</span><span class="p">(</span> <span class="n">transition</span><span class="o">.</span><span class="n">uniqueName</span> <span class="p">)</span><span class="o">.</span><span class="n">modes</span><span class="p">():</span>
+                    <span class="n">activated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkTranistionActivation</span><span class="p">(</span> <span class="n">transition</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">currentStep</span> <span class="p">)</span>
+                    <span class="n">enabled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkTransitionEnabled</span><span class="p">(</span> <span class="n">transition</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">currentStep</span><span class="p">,</span> <span class="n">activated</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">transitions2Fire</span><span class="p">)</span> 
+                
+<span class="c1">#                 if not enabled or not activated:</span>
+<span class="c1">#                     for inputArc in self.net.transition( transition.uniqueName ).input():</span>
+<span class="c1">#                         for place in inputArc:</span>
+<span class="c1">#                             activated = self.checkTranistionActivation( transition, place.mode, currentStep )</span>
+<span class="c1">#                             enabled = self.checkTransitionEnabled( transition, mode, currentStep, activated, self.transitions2Fire) </span>
+                        
+                        
+            <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span> 
+                <span class="n">transition</span><span class="o">.</span><span class="n">exceptionString</span> <span class="o">=</span> <span class="s2">&quot;Step </span><span class="si">%d</span><span class="s2"> transition </span><span class="si">%s</span><span class="s2"> Mode Name Error </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span> <span class="n">currentStep</span><span class="p">,</span>  <span class="n">transition</span><span class="o">.</span><span class="n">uniqueName</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">transition</span><span class="o">.</span><span class="n">exceptionString</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                <span class="n">transition</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+                <span class="k">pass</span>
+            <span class="k">except</span> <span class="n">snakes</span><span class="o">.</span><span class="n">DomainError</span><span class="p">:</span> 
+                <span class="n">transition</span><span class="o">.</span><span class="n">exceptionString</span> <span class="o">=</span> <span class="s2">&quot;Step </span><span class="si">%d</span><span class="s2"> transition </span><span class="si">%s</span><span class="s2"> Mode Domain Error </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span> <span class="n">currentStep</span><span class="p">,</span>  <span class="n">transition</span><span class="o">.</span><span class="n">uniqueName</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">transition</span><span class="o">.</span><span class="n">exceptionString</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                <span class="n">transition</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+                <span class="k">pass</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span> 
+                <span class="n">transition</span><span class="o">.</span><span class="n">exceptionString</span> <span class="o">=</span> <span class="s2">&quot;Step </span><span class="si">%d</span><span class="s2"> transition </span><span class="si">%s</span><span class="s2"> Mode Type Error </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span> <span class="n">currentStep</span><span class="p">,</span>  <span class="n">transition</span><span class="o">.</span><span class="n">uniqueName</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">transition</span><span class="o">.</span><span class="n">exceptionString</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                <span class="n">transition</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+                <span class="k">pass</span>                
+                         
+        <span class="k">for</span> <span class="n">transFire</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transitions2Fire</span><span class="p">:</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;FIRE transition </span><span class="si">%s</span><span class="s2"> for Substitution </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">transFire</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">transFire</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">green</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+            <span class="n">exceptionString</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">transition</span><span class="p">(</span> <span class="n">transFire</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span><span class="o">.</span><span class="n">fire</span><span class="p">(</span> <span class="n">transFire</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
+            <span class="k">except</span> <span class="n">snakes</span><span class="o">.</span><span class="n">DomainError</span><span class="p">:</span> 
+                <span class="n">exceptionString</span> <span class="o">=</span> <span class="s2">&quot;Step </span><span class="si">%d</span><span class="s2"> FIRE Domain Error transition </span><span class="si">%s</span><span class="s2"> activated </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span> <span class="n">currentStep</span><span class="p">,</span> <span class="n">transFire</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>  <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">exceptionString</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                <span class="k">pass</span>        
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span> 
+                <span class="n">exceptionString</span> <span class="o">=</span> <span class="s2">&quot;Step </span><span class="si">%d</span><span class="s2"> FIRE Type Error transition </span><span class="si">%s</span><span class="s2"> activated </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span> <span class="n">currentStep</span><span class="p">,</span> <span class="n">transFire</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>  <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">exceptionString</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                <span class="k">pass</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span> 
+                <span class="n">exceptionString</span> <span class="o">=</span> <span class="s2">&quot;Step </span><span class="si">%d</span><span class="s2"> FIRE Value Error transition </span><span class="si">%s</span><span class="s2"> not enabled for </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span> <span class="n">currentStep</span><span class="p">,</span> <span class="n">transFire</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>  <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">exceptionString</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+             
+        <span class="k">for</span> <span class="n">place</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">places</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">place</span><span class="o">.</span><span class="n">tokens</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot;None&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span> <span class="n">token</span> <span class="p">):</span>
+                    <span class="n">place</span><span class="o">.</span><span class="n">tokens</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+                <span class="k">break</span></div>
+            
+    <span class="c1">#-----------------------------------------------------------------------------------------------</span>
+     
+        
+        
+        
+        
+        
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#                             IN PROGRESS CHECK FOR EMPTY PLACES IN EXPRESSION</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     def checkForEmptyness(self, connection): </span>
+<span class="c1">#         for connection2 in self.connectionList: </span>
+<span class="c1">#             if connection[0] == connection2[2]:                    </span>
+<span class="c1">#                 evaluatedString = &quot;&quot;</span>
+<span class="c1">#                 splitted = str( connection[1].name ).split()</span>
+<span class="c1">#                 lengthSplitted = len( splitted )</span>
+<span class="c1"># #                     if lengthSplitted &lt; 5:</span>
+<span class="c1">#                 for idx, word in enumerate( splitted ):</span>
+<span class="c1">#                     if &quot;if&quot; in word:</span>
+<span class="c1">#                         if str( splitted[idx+1].split(&quot;==&quot;)[0] ) == str( connection2[1].name ) or\</span>
+<span class="c1">#                                     str( splitted[idx+1].split(&quot;!=&quot;)[0] ) == str( connection2[1].name ):    </span>
+<span class="c1">#                             if &quot;[]&quot; in splitted[idx+1] and &quot;==&quot; in splitted[idx+1]:</span>
+<span class="c1">#                                 print( connection[1].name )       </span>
+<span class="c1">#                                 if connection2[0].place.is_empty():</span>
+<span class="c1">#                                     print(&quot;place is empty1&quot;, connection2[0].uniqueName, splitted[idx-1] )</span>
+<span class="c1">#                                     return connection2, splitted[idx-1]</span>
+<span class="c1">#                                 else:</span>
+<span class="c1">#                                     print(&quot;place is not empty1&quot;, connection2[0].uniqueName, splitted[idx+3] )</span>
+<span class="c1">#                                     return connection2, splitted[idx+3]</span>
+<span class="c1">#                                                             </span>
+<span class="c1">#                             elif &quot;[]&quot; in splitted[idx+1] and &quot;!=&quot; in splitted[idx+1]:</span>
+<span class="c1">#                                 print( connection[1].name )       </span>
+<span class="c1">#                                 if not connection2[0].place.is_empty():</span>
+<span class="c1">#                                     print(&quot;place is not empty2&quot;, connection2[0].uniqueName, splitted[idx-1] )</span>
+<span class="c1">#                                     return connection2, splitted[idx-1] </span>
+<span class="c1">#                                 else:</span>
+<span class="c1">#                                     print(&quot;place is empty2&quot;, connection2[0].uniqueName, splitted[idx+3] )</span>
+<span class="c1">#                                     return connection2, splitted[idx+3] </span>
+<span class="c1">#         return None</span>
+<span class="c1">#                                 </span>
+<span class="c1">#                                 </span>
+<span class="c1">#     #-------------------------------------------------------------------</span>
+<div class="viewcode-block" id="CPNSimulator.getActualMarking"><a class="viewcode-back" href="../../model_link.html#model.CPNSimulator.CPNSimulator.getActualMarking">[docs]</a>    <span class="k">def</span> <span class="nf">getActualMarking</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actualMarking</span><span class="p">):</span>     
+        <span class="sd">&#39;&#39;&#39;Process status of visual net, depending on `actualMarking`.</span>
+<span class="sd">        </span>
+<span class="sd">        :param actualMarking: SNAKES Marking.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">infoString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;Step </span><span class="si">%d</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">displayStep</span><span class="p">,</span> <span class="n">actualMarking</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">infoString</span> <span class="p">)</span>
+        <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+<span class="c1">#         logging.warning( infoString )</span>
+        
+        <span class="k">for</span> <span class="n">subnetEditor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">editors</span><span class="p">:</span>
+<span class="c1">#             logging.debug( subnetEditor.visualConnectionList )</span>
+            <span class="n">subnetEditor</span><span class="o">.</span><span class="n">setTokens</span><span class="p">(</span><span class="n">actualMarking</span><span class="p">)</span>                
+            
+            <span class="k">for</span> <span class="n">place</span> <span class="ow">in</span> <span class="n">subnetEditor</span><span class="o">.</span><span class="n">visualPlaces</span><span class="p">:</span>
+                <span class="n">place</span><span class="o">.</span><span class="n">stackTokens</span><span class="p">()</span>
+                <span class="n">place</span><span class="o">.</span><span class="n">findItemsInPlanes</span><span class="p">()</span>
+                
+        <span class="bp">self</span><span class="o">.</span><span class="n">enabledTransitions</span> <span class="o">=</span> <span class="mi">0</span>
+        
+<span class="c1">#         substitutions = []</span>
+<span class="c1">#         for connection in self.connectionList: </span>
+<span class="c1">#             if isinstance(connection[0], TransitionItem):  </span>
+<span class="c1">#                 inputConnection = self.checkForEmptyness(connection)</span>
+<span class="c1">#                 if inputConnection is not None:</span>
+<span class="c1">#                     substitutions.append( [ inputConnection, connection] )</span>
+<span class="c1">#                 print( substitutions )</span>
+                
+                
+                
+        <span class="k">for</span> <span class="n">connection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">connectionList</span><span class="p">:</span> 
+<span class="c1">#             logging.debug( &quot;%s %s %s&quot;%(connection[0], connection[1], connection[2] ) )</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">TransitionItem</span><span class="p">):</span>
+                <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">exceptionString</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">modeString</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="k">for</span> <span class="n">connectionPre</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">connectionList</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">connectionPre</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+                        <span class="n">enabled</span> <span class="o">=</span> <span class="bp">False</span>       
+                        <span class="n">activated</span> <span class="o">=</span> <span class="bp">False</span>         
+                        <span class="n">removedInput</span> <span class="o">=</span> <span class="bp">None</span>    
+<span class="c1">#                         connection[2].setBrush(QtGui.QBrush(QtCore.Qt.lightGray)) </span>
+                        <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>       
+                        
+                        <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">exceptionString</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                        
+<span class="c1">#                         for sub in substitutions:                            </span>
+<span class="c1">#                             if connection[2] == sub[0][0][2]:</span>
+<span class="c1">#                                 print( &quot;Check transition&quot;, connection[2].uniqueName, sub[0][0][2].uniqueName )</span>
+<span class="c1">#                                 removedInput = sub  </span>
+<span class="c1">#                                 </span>
+<span class="c1">#                                 print(&quot;PRE remove input&quot;, removedInput[0][0][0].uniqueName, self.net.transition( removedInput[0][0][2].uniqueName ).input() )</span>
+<span class="c1">#                                 self.net.transition( removedInput[0][0][2].uniqueName ).remove_input( removedInput[0][0][0].place )</span>
+<span class="c1">#                                 print(&quot;POST remove input&quot;, removedInput[0][0][0].uniqueName, self.net.transition( removedInput[0][0][2].uniqueName ).input() )</span>
+<span class="c1">#                                 </span>
+<span class="c1">#                                 print(&quot;PRE remove output1&quot;, self.net.transition( removedInput[0][0][2].uniqueName ).output() )</span>
+<span class="c1">#                                 self.net.transition( removedInput[0][0][2].uniqueName ).remove_output(removedInput[1][2].place)   </span>
+<span class="c1">#                                 print(&quot;POST remove output1&quot;, self.net.transition( removedInput[0][0][2].uniqueName ).output() )</span>
+<span class="c1">#                                 </span>
+<span class="c1">#                                 print(&quot;PRE remove output2&quot;, removedInput[1][2].uniqueName, removedInput[0][1], self.net.transition( removedInput[0][0][2].uniqueName ).output() )</span>
+<span class="c1">#                                 self.net.transition( removedInput[0][0][2].uniqueName ).add_output(removedInput[1][2].place, removedInput[0][1])</span>
+<span class="c1">#                                 print(&quot;POST remove output2&quot;, removedInput[1][2].uniqueName, removedInput[0][1], self.net.transition( removedInput[0][0][2].uniqueName ).output() )</span>
+                                
+                                
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">modeString</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                            <span class="k">for</span> <span class="n">mode</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">transition</span><span class="p">(</span> <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">uniqueName</span> <span class="p">)</span><span class="o">.</span><span class="n">modes</span><span class="p">():</span>  
+                                <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">modeString</span> <span class="o">+=</span> <span class="s2">&quot;Mode: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">mode</span> <span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span> <span class="s2">&quot;{&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span> <span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span> <span class="s2">&quot;}&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span> <span class="p">)</span> <span class="p">)</span>
+                                <span class="k">if</span> <span class="ow">not</span> <span class="n">activated</span><span class="p">:</span>
+                                    <span class="n">activated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">transition</span><span class="p">(</span> <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">uniqueName</span> <span class="p">)</span><span class="o">.</span><span class="n">activated</span><span class="p">(</span> <span class="n">mode</span> <span class="p">)</span>       
+<span class="c1">#                                     connection[2].setBrush(QtGui.QBrush(QtCore.Qt.white))                                </span>
+                                <span class="k">if</span> <span class="ow">not</span> <span class="n">enabled</span><span class="p">:</span> 
+                                    <span class="n">enabled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">transition</span><span class="p">(</span> <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">uniqueName</span> <span class="p">)</span><span class="o">.</span><span class="n">enabled</span><span class="p">(</span> <span class="n">mode</span> <span class="p">)</span>
+                                    <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">green</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+                        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>                                
+                            <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">exceptionString</span> <span class="o">=</span> <span class="s2">&quot;Key Error: Node </span><span class="si">%s</span><span class="s2"> - Token </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span> <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+                            <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">exceptionString</span> <span class="p">)</span> <span class="p">)</span>
+                            <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+<span class="c1">#                             logging.warning( connection[2].exceptionString )</span>
+                            <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+                            <span class="k">pass</span>      
+                        <span class="k">except</span> <span class="n">snakes</span><span class="o">.</span><span class="n">DomainError</span><span class="p">:</span>
+                            <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">exceptionString</span> <span class="o">=</span> <span class="s2">&quot;Domain Error: Node </span><span class="si">%s</span><span class="s2"> - Token </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span> <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+                            <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">exceptionString</span> <span class="p">)</span> <span class="p">)</span>
+                            <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+<span class="c1">#                             logging.warning( connection[2].exceptionString )</span>
+                            <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+                            <span class="k">pass</span>      
+                        <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span> 
+                            <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">exceptionString</span> <span class="o">=</span> <span class="s2">&quot;Name Error: Node </span><span class="si">%s</span><span class="s2"> - </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span> <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+                            <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">exceptionString</span> <span class="p">)</span> <span class="p">)</span>
+                            <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+<span class="c1">#                             logging.warning( connection[2].exceptionString )</span>
+                            <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+                            <span class="k">pass</span>
+                        
+<span class="c1">#                         if removedInput is not None:</span>
+<span class="c1">#                             connection[2].add_input( removedInput[0][0].dstConnector.parent, removedInput[1] )</span>
+<span class="c1">#                             print(&quot;add input again&quot;, connection[2].input() )</span>
+                        
+                        <span class="k">if</span> <span class="n">enabled</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">enabledTransitions</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">enabled</span> <span class="o">=</span> <span class="n">enabled</span>
+                        <span class="k">break</span> 
+                    
+        <span class="k">for</span> <span class="n">subnetEditor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">editors</span><span class="p">:</span>
+<span class="c1">#             logging.debug( subnetEditor.visualConnectionList )</span>
+            <span class="n">subnetEditor</span><span class="o">.</span><span class="n">setTokens</span><span class="p">(</span><span class="n">actualMarking</span><span class="p">)</span>                
+            
+            <span class="k">for</span> <span class="n">place</span> <span class="ow">in</span> <span class="n">subnetEditor</span><span class="o">.</span><span class="n">visualPlaces</span><span class="p">:</span>
+                <span class="n">place</span><span class="o">.</span><span class="n">stackTokens</span><span class="p">()</span>
+                <span class="n">place</span><span class="o">.</span><span class="n">findItemsInPlanes</span><span class="p">()</span>
+            
+            <span class="k">for</span> <span class="n">transition</span> <span class="ow">in</span> <span class="n">subnetEditor</span><span class="o">.</span><span class="n">visualTransitions</span><span class="p">:</span>
+                <span class="n">transition</span><span class="o">.</span><span class="n">findItemsInPlanes</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">transition</span><span class="o">.</span><span class="n">enabled</span><span class="p">:</span>   
+                    <span class="n">transition</span><span class="o">.</span><span class="n">setInfoString</span><span class="p">(</span> <span class="n">transition</span><span class="o">.</span><span class="n">modeString</span> <span class="p">)</span>
+                    <span class="n">transition</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">green</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="n">transition</span><span class="o">.</span><span class="n">exceptionString</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>                  
+                    <span class="n">transition</span><span class="o">.</span><span class="n">setInfoString</span><span class="p">(</span> <span class="n">transition</span><span class="o">.</span><span class="n">exceptionString</span> <span class="p">)</span>
+                    <span class="n">transition</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">transition</span><span class="o">.</span><span class="n">setInfoString</span><span class="p">(</span> <span class="n">transition</span><span class="o">.</span><span class="n">modeString</span> <span class="p">)</span>
+                    <span class="n">transition</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span></div></div>
+                            
+
+    <span class="c1">#-----------------------------------------------------------------------------------------------</span>
+    
+    
+<span class="c1">#===========================================================================================================</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Christoph Kuhr.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

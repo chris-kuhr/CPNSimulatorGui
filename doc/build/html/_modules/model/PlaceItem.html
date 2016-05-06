@@ -1,0 +1,366 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>model.PlaceItem &mdash; Colored Petrinets Simulator Gui alpha 2 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     'alpha 2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Colored Petrinets Simulator Gui alpha 2 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for model.PlaceItem</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">PyQt4</span> <span class="kn">import</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtCore</span>
+<span class="kn">from</span> <span class="nn">PyQt4.QtGui</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">PyQt4.QtCore</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">deque</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">snakes.plugins</span>
+<span class="kn">from</span> <span class="nn">snakes.nets</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">from</span> <span class="nn">gui.NameDialog</span> <span class="kn">import</span> <span class="n">NameDialog</span>
+<span class="kn">from</span> <span class="nn">gui.TokenDialog</span> <span class="kn">import</span> <span class="n">TokenDialog</span>
+<span class="kn">from</span> <span class="nn">gui.ParameterDialog</span> <span class="kn">import</span> <span class="n">ParameterDialog</span>
+
+
+<span class="kn">from</span> <span class="nn">model.AbstractItem</span> <span class="kn">import</span> <span class="n">AbstractItem</span>
+<span class="kn">from</span> <span class="nn">model.TokenItem</span> <span class="kn">import</span> <span class="n">TokenItem</span>
+<span class="kn">from</span> <span class="nn">model.PortItem</span> <span class="kn">import</span> <span class="n">PortItem</span>
+
+
+
+<div class="viewcode-block" id="PlaceItem"><a class="viewcode-back" href="../../model_link.html#model.PlaceItem.PlaceItem">[docs]</a><span class="k">class</span> <span class="nc">PlaceItem</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QGraphicsEllipseItem</span><span class="p">,</span> <span class="n">AbstractItem</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;CPN Transition element.</span>
+<span class="sd">    </span>
+<span class="sd">        :member editor: `gui.DiagramEditor`. Editor to show in.</span>
+<span class="sd">        :member name: Name of the CPN element assigned by the user. </span>
+<span class="sd">        :member subnet: Name of the subnet this transition is contained in.</span>
+<span class="sd">        :member position: Position of this item in the `gui.DiagramScene`.</span>
+<span class="sd">        :member port: `model.PortItem` if this is a port place, else None.</span>
+<span class="sd">        :member portClone: A port place in the super net or None.   </span>
+<span class="sd">        :member portDirection: Direction of the port, if this is a port place.</span>
+<span class="sd">        :member uniqueName: Unique name of this transition used by the simulator.</span>
+<span class="sd">        :member place: SNAKES place node with id `uniqueName`, except portClones. </span>
+<span class="sd">        :member initMarking: List of initial tokens present in this place.</span>
+<span class="sd">        :member tokens: List ( deque ) of `model.TokenItem` s in this place.</span>
+<span class="sd">        :member toolTipString: Information string containing the tokens present in this place.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+<div class="viewcode-block" id="PlaceItem.__init__"><a class="viewcode-back" href="../../model_link.html#model.PlaceItem.PlaceItem.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">editor</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">initMarking</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">uniqueName</span><span class="o">=</span><span class="s2">&quot;p0&quot;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">loadFromFile</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">portDirection</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">portClone</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">superNet</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">subnet</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Create and initialize place item.</span>
+<span class="sd">        </span>
+<span class="sd">        :param editor: `gui.DiagramEditor`. Editor to show in.</span>
+<span class="sd">        :param name: Name of the CPN element assigned by the user. </span>
+<span class="sd">        :param position: Position of this item in the `gui.DiagramScene`.</span>
+<span class="sd">        :param initMarking: List of initial tokens present in this place.</span>
+<span class="sd">        :param uniqueName: Unique name of this transition used by the simulator.</span>
+<span class="sd">        :param port: `model.PortItem` if this is a port place, else None.</span>
+<span class="sd">        :param loadFromFile: Flag determining, whether the place is loaded from file.</span>
+<span class="sd">        :param portDirection: Direction of the port, if this is a port place.</span>
+<span class="sd">        :param portClone: A port place in the super net or None.   </span>
+<span class="sd">        :param superNe: The super net is used to determine the editor for port place clones.</span>
+<span class="sd">        :param subnet: Name of the subnet this transition is contained in.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PlaceItem</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initMarking</span> <span class="o">=</span> <span class="n">initMarking</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uniqueName</span> <span class="o">=</span> <span class="n">uniqueName</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span> <span class="o">=</span> <span class="n">editor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">port</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subnet</span> <span class="o">=</span> <span class="n">subnet</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">superNet</span> <span class="o">=</span> <span class="n">superNet</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">portClone</span> <span class="o">=</span> <span class="n">portClone</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">portDirection</span> <span class="o">=</span> <span class="n">portDirection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toolTipString</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokens</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">place</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span>
+        <span class="n">rect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span>    
+        
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;-------Create----Place-------------------</span><span class="si">%s</span><span class="s2">---------</span><span class="si">%s</span><span class="s2">----------&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">uniqueName</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span> <span class="s2">&quot;editor </span><span class="si">%s</span><span class="s2"> position </span><span class="si">%s</span><span class="s2"> initMarking </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">editor</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">initMarking</span><span class="p">))</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span> <span class="s2">&quot;port </span><span class="si">%s</span><span class="s2"> loadFromFile </span><span class="si">%s</span><span class="s2"> portDirection </span><span class="si">%s</span><span class="s2"> portClone </span><span class="si">%s</span><span class="s2"> superNet </span><span class="si">%s</span><span class="s2"> subnet </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="n">loadFromFile</span><span class="p">,</span> <span class="n">portDirection</span><span class="p">,</span> <span class="n">portClone</span><span class="p">,</span> <span class="n">superNet</span><span class="p">,</span> <span class="n">subnet</span><span class="p">))</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;-----------------------------------------------------------------------------------&quot;</span><span class="p">)</span>
+        
+        <span class="n">w</span> <span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createItem</span><span class="p">(</span><span class="n">editor</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">nodeType</span><span class="o">=</span><span class="s2">&quot;place&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">initMarking</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tokens</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">TokenItem</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="p">,</span> <span class="n">token</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QRectF</span><span class="p">(</span> <span class="n">pos</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">+</span> <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="n">pos</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">),</span>  <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span> <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokens</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">defineNewColour</span><span class="p">(</span> <span class="n">token</span> <span class="p">)</span>  
+            
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">loadFromFile</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">place</span> <span class="o">=</span> <span class="n">Place</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">uniqueName</span> <span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">initMarking</span> <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">add_place</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">place</span> <span class="p">)</span>                 
+                <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">places</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                     
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">subnet</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">str</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">subnet</span> <span class="p">)</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;None&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">portDirection</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">str</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">portDirection</span> <span class="p">)</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;None&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="s2">&quot;i&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">portDirection</span> <span class="ow">or</span> <span class="s2">&quot;o&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">portDirection</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">PortItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">portDirection</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="o">.</span><span class="n">setDirection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">portDirection</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">portDirection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">portDirection</span>
+                    <span class="n">rect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span> 
+                    <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span> <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">+</span> <span class="mf">20.0</span><span class="p">,</span> <span class="n">rect</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">+</span> <span class="mf">20.0</span> <span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">setPort</span><span class="p">(</span> <span class="n">loadFromFile</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>            
+            <span class="bp">self</span><span class="o">.</span><span class="n">subnet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">subnet</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">PortItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">portDirection</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="o">.</span><span class="n">setDirection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">portDirection</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">portDirection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">portDirection</span>
+            <span class="n">rect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span> <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">+</span> <span class="mf">20.0</span><span class="p">,</span> <span class="n">rect</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">+</span> <span class="mf">20.0</span> <span class="p">)</span>
+                
+        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">visualPlaces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> </div>
+        
+<span class="c1">#         logging.debug(&quot;place %s %s %s %s %s&quot;%( self.uniqueName, self.port, self.portDirection, self.portClone, self.place ) )</span>
+ 
+    <span class="c1">#------------------------------------------------------------------------------------------------    </span>
+    
+    
+<div class="viewcode-block" id="PlaceItem.setPortDiag"><a class="viewcode-back" href="../../model_link.html#model.PlaceItem.PlaceItem.setPortDiag">[docs]</a>    <span class="k">def</span> <span class="nf">setPortDiag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Callback function to modify the port.&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">portDiag</span> <span class="o">=</span> <span class="n">NameDialog</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Enter Direction&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;io&quot;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">portDiag</span><span class="o">.</span><span class="n">accepted</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setPort</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">portDiag</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+    <span class="c1">#-----------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="PlaceItem.setPort"><a class="viewcode-back" href="../../model_link.html#model.PlaceItem.PlaceItem.setPort">[docs]</a>    <span class="k">def</span> <span class="nf">setPort</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loadFromFile</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Create a new `model.PortItem` or edit the existing port.</span>
+<span class="sd">        </span>
+<span class="sd">        :param loadFromFile: Flag determining, whether the place is loaded from file.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">loadFromFile</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">PortItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">portDirection</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+            <span class="n">rect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span> <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">+</span> <span class="mf">20.0</span><span class="p">,</span> <span class="n">rect</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">+</span> <span class="mf">20.0</span> <span class="p">)</span>
+            <span class="n">direction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">portDiag</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="o">.</span><span class="n">setDirection</span><span class="p">(</span> <span class="n">direction</span> <span class="p">)</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">portDirection</span> <span class="o">=</span> <span class="n">direction</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">portDiag</span>    
+            
+        <span class="n">srcConnector</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">dstConnector</span> <span class="o">=</span> <span class="mi">0</span>
+        
+        <span class="k">for</span> <span class="n">editor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">editors</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">transition</span> <span class="ow">in</span> <span class="n">editor</span><span class="o">.</span><span class="n">visualTransitions</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">subnet</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span> <span class="n">transition</span><span class="o">.</span><span class="n">name</span> <span class="p">)</span> <span class="ow">and</span> <span class="n">transition</span><span class="o">.</span><span class="n">substitutionTransition</span><span class="p">:</span>
+                    <span class="n">pos</span> <span class="o">=</span> <span class="n">transition</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span>
+                    <span class="n">rect</span> <span class="o">=</span> <span class="n">transition</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">portClone</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">portClone</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                        <span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">portClone</span> <span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;i&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="o">.</span><span class="n">getDirection</span><span class="p">()</span> <span class="p">):</span> 
+                        <span class="bp">self</span><span class="o">.</span><span class="n">portClone</span> <span class="o">=</span> <span class="n">PlaceItem</span><span class="p">(</span> <span class="n">editor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QPointF</span><span class="p">(</span> <span class="n">pos</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="p">,</span> <span class="n">pos</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">-</span><span class="mi">100</span> <span class="p">)</span>  <span class="p">,</span> <span class="n">initMarking</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initMarking</span><span class="p">,</span> <span class="n">uniqueName</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uniqueName</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="n">portDirection</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">portDirection</span> <span class="p">)</span>
+                        <span class="n">srcConnector</span> <span class="o">=</span> <span class="mi">13</span>
+                        <span class="n">dstConnector</span> <span class="o">=</span> <span class="mi">2</span>
+                    <span class="k">elif</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;o&quot;</span><span class="p">)</span>  <span class="o">==</span> <span class="nb">str</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="o">.</span><span class="n">getDirection</span><span class="p">()</span> <span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">portClone</span> <span class="o">=</span> <span class="n">PlaceItem</span><span class="p">(</span> <span class="n">editor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QPointF</span><span class="p">(</span> <span class="n">pos</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="p">,</span> <span class="n">pos</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">+</span><span class="mi">100</span> <span class="p">)</span>  <span class="p">,</span> <span class="n">initMarking</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initMarking</span><span class="p">,</span> <span class="n">uniqueName</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uniqueName</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="n">portDirection</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">portDirection</span> <span class="p">)</span>
+                        <span class="n">srcConnector</span> <span class="o">=</span> <span class="mi">2</span>
+                        <span class="n">dstConnector</span> <span class="o">=</span> <span class="mi">13</span>
+                    <span class="k">elif</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;io&quot;</span><span class="p">)</span>  <span class="o">==</span> <span class="nb">str</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="o">.</span><span class="n">getDirection</span><span class="p">()</span> <span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">portClone</span> <span class="o">=</span> <span class="n">PlaceItem</span><span class="p">(</span> <span class="n">editor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QPointF</span><span class="p">(</span> <span class="n">pos</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">-</span> <span class="mi">100</span> <span class="p">,</span> <span class="n">pos</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="p">)</span>  <span class="p">,</span> <span class="n">initMarking</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initMarking</span><span class="p">,</span> <span class="n">uniqueName</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uniqueName</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="n">portDirection</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">portDirection</span> <span class="p">)</span>
+                        <span class="n">srcConnector</span> <span class="o">=</span> <span class="mi">7</span>
+                        <span class="n">dstConnector</span> <span class="o">=</span> <span class="mi">18</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">break</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">portDirection</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="o">.</span><span class="n">getDirection</span><span class="p">()</span> <span class="p">)</span>
+                    <span class="n">editor</span><span class="o">.</span><span class="n">setPortConnection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">portClone</span><span class="o">.</span><span class="n">connectorList</span><span class="p">[</span><span class="n">srcConnector</span><span class="p">],</span> <span class="n">transition</span><span class="o">.</span><span class="n">connectorList</span><span class="p">[</span><span class="n">dstConnector</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">portClone</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                        <span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">portClone</span> <span class="p">)</span></div>
+                        
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+        
+<div class="viewcode-block" id="PlaceItem.addToken"><a class="viewcode-back" href="../../model_link.html#model.PlaceItem.PlaceItem.addToken">[docs]</a>    <span class="k">def</span> <span class="nf">addToken</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>      
+        <span class="sd">&#39;&#39;&#39;Method to add a `model.TokenItem` to this place&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenDiag</span> <span class="o">=</span> <span class="n">TokenDialog</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenDiag</span><span class="o">.</span><span class="n">accepted</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newTokenValue</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenDiag</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>      </div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="PlaceItem.newTokenValue"><a class="viewcode-back" href="../../model_link.html#model.PlaceItem.PlaceItem.newTokenValue">[docs]</a>    <span class="k">def</span> <span class="nf">newTokenValue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Accept new token.&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">portClone</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span>
+            <span class="n">rect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">tmpToken</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tokens</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">TokenItem</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenDiag</span><span class="o">.</span><span class="n">getListEntry</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenDiag</span><span class="o">.</span><span class="n">getCountToken</span><span class="p">(),</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QRectF</span><span class="p">(</span> <span class="n">pos</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">+</span> <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="n">pos</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="p">,</span> <span class="mf">15.0</span><span class="p">,</span> <span class="mf">15.0</span> <span class="p">),</span>  <span class="n">parent</span><span class="o">=</span><span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenDiag</span><span class="o">.</span><span class="n">getInitMarking</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">initMarking</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokens</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">token</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">place</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokens</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">token</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">tokenAdded</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokens</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+        
+        
+<div class="viewcode-block" id="PlaceItem.stackTokens"><a class="viewcode-back" href="../../model_link.html#model.PlaceItem.PlaceItem.stackTokens">[docs]</a>    <span class="k">def</span> <span class="nf">stackTokens</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>        
+        <span class="sd">&#39;&#39;&#39;Method to order the visual stacking of different tokens.&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toolTipString</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">setToolTip</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toolTipString</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">descCanvas</span><span class="o">.</span><span class="n">setCanvasString</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toolTipString</span> <span class="p">)</span>
+        
+        <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span>
+        <span class="n">rect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span>
+        <span class="n">lenTok</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokens</span> <span class="p">)</span>
+        <span class="n">tokens</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokens</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">lenTok</span><span class="p">):</span>
+            <span class="n">token</span> <span class="o">=</span> <span class="n">tokens</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">toolTipString</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&#39; </span><span class="si">%s</span><span class="s2"> ++</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">token</span><span class="o">.</span><span class="n">countTokenLabel</span><span class="o">.</span><span class="n">toPlainText</span><span class="p">(),</span> <span class="n">token</span><span class="o">.</span><span class="n">token</span><span class="p">)</span>
+            <span class="n">token</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QPointF</span><span class="p">(</span> <span class="n">rect</span><span class="o">.</span><span class="n">x</span><span class="p">()</span>  <span class="o">+</span> <span class="p">(</span><span class="n">lenTok</span> <span class="o">-</span> <span class="n">idx</span><span class="p">)</span><span class="o">*</span><span class="mi">10</span> <span class="p">,</span> <span class="n">rect</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">-</span> <span class="p">(</span><span class="n">lenTok</span> <span class="o">-</span> <span class="n">idx</span><span class="p">)</span><span class="o">*</span><span class="mi">10</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setToolTip</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toolTipString</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">descCanvas</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">descCanvas</span><span class="o">.</span><span class="n">setCanvasString</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toolTipString</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">descCanvas</span> <span class="p">)</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="PlaceItem.mousePressEvent"><a class="viewcode-back" href="../../model_link.html#model.PlaceItem.PlaceItem.mousePressEvent">[docs]</a>    <span class="k">def</span> <span class="nf">mousePressEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>        
+        <span class="sd">&#39;&#39;&#39;Prevents the movement of this item, when connections are drawn.</span>
+<span class="sd">        </span>
+<span class="sd">        :param event: `QtGui.mousePressEvent`</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">modifiers</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ShiftModifier</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">startArc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">QtGui</span><span class="o">.</span><span class="n">QGraphicsEllipseItem</span><span class="o">.</span><span class="n">mousePressEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+        
+        
+<div class="viewcode-block" id="PlaceItem.mouseMoveEvent"><a class="viewcode-back" href="../../model_link.html#model.PlaceItem.PlaceItem.mouseMoveEvent">[docs]</a>    <span class="k">def</span> <span class="nf">mouseMoveEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Prevents the movement of this item, when connections are drawn.</span>
+<span class="sd">        </span>
+<span class="sd">        :param event: `QtGui.mouseMoveEvent`</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">event</span><span class="o">.</span><span class="n">modifiers</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ShiftModifier</span><span class="p">:</span>    
+            <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokens</span><span class="p">:</span>
+                <span class="n">QtGui</span><span class="o">.</span><span class="n">QGraphicsEllipseItem</span><span class="o">.</span><span class="n">mouseMoveEvent</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span>                
+            <span class="bp">self</span><span class="o">.</span><span class="n">stackTokens</span><span class="p">()</span>
+            <span class="n">QtGui</span><span class="o">.</span><span class="n">QGraphicsEllipseItem</span><span class="o">.</span><span class="n">mouseMoveEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span>  </div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="PlaceItem.mouseReleaseEvent"><a class="viewcode-back" href="../../model_link.html#model.PlaceItem.PlaceItem.mouseReleaseEvent">[docs]</a>    <span class="k">def</span> <span class="nf">mouseReleaseEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Forward `QtGui.mouseReleaseEvent`.</span>
+<span class="sd">        </span>
+<span class="sd">        :param event: `QtGui.mouseReleaseEvent`</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stackTokens</span><span class="p">()</span>
+        <span class="n">QtGui</span><span class="o">.</span><span class="n">QGraphicsEllipseItem</span><span class="o">.</span><span class="n">mouseReleaseEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+        
+<div class="viewcode-block" id="PlaceItem.renameModifications"><a class="viewcode-back" href="../../model_link.html#model.PlaceItem.PlaceItem.renameModifications">[docs]</a>    <span class="k">def</span> <span class="nf">renameModifications</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Make neccessary modification and renaming.</span>
+<span class="sd">        </span>
+<span class="sd">        :param name: Name of the CPN element assigned by the user. </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">editor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">editors</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">place</span> <span class="ow">in</span> <span class="n">editor</span><span class="o">.</span><span class="n">visualPlaces</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">str</span><span class="p">(</span> <span class="n">place</span><span class="o">.</span><span class="n">uniqueName</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">uniqueName</span> <span class="p">):</span>                
+                        <span class="n">place</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+                        <span class="n">place</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setPlainText</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>       
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setPlainText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+
+    
+<div class="viewcode-block" id="PlaceItem.deleteItemLocal"><a class="viewcode-back" href="../../model_link.html#model.PlaceItem.PlaceItem.deleteItemLocal">[docs]</a>    <span class="k">def</span> <span class="nf">deleteItemLocal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Capture delete event and call editor delete function.&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">deleteItems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="p">])</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="PlaceItem.contextMenuEvent"><a class="viewcode-back" href="../../model_link.html#model.PlaceItem.PlaceItem.contextMenuEvent">[docs]</a>    <span class="k">def</span> <span class="nf">contextMenuEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Generate Context menu on context menu event.</span>
+<span class="sd">        </span>
+<span class="sd">        :param event: QContextMenuEvent. </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">menu</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMenu</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contextMenuPortSet</span> <span class="o">=</span> <span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s1">&#39;Set Port&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contextMenuPortSet</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setPortDiag</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delete</span> <span class="o">=</span> <span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s1">&#39;Delete&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delete</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deleteItemLocal</span><span class="p">)</span>
+        <span class="n">menu</span><span class="o">.</span><span class="n">exec_</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">screenPos</span><span class="p">())</span></div></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+
+<span class="c1">#========================================================================================================================</span>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Christoph Kuhr.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,20 @@
+Metadata-Version: 1.1
+Name: pyPetriNets
+Version: 0.0.1
+Summary: PetriNet Simulator Gui
+Home-page: http://www.christophkuhr.de
+Author: Christoph Kuhr
+Author-email: info@christophkuhr.de
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Development Status :: 2 - Pre-Alpha
+Classifier: Environment :: X11 Applications :: Qt
+Classifier: Framework :: Setuptools Plugin
+Classifier: Intended Audience :: Education
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)
+Classifier: Natural Language :: English
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Topic :: Scientific/Engineering :: Visualization

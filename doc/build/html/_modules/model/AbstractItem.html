@@ -1,0 +1,529 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>model.AbstractItem &mdash; Colored Petrinets Simulator Gui alpha 2 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     'alpha 2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Colored Petrinets Simulator Gui alpha 2 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for model.AbstractItem</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">PyQt4</span> <span class="kn">import</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtCore</span>
+<span class="kn">from</span> <span class="nn">PyQt4.QtGui</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">PyQt4.QtCore</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">deque</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">snakes.plugins</span>
+<span class="kn">from</span> <span class="nn">snakes.nets</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">from</span> <span class="nn">gui.NameDialog</span> <span class="kn">import</span> <span class="n">NameDialog</span>
+<span class="kn">from</span> <span class="nn">gui.TokenDialog</span> <span class="kn">import</span> <span class="n">TokenDialog</span>
+<span class="kn">from</span> <span class="nn">gui.ParameterDialog</span> <span class="kn">import</span> <span class="n">ParameterDialog</span>
+
+    
+
+<div class="viewcode-block" id="Connector"><a class="viewcode-back" href="../../model_link.html#model.AbstractItem.Connector">[docs]</a><span class="k">class</span> <span class="nc">Connector</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QGraphicsRectItem</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Connector for visual arcs. </span>
+<span class="sd">    </span>
+<span class="sd">    A connector is a socket, to or from which a visual arc may be connected.</span>
+<span class="sd">    </span>
+<span class="sd">    :member parent: Parent port place.</span>
+<span class="sd">    :member orientation: Orientation relative to its parent: &quot;N&quot;,&quot;NE&quot;,&quot;E&quot;,&quot;SE&quot;,&quot;S&quot;,&quot;SW&quot;,&quot;W&quot;,&quot;NW&quot;.</span>
+<span class="sd">    :member idx: Index assinged from parent.</span>
+<span class="sd">    :member connectionArc: Reference to the arc connected to this Connector.</span>
+<span class="sd">    :member posCallbacks: List of callback functions, to calculate position changes.</span>
+<span class="sd">    :member position: Position relative to parent.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+<div class="viewcode-block" id="Connector.__init__"><a class="viewcode-back" href="../../model_link.html#model.AbstractItem.Connector.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Create a connector.</span>
+<span class="sd">        </span>
+<span class="sd">        :param parent: Parent AbstractItem.</span>
+<span class="sd">        :param idx: Absolut number in the parent list of connectors.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Connector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">=</span> <span class="n">idx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connectionArc</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">posCallbacks</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">rect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setFlags</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ItemIsSelectable</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">ItemSendsScenePositionChanges</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setCursor</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QCursor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">PointingHandCursor</span><span class="p">))</span>
+        
+        <span class="n">connectorWidth</span> <span class="o">=</span> <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">()</span><span class="o">/</span><span class="mi">6</span>
+        <span class="n">connectorHeight</span> <span class="o">=</span> <span class="n">rect</span><span class="o">.</span><span class="n">height</span><span class="p">()</span><span class="o">/</span><span class="mi">6</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">gray</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QBrush</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">gray</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setAcceptHoverEvents</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setFlag</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">ItemStacksBehindParent</span> <span class="p">,</span> <span class="bp">True</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setOpacity</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QPointF</span><span class="p">(</span> <span class="mf">0.0</span> <span class="p">,</span> <span class="mf">0.0</span> <span class="p">)</span>
+        
+        
+        <span class="k">if</span> <span class="n">idx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;northWest&quot;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;northWest&quot;</span><span class="p">,</span> <span class="s2">&quot;north&quot;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;north&quot;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;north&quot;</span><span class="p">,</span> <span class="s2">&quot;northEast&quot;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;northEast&quot;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;northEast&quot;</span><span class="p">,</span> <span class="s2">&quot;east&quot;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="mi">7</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;east&quot;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="mi">9</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;east&quot;</span><span class="p">,</span> <span class="s2">&quot;southEast&quot;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;southEast&quot;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="mi">11</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;south&quot;</span><span class="p">,</span> <span class="s2">&quot;southEast&quot;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="mi">12</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="mi">13</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;south&quot;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="mi">14</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;south&quot;</span><span class="p">,</span> <span class="s2">&quot;southWest&quot;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="mi">15</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;southWest&quot;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="mi">16</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;southWest&quot;</span><span class="p">,</span> <span class="s2">&quot;west&quot;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="mi">17</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="mi">18</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;west&quot;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="mi">19</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;west&quot;</span><span class="p">,</span> <span class="s2">&quot;northWest&quot;</span><span class="p">]</span>
+            
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">&lt;=</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QPointF</span><span class="p">(</span> <span class="n">rect</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">*</span> <span class="n">connectorWidth</span> <span class="p">,</span> <span class="n">rect</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="p">)</span>
+            
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">&gt;</span> <span class="mi">5</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QPointF</span><span class="p">(</span> <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">-</span> <span class="n">connectorWidth</span> <span class="p">,</span> <span class="n">rect</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">-</span> <span class="mi">5</span> <span class="p">)</span> <span class="o">*</span> <span class="n">connectorHeight</span> <span class="p">)</span>
+            
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">&gt;=</span> <span class="mi">10</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">&lt;=</span> <span class="mi">15</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QPointF</span><span class="p">(</span> <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">-</span> <span class="n">connectorWidth</span> <span class="o">*</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">-</span> <span class="mi">9</span> <span class="p">)</span> <span class="p">,</span> <span class="n">rect</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">-</span> <span class="n">connectorHeight</span> <span class="p">)</span>
+            
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">&gt;</span> <span class="mi">15</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QPointF</span><span class="p">(</span> <span class="n">rect</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="n">rect</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span> <span class="mi">20</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="p">)</span> <span class="o">*</span> <span class="n">connectorHeight</span><span class="p">)</span>       
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">setRect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span> <span class="n">connectorWidth</span><span class="p">,</span> <span class="n">connectorHeight</span><span class="p">)</span></div>
+        
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+<div class="viewcode-block" id="Connector.mousePressEvent"><a class="viewcode-back" href="../../model_link.html#model.AbstractItem.Connector.mousePressEvent">[docs]</a>    <span class="k">def</span> <span class="nf">mousePressEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>        
+        <span class="sd">&#39;&#39;&#39;Capture QtGui.mousePressEvent with **Shift-Key** modifier.</span>
+<span class="sd">        </span>
+<span class="sd">        :param event: QtGui.mousePressEvent</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">modifiers</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ShiftModifier</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">startArc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+<span class="c1">#         QtGui.QGraphicsRectItem.mousePressEvent(self, event)</span>
+
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+<div class="viewcode-block" id="Connector.hoverEnterEvent"><a class="viewcode-back" href="../../model_link.html#model.AbstractItem.Connector.hoverEnterEvent">[docs]</a>    <span class="k">def</span> <span class="nf">hoverEnterEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Make connector visible on hoverEnterEvent.  </span>
+<span class="sd">        </span>
+<span class="sd">        :param event: hoverEnterEvent</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setFlag</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">ItemStacksBehindParent</span> <span class="p">,</span> <span class="bp">False</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setOpacity</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="Connector.hoverLeaveEvent"><a class="viewcode-back" href="../../model_link.html#model.AbstractItem.Connector.hoverLeaveEvent">[docs]</a>    <span class="k">def</span> <span class="nf">hoverLeaveEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Make connector invisible on hoverLeaveEvent.  </span>
+<span class="sd">        </span>
+<span class="sd">        :param event: hoverLeaveEvent</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setFlag</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">ItemStacksBehindParent</span> <span class="p">,</span> <span class="bp">True</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setOpacity</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="Connector.itemChange"><a class="viewcode-back" href="../../model_link.html#model.AbstractItem.Connector.itemChange">[docs]</a>    <span class="k">def</span> <span class="nf">itemChange</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">change</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>                    
+        <span class="sd">&#39;&#39;&#39;Item position has changed, calculate new position.</span>
+<span class="sd">        </span>
+<span class="sd">        :param change: Change event.</span>
+<span class="sd">        :param value: QtCore.QPointF().</span>
+<span class="sd">        :return value: QtCore.QPointF(x, y) or super(Connector, self).itemChange(change, value).</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">change</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">ItemScenePositionHasChanged</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">cb</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">posCallbacks</span><span class="p">:</span>                
+                <span class="n">cb</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span>
+            <span class="k">return</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Connector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">itemChange</span><span class="p">(</span><span class="n">change</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+<span class="c1">#========================================================================================================================</span>
+
+<div class="viewcode-block" id="DescriptionCanvas"><a class="viewcode-back" href="../../model_link.html#model.AbstractItem.DescriptionCanvas">[docs]</a><span class="k">class</span> <span class="nc">DescriptionCanvas</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QGraphicsRectItem</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Description area for tokens, exceptions and modes. Toggle with **Ctrl**+**M**. </span>
+<span class="sd">    </span>
+<span class="sd">    In this canvas label, detailed information about the CPN element is shown.</span>
+<span class="sd">    Firstly the unique name used by the simulator is shown, followed by the visual name, </span>
+<span class="sd">    that is assigned by the user. The latter does not have to be unique.</span>
+<span class="sd">    </span>
+<span class="sd">    :member parent: Parent CPN element.</span>
+<span class="sd">    :member label: Visual representation of the information about the CPN element.</span>
+<span class="sd">    :member text: Unique name of parent CPN element.</span>
+<span class="sd">    :member visibility: Switch for the visibility of the description canvas.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+<div class="viewcode-block" id="DescriptionCanvas.__init__"><a class="viewcode-back" href="../../model_link.html#model.AbstractItem.DescriptionCanvas.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>  
+        <span class="sd">&#39;&#39;&#39;Create description canvas.</span>
+<span class="sd">        </span>
+<span class="sd">        :param parent: Abstract CPN element.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DescriptionCanvas</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">uniqueName</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">darkYellow</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QBrush</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">darkYellow</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setFlags</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ItemIsSelectable</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">ItemIsMovable</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">ItemSendsScenePositionChanges</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QGraphicsTextItem</span><span class="p">(</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">uniqueName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span> <span class="p">)</span>  
+<span class="c1">#         self.label.setFlag(self.ItemIsMovable, True)</span>
+        <span class="n">rect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setRect</span><span class="p">(</span><span class="n">rect</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">+</span> <span class="mi">30</span><span class="p">,</span> <span class="n">rect</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">+</span> <span class="mi">20</span><span class="p">,</span> <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="n">rect</span><span class="o">.</span><span class="n">height</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">rect</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">+</span> <span class="mi">30</span><span class="p">,</span> <span class="n">rect</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">+</span> <span class="mi">20</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="mi">21</span><span class="p">)</span>   
+        <span class="bp">self</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>      
+        <span class="bp">self</span><span class="o">.</span><span class="n">visibility</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setVisibility</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">visibility</span> <span class="p">)</span> </div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+<div class="viewcode-block" id="DescriptionCanvas.setVisibility"><a class="viewcode-back" href="../../model_link.html#model.AbstractItem.DescriptionCanvas.setVisibility">[docs]</a>    <span class="k">def</span> <span class="nf">setVisibility</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">visible</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Set visibility of DescriptionCanvas.</span>
+<span class="sd">        </span>
+<span class="sd">        :param visible: True if visible, False if invisible.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">visibility</span> <span class="o">=</span> <span class="n">visible</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span> <span class="n">visible</span> <span class="p">)</span>   
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span> <span class="n">visible</span> <span class="p">)</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+
+    
+<div class="viewcode-block" id="DescriptionCanvas.setCanvasString"><a class="viewcode-back" href="../../model_link.html#model.AbstractItem.DescriptionCanvas.setCanvasString">[docs]</a>    <span class="k">def</span> <span class="nf">setCanvasString</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">infoString</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Set info string, that appended to the first line.</span>
+<span class="sd">        </span>
+<span class="sd">        :param infoString: Info string, may contain line breaks.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+<span class="c1">#         self.parent.editor.diagramScene.removeItem(self.label)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setPlainText</span><span class="p">(</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">uniqueName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">infoString</span><span class="p">))</span>  
+<span class="c1">#         self.label.setFlag(self.ItemIsMovable, True)</span>
+<span class="c1">#         self.parent.editor.diagramScene.addItem(self.label)</span>
+        <span class="n">rect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setRect</span><span class="p">(</span><span class="n">pos</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">+</span> <span class="mi">30</span><span class="p">,</span> <span class="n">pos</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">+</span> <span class="mi">20</span><span class="p">,</span> <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="n">rect</span><span class="o">.</span><span class="n">height</span><span class="p">())</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">pos</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">+</span> <span class="mi">30</span><span class="p">,</span> <span class="n">pos</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">+</span> <span class="mi">20</span><span class="p">)</span>
+<span class="c1">#         self.label.setZValue(21)   </span>
+<span class="c1">#         self.setZValue(20)       </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setVisibility</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">visibility</span><span class="p">)</span></div></div>
+            
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+        
+    
+<span class="c1">#========================================================================================================================</span>
+
+              
+
+
+<div class="viewcode-block" id="AbstractItem"><a class="viewcode-back" href="../../model_link.html#model.AbstractItem.AbstractItem">[docs]</a><span class="k">class</span> <span class="nc">AbstractItem</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QGraphicsItem</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Base class of the CPN elements transition and place.</span>
+<span class="sd">    </span>
+<span class="sd">    :member parent: `gui.DiagramEditor`. Editor to show in. </span>
+<span class="sd">    :member tokens: List of `model.TokenItem` s, if inheriting class is `model.PlaceItem` else None</span>
+<span class="sd">    :member name: Name of the CPN element. </span>
+<span class="sd">    :member posCallbacks: List of callback functions, to calculate position changes.</span>
+<span class="sd">    :member connectorList: List of 20 `Connector` s</span>
+<span class="sd">    :member planeMap: Dictionary-&gt;Set(), mapping the relative orientation of an any other `model.AbstractItem` in the containing editor. </span>
+<span class="sd">    :member connectorMap: Dictionary-&gt;List(), mapping the relative orientation of the 20 `model.AbstractItem.Connector` s.</span>
+<span class="sd">    :member nodeType: Determining the type of the item at creation time.        </span>
+<span class="sd">    :member superNet: The super net is used to determine the editor for port place clones.</span>
+<span class="sd">    :member label: `QtGui.QGraphicsTextItem`, visual representation of the `model.AbstractItem` s name.     </span>
+<span class="sd">    :member descCanvas: `gui.AbstractItem.DescriptionCanvas`, showing detailed information.    </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+<div class="viewcode-block" id="AbstractItem.__init__"><a class="viewcode-back" href="../../model_link.html#model.AbstractItem.AbstractItem.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>  
+        <span class="sd">&#39;&#39;&#39;Create abstract item.</span>
+<span class="sd">        </span>
+<span class="sd">        :param parent: `gui.DiagramEditor`. Editor to show in. </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AbstractItem</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokens</span> <span class="o">=</span> <span class="bp">None</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">posCallbacks</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connectorList</span> <span class="o">=</span> <span class="p">[]</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QBrush</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">white</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setFlags</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ItemIsSelectable</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">ItemIsMovable</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">ItemSendsScenePositionChanges</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">planeMap</span> <span class="o">=</span> <span class="p">{</span>
+                         <span class="s2">&quot;northWest&quot;</span><span class="p">:</span><span class="nb">set</span><span class="p">(),</span>
+                         <span class="s2">&quot;north&quot;</span><span class="p">:</span><span class="nb">set</span><span class="p">(),</span>
+                         <span class="s2">&quot;northEast&quot;</span><span class="p">:</span><span class="nb">set</span><span class="p">(),</span>
+                         <span class="s2">&quot;east&quot;</span><span class="p">:</span><span class="nb">set</span><span class="p">(),</span>
+                         <span class="s2">&quot;southEast&quot;</span><span class="p">:</span><span class="nb">set</span><span class="p">(),</span>
+                         <span class="s2">&quot;south&quot;</span><span class="p">:</span><span class="nb">set</span><span class="p">(),</span>
+                         <span class="s2">&quot;southWest&quot;</span><span class="p">:</span><span class="nb">set</span><span class="p">(),</span>
+                         <span class="s2">&quot;west&quot;</span><span class="p">:</span><span class="nb">set</span><span class="p">()</span>
+                         <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connectorMap</span> <span class="o">=</span> <span class="p">{</span>
+                         <span class="s2">&quot;northWest&quot;</span><span class="p">:[],</span>
+                         <span class="s2">&quot;north&quot;</span><span class="p">:[],</span>
+                         <span class="s2">&quot;northEast&quot;</span><span class="p">:[],</span>
+                         <span class="s2">&quot;east&quot;</span><span class="p">:[],</span>
+                         <span class="s2">&quot;southEast&quot;</span><span class="p">:[],</span>
+                         <span class="s2">&quot;south&quot;</span><span class="p">:[],</span>
+                         <span class="s2">&quot;southWest&quot;</span><span class="p">:[],</span>
+                         <span class="s2">&quot;west&quot;</span><span class="p">:[]</span>
+                         <span class="p">}</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+        
+        
+<div class="viewcode-block" id="AbstractItem.createItem"><a class="viewcode-back" href="../../model_link.html#model.AbstractItem.AbstractItem.createItem">[docs]</a>    <span class="k">def</span> <span class="nf">createItem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">editor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Untitled&#39;</span><span class="p">,</span> <span class="n">nodeType</span><span class="o">=</span><span class="s2">&quot;undefined&quot;</span> <span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Create the typed item.</span>
+<span class="sd">        </span>
+<span class="sd">        :param editor:  `gui.DiagramEditor`. Editor to show in. </span>
+<span class="sd">        :param name: Name of the CPN element. </span>
+<span class="sd">        :param nodeType: Determining the type of the item at creation time.        </span>
+<span class="sd">        :return w, h: Width and height of CPN element, depending on the label length. </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">editor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodeType</span> <span class="o">=</span> <span class="n">nodeType</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">superNet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">subnet</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QGraphicsTextItem</span><span class="p">(</span> <span class="n">name</span><span class="p">,</span> <span class="bp">self</span> <span class="p">)</span>        
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">descCanvas</span> <span class="o">=</span> <span class="n">DescriptionCanvas</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        
+        <span class="n">rect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span>        
+        <span class="n">w</span> <span class="o">=</span> <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">+</span> <span class="mf">20.0</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">rect</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">+</span> <span class="mf">20.0</span>
+        <span class="k">if</span> <span class="n">h</span> <span class="o">&lt;</span> <span class="mi">20</span><span class="p">:</span>
+            <span class="n">h</span> <span class="o">=</span> <span class="mi">20</span>
+        <span class="k">if</span> <span class="n">w</span> <span class="o">&lt;</span> <span class="mi">40</span><span class="p">:</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="mi">40</span>
+             
+        <span class="bp">self</span><span class="o">.</span><span class="n">setRect</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+        <span class="n">rect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span>
+        <span class="n">lw</span><span class="p">,</span> <span class="n">lh</span> <span class="o">=</span> <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="n">rect</span><span class="o">.</span><span class="n">height</span><span class="p">()</span>
+        <span class="n">lx</span> <span class="o">=</span> <span class="p">(</span><span class="n">w</span> <span class="o">-</span> <span class="n">lw</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">ly</span> <span class="o">=</span> <span class="p">(</span><span class="n">h</span> <span class="o">-</span> <span class="n">lh</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">lx</span><span class="p">,</span> <span class="n">ly</span><span class="p">)</span>
+        
+        <span class="n">rect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span>
+        
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">):</span>
+            <span class="n">connector</span> <span class="o">=</span> <span class="n">Connector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connectorList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">connector</span> <span class="p">)</span>
+            <span class="k">for</span> <span class="n">orientation</span> <span class="ow">in</span> <span class="n">connector</span><span class="o">.</span><span class="n">orientation</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connectorMap</span><span class="p">[</span><span class="n">orientation</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">connector</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokens</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokens</span><span class="p">:</span>
+                <span class="n">token</span><span class="o">.</span><span class="n">setRect</span><span class="p">(</span> <span class="n">pos</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">+</span> <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="n">pos</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">)</span>
+                <span class="k">break</span>      
+        <span class="k">return</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span>          </div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="AbstractItem.checkItem"><a class="viewcode-back" href="../../model_link.html#model.AbstractItem.AbstractItem.checkItem">[docs]</a>    <span class="k">def</span> <span class="nf">checkItem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">orientation</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Check `item` is of propper type.</span>
+<span class="sd">        </span>
+<span class="sd">        :param item: `model.AbstractItem` to lookup.</span>
+<span class="sd">        :param orientation: Orientation to assign, if type check is passed.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">item</span><span class="o">.</span><span class="n">nodeType</span> <span class="p">)</span>  <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;transition&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">str</span><span class="p">(</span> <span class="n">item</span><span class="o">.</span><span class="n">nodeType</span> <span class="p">)</span>  <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;place&quot;</span><span class="p">)</span> <span class="p">)</span> <span class="ow">and</span> <span class="n">item</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">planeMap</span><span class="p">[</span><span class="n">orientation</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+        
+<div class="viewcode-block" id="AbstractItem.findItemsInPlanes"><a class="viewcode-back" href="../../model_link.html#model.AbstractItem.AbstractItem.findItemsInPlanes">[docs]</a>    <span class="k">def</span> <span class="nf">findItemsInPlanes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Finds the orientation of any other item in the `gui.DiagramScene`.&#39;&#39;&#39;</span>
+        <span class="n">rect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span>
+        
+        <span class="n">sceneRect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">itemsBoundingRect</span><span class="p">()</span> 
+               
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">items</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapToScene</span><span class="p">(</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QRectF</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">rect</span><span class="o">.</span><span class="n">height</span><span class="p">(),</span> <span class="o">-</span><span class="n">sceneRect</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="o">-</span><span class="n">sceneRect</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="p">)</span> <span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ContainsItemShape</span> <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">checkItem</span><span class="p">(</span> <span class="n">item</span><span class="p">,</span> <span class="s2">&quot;northWest&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">items</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapToScene</span><span class="p">(</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QRectF</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">rect</span><span class="o">.</span><span class="n">height</span><span class="p">(),</span> <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="o">-</span><span class="n">sceneRect</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="p">)</span> <span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">IntersectsItemShape</span> <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">checkItem</span><span class="p">(</span> <span class="n">item</span><span class="p">,</span> <span class="s2">&quot;north&quot;</span><span class="p">)</span>     
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">items</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapToScene</span><span class="p">(</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QRectF</span><span class="p">(</span> <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="o">-</span><span class="n">rect</span><span class="o">.</span><span class="n">height</span><span class="p">(),</span> <span class="n">sceneRect</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="o">-</span><span class="n">sceneRect</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="p">)</span> <span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ContainsItemShape</span> <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">checkItem</span><span class="p">(</span> <span class="n">item</span><span class="p">,</span> <span class="s2">&quot;northEast&quot;</span><span class="p">)</span>            
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">items</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapToScene</span><span class="p">(</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QRectF</span><span class="p">(</span> <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sceneRect</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="o">-</span><span class="n">rect</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="p">)</span> <span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">IntersectsItemShape</span> <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">checkItem</span><span class="p">(</span> <span class="n">item</span><span class="p">,</span> <span class="s2">&quot;east&quot;</span><span class="p">)</span>     
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">items</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapToScene</span><span class="p">(</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QRectF</span><span class="p">(</span> <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="mi">0</span><span class="p">,</span> <span class="o">+</span><span class="n">sceneRect</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="o">+</span><span class="n">sceneRect</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="p">)</span> <span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ContainsItemShape</span> <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">checkItem</span><span class="p">(</span> <span class="n">item</span><span class="p">,</span> <span class="s2">&quot;southEast&quot;</span><span class="p">)</span> 
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">items</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapToScene</span><span class="p">(</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QRectF</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="o">+</span><span class="n">sceneRect</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="p">)</span> <span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">IntersectsItemShape</span> <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">checkItem</span><span class="p">(</span> <span class="n">item</span><span class="p">,</span> <span class="s2">&quot;south&quot;</span><span class="p">)</span> 
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">items</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapToScene</span><span class="p">(</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QRectF</span><span class="p">(</span>  <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">sceneRect</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="o">+</span><span class="n">sceneRect</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="p">)</span> <span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ContainsItemShape</span> <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">checkItem</span><span class="p">(</span> <span class="n">item</span><span class="p">,</span> <span class="s2">&quot;southWest&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">items</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapToScene</span><span class="p">(</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QRectF</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">sceneRect</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="o">-</span><span class="n">rect</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="p">)</span> <span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">IntersectsItemShape</span>  <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">checkItem</span><span class="p">(</span> <span class="n">item</span><span class="p">,</span> <span class="s2">&quot;west&quot;</span><span class="p">)</span></div>
+        
+<span class="c1">#         logging.debug(&quot;----------------------------------------------------------&quot;)</span>
+<span class="c1">#         logging.debug(self.planeMap)        </span>
+<span class="c1">#         logging.debug( &quot;---------------------------------------------Planes of %s&quot;%( self.name  ))</span>
+<span class="c1">#         logging.debug( &quot;plane northWest&quot; )</span>
+<span class="c1">#         for item in self.planeMap[&quot;northWest&quot;]:            </span>
+<span class="c1">#             logging.debug( item.name )</span>
+<span class="c1">#         logging.debug( &quot;plane north&quot; )</span>
+<span class="c1">#         for item in self.planeMap[&quot;north&quot;]:</span>
+<span class="c1">#             logging.debug( item.name )</span>
+<span class="c1">#         logging.debug( &quot;plane northEast&quot; )</span>
+<span class="c1">#         for item in self.planeMap[&quot;northEast&quot;]:</span>
+<span class="c1">#             logging.debug( item.name )</span>
+<span class="c1">#         logging.debug( &quot;plane east&quot; )</span>
+<span class="c1">#         for item in self.planeMap[&quot;east&quot;]:</span>
+<span class="c1">#             logging.debug( item.name )</span>
+<span class="c1">#         logging.debug( &quot;plane southEast&quot; )</span>
+<span class="c1">#         for item in self.planeMap[&quot;southEast&quot;]:</span>
+<span class="c1">#             logging.debug( item.name )</span>
+<span class="c1">#         logging.debug( &quot;plane south&quot; )</span>
+<span class="c1">#         for item in self.planeMap[&quot;south&quot;]:</span>
+<span class="c1">#             logging.debug( item.name )</span>
+<span class="c1">#         logging.debug( &quot;plane southWest&quot; )</span>
+<span class="c1">#         for item in self.planeMap[&quot;southWest&quot;]:</span>
+<span class="c1">#             logging.debug( item.name )</span>
+<span class="c1">#         logging.debug( &quot;plane west&quot; )</span>
+<span class="c1">#         for item in self.planeMap[&quot;west&quot;]:</span>
+<span class="c1">#             logging.debug( item.name )</span>
+
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+            
+            
+<div class="viewcode-block" id="AbstractItem.mouseDoubleClickEvent"><a class="viewcode-back" href="../../model_link.html#model.AbstractItem.AbstractItem.mouseDoubleClickEvent">[docs]</a>    <span class="k">def</span> <span class="nf">mouseDoubleClickEvent</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Edit visual name on `QtGui.mouseDoubleClickEvent`.</span>
+<span class="sd">        </span>
+<span class="sd">        :param event: `QtGui.mouseDoubleClickEvent`.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diag</span> <span class="o">=</span> <span class="n">NameDialog</span><span class="p">(</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Rename </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">accepted</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">renameElement</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+    <span class="c1">#-----------------------------------------------------------------------------------------------</span>
+    
+    
+        
+<div class="viewcode-block" id="AbstractItem.renameElement"><a class="viewcode-back" href="../../model_link.html#model.AbstractItem.AbstractItem.renameElement">[docs]</a>    <span class="k">def</span> <span class="nf">renameElement</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>         
+        <span class="sd">&#39;&#39;&#39;Capture rename event and call virtual function of `model.PlaceItem` or `model.TrasnitionItem`.&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">renameModifications</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getName</span><span class="p">())</span>             
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">diag</span>        </div>
+    <span class="c1">#-----------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="AbstractItem.deleteItemLocal"><a class="viewcode-back" href="../../model_link.html#model.AbstractItem.AbstractItem.deleteItemLocal">[docs]</a>    <span class="k">def</span> <span class="nf">deleteItemLocal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Capture delete event and call editor delete function.&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">deleteItem</span><span class="p">([</span><span class="bp">self</span><span class="p">])</span>   </div></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+        
+    
+<span class="c1">#     def itemChange(self, change, value):                    </span>
+<span class="c1">#         if change == self.ItemScenePositionHasChanged:</span>
+<span class="c1">#             rect = self.boundingRect()</span>
+<span class="c1">#             pos = self.scenePos()</span>
+<span class="c1">#             for cb in self.posCallbacks:                </span>
+<span class="c1">#                 for connection in self.parent.visualConnectionList:</span>
+<span class="c1">#                     if connection[0] is self or connection[2] is self:</span>
+<span class="c1">#                         inputCoordinates = QtCore.QPointF(connection[0].x(), connection[0].y())</span>
+<span class="c1">#                         outputCoordinates = QtCore.QPointF(connection[2].x(), connection[2].y())</span>
+<span class="c1">#                         if connection[0] is self:                        </span>
+<span class="c1">#                             value = self.determineBorder( connection[1], connection[2], rect, pos, inputCoordinates, outputCoordinates )  </span>
+<span class="c1">#                         if connection[2] is self:</span>
+<span class="c1">#                             value = self.determineBorder( connection[1], connection[0], rect, pos, outputCoordinates, inputCoordinates )     </span>
+<span class="c1">#                 cb(value)</span>
+<span class="c1">#             return value</span>
+<span class="c1">#         return super(AbstractItem, self).itemChange(change, value)</span>
+<span class="c1">#     #-----------------------------------------------------------------------------------------------</span>
+    
+<span class="c1">#========================================================================================================================</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Christoph Kuhr.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

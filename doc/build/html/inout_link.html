@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>inout &mdash; Colored Petrinets Simulator Gui alpha 2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     'alpha 2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Colored Petrinets Simulator Gui alpha 2 documentation" href="index.html" />
+    <link rel="prev" title="&lt;no title&gt;" href="model_link.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-inout.XMLIO">
+<span id="inout"></span><h1>inout<a class="headerlink" href="#module-inout.XMLIO" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="inout.XMLIO.XMLIO">
+<em class="property">class </em><code class="descclassname">inout.XMLIO.</code><code class="descname">XMLIO</code><span class="sig-paren">(</span><em>simulator</em>, <em>rootElementName=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/inout/XMLIO.html#XMLIO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#inout.XMLIO.XMLIO" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>XML Input and Output</p>
+<dl class="method">
+<dt id="inout.XMLIO.XMLIO.loadNet">
+<code class="descname">loadNet</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/inout/XMLIO.html#XMLIO.loadNet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#inout.XMLIO.XMLIO.loadNet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse XML file and prepare data for object creation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> &#8211; Filepath to XML file which shall be loaded.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Return [ netName, subnets, serConnections, serPlaces, serTransitions ]:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">A list containing lists for object creation.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="inout.XMLIO.XMLIO.netToXML">
+<code class="descname">netToXML</code><span class="sig-paren">(</span><em>subnet</em>, <em>placesS</em>, <em>transitionsS</em>, <em>connectionsS</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/inout/XMLIO.html#XMLIO.netToXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#inout.XMLIO.XMLIO.netToXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save Colored Petrinet <strong>Subnet</strong> to XML tree.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>subnet</strong> &#8211; Subnet name.</li>
+<li><strong>placesS</strong> &#8211; Place contained in <cite>subnet</cite>.</li>
+<li><strong>transitionsS</strong> &#8211; Transitions contained in <cite>subnet</cite>.</li>
+<li><strong>connectionsS</strong> &#8211; Connections contained in <cite>subnet</cite>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="inout.XMLIO.XMLIO.saveLog">
+<code class="descname">saveLog</code><span class="sig-paren">(</span><em>logList</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/inout/XMLIO.html#XMLIO.saveLog"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#inout.XMLIO.XMLIO.saveLog" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save Log Entries to XML tree.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>logList</strong> &#8211; List of log entries from the log widget.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="inout.XMLIO.XMLIO.saveNet">
+<code class="descname">saveNet</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/inout/XMLIO.html#XMLIO.saveNet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#inout.XMLIO.XMLIO.saveNet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save XML tree to file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> &#8211; Filepath where the XML tree is saved.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="inout.XMLIO.bin_">
+<code class="descclassname">inout.XMLIO.</code><code class="descname">bin_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#inout.XMLIO.bin_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="inout.XMLIO.hex_">
+<code class="descclassname">inout.XMLIO.</code><code class="descname">hex_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#inout.XMLIO.hex_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="inout.XMLIO.oct_">
+<code class="descclassname">inout.XMLIO.</code><code class="descname">oct_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#inout.XMLIO.oct_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="model_link.html" title="previous chapter">&lt;no title&gt;</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/inout_link.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Christoph Kuhr.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="_sources/inout_link.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

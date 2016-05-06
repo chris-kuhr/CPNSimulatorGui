@@ -1,0 +1,144 @@
+DEBUG:PyQt4.uic.uiparser:UI version is 4.0
+DEBUG:PyQt4.uic.uiparser:uiname is MainWindow
+DEBUG:PyQt4.uic.uiparser:toplevel widget is MainWindow
+DEBUG:PyQt4.uic.properties:setting property geometry
+DEBUG:PyQt4.uic.properties:setting property windowTitle
+DEBUG:PyQt4.uic.uiparser:push MainWindow MainWindow
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.uiparser:push QWidget centralwidget
+DEBUG:PyQt4.uic.properties:setting property geometry
+DEBUG:PyQt4.uic.uiparser:push QWidget verticalLayoutWidget
+DEBUG:PyQt4.uic.properties:setting property margin
+DEBUG:PyQt4.uic.uiparser:push QVBoxLayout verticalLayout
+DEBUG:PyQt4.uic.properties:setting property sizeConstraint
+DEBUG:PyQt4.uic.uiparser:push QHBoxLayout horizontalLayout_2
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:push QRadioButton radioButton
+DEBUG:PyQt4.uic.uiparser:pop widget QRadioButton radioButton
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fcf44bcbee8>
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:push QRadioButton radioButton_2
+DEBUG:PyQt4.uic.uiparser:pop widget QRadioButton radioButton_2
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fcf44bcbee8>
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:push QRadioButton radioButton_3
+DEBUG:PyQt4.uic.uiparser:pop widget QRadioButton radioButton_3
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fcf44bcbee8>
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.uiparser:push QLineEdit lineEdit
+DEBUG:PyQt4.uic.uiparser:pop widget QLineEdit lineEdit
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fcf44bcbee8>
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.uiparser:push QLineEdit lineEdit_2
+DEBUG:PyQt4.uic.uiparser:pop widget QLineEdit lineEdit_2
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fcf44bcbee8>
+DEBUG:PyQt4.uic.uiparser:pop layout QHBoxLayout horizontalLayout_2
+DEBUG:PyQt4.uic.uiparser:push QHBoxLayout horizontalLayout
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:push QPushButton pushButton
+DEBUG:PyQt4.uic.uiparser:pop widget QPushButton pushButton
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fcf44bcbee8>
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:push QPushButton pushButton_2
+DEBUG:PyQt4.uic.uiparser:pop widget QPushButton pushButton_2
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fcf44bcbee8>
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:push QPushButton pushButton_7
+DEBUG:PyQt4.uic.uiparser:pop widget QPushButton pushButton_7
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fcf44bcbee8>
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:push QPushButton pushButton_3
+DEBUG:PyQt4.uic.uiparser:pop widget QPushButton pushButton_3
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fcf44bcbee8>
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:push QPushButton pushButton_4
+DEBUG:PyQt4.uic.uiparser:pop widget QPushButton pushButton_4
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fcf44bcbee8>
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:push QPushButton pushButton_5
+DEBUG:PyQt4.uic.uiparser:pop widget QPushButton pushButton_5
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fcf44bcbee8>
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:push QPushButton pushButton_6
+DEBUG:PyQt4.uic.uiparser:pop widget QPushButton pushButton_6
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fcf44bcbee8>
+DEBUG:PyQt4.uic.uiparser:pop layout QHBoxLayout horizontalLayout
+DEBUG:PyQt4.uic.uiparser:pop layout QVBoxLayout verticalLayout
+DEBUG:PyQt4.uic.uiparser:pop widget QWidget verticalLayoutWidget
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fcf44bcbf78>
+DEBUG:PyQt4.uic.uiparser:pop widget QWidget centralwidget
+DEBUG:PyQt4.uic.uiparser:new topwidget <gui.MainWindow.MainWindow object at 0x7fcf4a18bb88>
+DEBUG:PyQt4.uic.properties:setting property geometry
+DEBUG:PyQt4.uic.uiparser:push QMenuBar menubar
+DEBUG:PyQt4.uic.properties:setting property title
+DEBUG:PyQt4.uic.uiparser:push QMenu menuFile
+DEBUG:PyQt4.uic.uiparser:pop widget QMenu menuFile
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QMenuBar object at 0x7fcf4519c318>
+DEBUG:PyQt4.uic.properties:setting property title
+DEBUG:PyQt4.uic.uiparser:push QMenu menuView
+DEBUG:PyQt4.uic.uiparser:pop widget QMenu menuView
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QMenuBar object at 0x7fcf4519c318>
+DEBUG:PyQt4.uic.uiparser:pop widget QMenuBar menubar
+DEBUG:PyQt4.uic.uiparser:new topwidget <gui.MainWindow.MainWindow object at 0x7fcf4a18bb88>
+DEBUG:PyQt4.uic.uiparser:push QStatusBar statusbar
+DEBUG:PyQt4.uic.uiparser:pop widget QStatusBar statusbar
+DEBUG:PyQt4.uic.uiparser:new topwidget <gui.MainWindow.MainWindow object at 0x7fcf4a18bb88>
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property shortcut
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property shortcut
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property shortcut
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:pop widget MainWindow MainWindow
+DEBUG:PyQt4.uic.uiparser:new topwidget None
+DEBUG:PyQt4.uic.uiparser:add action actionNew_Net to menuFile
+DEBUG:PyQt4.uic.uiparser:add action actionOpen_Net to menuFile
+DEBUG:PyQt4.uic.uiparser:add action actionSave_Net to menuFile
+DEBUG:PyQt4.uic.uiparser:add action actionExport_Step_as_SVG to menuFile
+DEBUG:PyQt4.uic.uiparser:add action actionExport_to_Gif to menuFile
+DEBUG:PyQt4.uic.uiparser:add action actionExit to menuFile
+DEBUG:PyQt4.uic.uiparser:add action actionZoom_In_2 to menuView
+DEBUG:PyQt4.uic.uiparser:add action actionZoom_Out_2 to menuView
+DEBUG:PyQt4.uic.uiparser:add action actionZoom_1_2 to menuView
+DEBUG:PyQt4.uic.uiparser:add action menuFile to menubar
+DEBUG:PyQt4.uic.uiparser:add action menuView to menubar
+DEBUG:root:------delete item-------------------------------------------------------
+DEBUG:root:[]
+DEBUG:root:[Transition('t3735928496', Expression('True'))]
+DEBUG:root:Count editors: 1
+DEBUG:root:[]
+DEBUG:root:[]
+DEBUG:root:Count editors: 1
+DEBUG:root:-------------------------------------------------------------

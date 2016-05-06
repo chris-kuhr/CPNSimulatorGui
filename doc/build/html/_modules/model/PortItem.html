@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>model.PortItem &mdash; Colored Petrinets Simulator Gui alpha 2 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     'alpha 2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Colored Petrinets Simulator Gui alpha 2 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for model.PortItem</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">PyQt4</span> <span class="kn">import</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtCore</span>
+<span class="kn">from</span> <span class="nn">PyQt4.QtGui</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">PyQt4.QtCore</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+<div class="viewcode-block" id="PortItem"><a class="viewcode-back" href="../../model_link.html#model.PortItem.PortItem">[docs]</a><span class="k">class</span> <span class="nc">PortItem</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QGraphicsEllipseItem</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Port place indicator. </span>
+<span class="sd">    </span>
+<span class="sd">    The label indicates the port direction of the port place.</span>
+<span class="sd">    </span>
+<span class="sd">    :member direction: Port direction: (i)nput, (o)utput, (io) bidirectional.</span>
+<span class="sd">    :member parent: Parent port place.</span>
+<span class="sd">    :member label: Visual representation of direction.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+<div class="viewcode-block" id="PortItem.__init__"><a class="viewcode-back" href="../../model_link.html#model.PortItem.PortItem.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">direction</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Create a port</span>
+<span class="sd">        </span>
+<span class="sd">        :param direction:  Port direction: (i)nput, (o)utput, (io) bidirectional.</span>
+<span class="sd">        :param parent: Parent port place.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PortItem</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QRectF</span><span class="p">(</span><span class="o">-</span><span class="mf">4.0</span><span class="p">,</span><span class="o">-</span><span class="mf">4.0</span><span class="p">,</span><span class="mf">17.0</span><span class="p">,</span><span class="mf">17.0</span><span class="p">),</span> <span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">posChangeCallbacks</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QBrush</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">white</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setFlags</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ItemIsSelectable</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">ItemIsMovable</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">ItemSendsScenePositionChanges</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QGraphicsTextItem</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QPointF</span><span class="p">(</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="o">-</span><span class="mi">7</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">direction</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="PortItem.setDirection"><a class="viewcode-back" href="../../model_link.html#model.PortItem.PortItem.setDirection">[docs]</a>    <span class="k">def</span> <span class="nf">setDirection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">direction</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Set direction of the port.</span>
+<span class="sd">        </span>
+<span class="sd">        :param direction: Direction of port: &quot;i&quot;, &quot;o&quot;, &quot;io&quot;.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">direction</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setPlainText</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+<div class="viewcode-block" id="PortItem.getDirection"><a class="viewcode-back" href="../../model_link.html#model.PortItem.PortItem.getDirection">[docs]</a>    <span class="k">def</span> <span class="nf">getDirection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Return direction of the port: &quot;i&quot;, &quot;o&quot;, &quot;io&quot;.&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+
+           
+<div class="viewcode-block" id="PortItem.editPort"><a class="viewcode-back" href="../../model_link.html#model.PortItem.PortItem.editPort">[docs]</a>    <span class="k">def</span> <span class="nf">editPort</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Edit port direction.&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">portDiag</span> <span class="o">=</span> <span class="n">NameDialog</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Enter Direction&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">plainText</span><span class="p">()</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">portDiag</span><span class="o">.</span><span class="n">accepted</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setPort</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">portDiag</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>  </div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+           
+<div class="viewcode-block" id="PortItem.setPort"><a class="viewcode-back" href="../../model_link.html#model.PortItem.PortItem.setPort">[docs]</a>    <span class="k">def</span> <span class="nf">setPort</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>        
+        <span class="sd">&#39;&#39;&#39;Is this really neccessary?&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">PortItem</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">rect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span> <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">+</span> <span class="mf">20.0</span><span class="p">,</span> <span class="n">rect</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">+</span> <span class="mf">20.0</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setDirection</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">portDiag</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="p">)</span>  
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">portDiag</span>   
+        <span class="k">pass</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+<div class="viewcode-block" id="PortItem.contextMenuEvent"><a class="viewcode-back" href="../../model_link.html#model.PortItem.PortItem.contextMenuEvent">[docs]</a>    <span class="k">def</span> <span class="nf">contextMenuEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Generate Context menu on context menu event.</span>
+<span class="sd">        </span>
+<span class="sd">        :param event: QContextMenuEvent.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">menu</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMenu</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delete</span> <span class="o">=</span> <span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s1">&#39;Delete&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delete</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deleteItemLocal</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contextMenuEditPort</span> <span class="o">=</span> <span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s1">&#39;Edit Port&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contextMenuEditPort</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">editPort</span><span class="p">)</span>
+        <span class="n">menu</span><span class="o">.</span><span class="n">exec_</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">screenPos</span><span class="p">())</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="PortItem.itemChange"><a class="viewcode-back" href="../../model_link.html#model.PortItem.PortItem.itemChange">[docs]</a>    <span class="k">def</span> <span class="nf">itemChange</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">change</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Item position has changed, calculate new position.</span>
+<span class="sd">        </span>
+<span class="sd">        :param change: Change value.</span>
+<span class="sd">        :param value: QtCore.QPointF().</span>
+<span class="sd">        :return value: QtCore.QPointF(x, y) or super(PortItem, self).itemChange(change, value).</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">change</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">ItemPositionChange</span><span class="p">:</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="n">value</span><span class="o">.</span><span class="n">y</span><span class="p">()</span>
+            <span class="c1"># TODO: make this a signal?</span>
+            <span class="c1"># This cannot be a signal because this is not a QObject</span>
+            <span class="k">for</span> <span class="n">cb</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">posChangeCallbacks</span><span class="p">:</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">cb</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">res</span><span class="p">:</span>
+                    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">res</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QPointF</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+            
+            <span class="k">return</span> <span class="n">value</span>
+        <span class="c1"># Call superclass method:</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">PortItem</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">itemChange</span><span class="p">(</span><span class="n">change</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+<span class="c1">#========================================================================================================================</span>
+    
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Christoph Kuhr.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

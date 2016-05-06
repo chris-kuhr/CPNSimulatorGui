@@ -1,0 +1,805 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>gui.DiagramEditor &mdash; Colored Petrinets Simulator Gui alpha 2 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     'alpha 2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Colored Petrinets Simulator Gui alpha 2 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for gui.DiagramEditor</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">PyQt4</span> <span class="kn">import</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtCore</span><span class="p">,</span> <span class="n">QtSvg</span><span class="p">,</span> <span class="n">uic</span>
+<span class="kn">from</span> <span class="nn">PyQt4.QtGui</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">PyQt4.QtCore</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">snakes.plugins</span>
+<span class="kn">from</span> <span class="nn">snakes.nets</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">deque</span>
+
+
+<span class="kn">from</span> <span class="nn">model</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">model.AbstractItem</span> <span class="kn">import</span> <span class="n">Connector</span>
+<span class="kn">from</span> <span class="nn">model.PlaceItem</span> <span class="kn">import</span> <span class="n">PlaceItem</span>
+<span class="kn">from</span> <span class="nn">model.TransitionItem</span> <span class="kn">import</span> <span class="n">TransitionItem</span>
+<span class="kn">from</span> <span class="nn">model.TokenItem</span> <span class="kn">import</span> <span class="n">TokenItem</span>
+<span class="kn">from</span> <span class="nn">model.PortItem</span> <span class="kn">import</span> <span class="n">PortItem</span>
+<span class="kn">from</span> <span class="nn">model.ArcItem</span> <span class="kn">import</span> <span class="n">ArcItem</span><span class="p">,</span> <span class="n">LineItem</span>
+
+<span class="kn">from</span> <span class="nn">gui.DiagramScene</span> <span class="kn">import</span> <span class="n">DiagramScene</span>
+<span class="kn">from</span> <span class="nn">gui.NameDialog</span> <span class="kn">import</span> <span class="n">NameDialog</span>
+<span class="kn">from</span> <span class="nn">gui.LibraryModel</span> <span class="kn">import</span> <span class="n">LibraryModel</span>
+
+<span class="kn">from</span> <span class="nn">inout.XMLIO</span> <span class="kn">import</span> <span class="n">XMLIO</span>
+
+
+<div class="viewcode-block" id="EditorGraphicsView"><a class="viewcode-back" href="../../gui_link.html#gui.DiagramEditor.EditorGraphicsView">[docs]</a><span class="k">class</span> <span class="nc">EditorGraphicsView</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QGraphicsView</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Viewport for the `gui.DiagramScene` s.</span>
+<span class="sd">    </span>
+<span class="sd">    It controls the zooming feature and drag and drop operations from the item library.</span>
+<span class="sd">    </span>
+<span class="sd">    :member parent: Parent editor widget.   </span>
+<span class="sd">    :member scaleFactor: Zooming factor.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>        
+        <span class="sd">&#39;&#39;&#39;Create the Viewport.</span>
+<span class="sd">        </span>
+<span class="sd">        :param parent: Parent editor widget.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">QtGui</span><span class="o">.</span><span class="n">QGraphicsView</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">.</span><span class="n">diagramScene</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scaleFactor</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+            
+<div class="viewcode-block" id="EditorGraphicsView.dragEnterEvent"><a class="viewcode-back" href="../../gui_link.html#gui.DiagramEditor.EditorGraphicsView.dragEnterEvent">[docs]</a>    <span class="k">def</span> <span class="nf">dragEnterEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Callback method, when an icon is dragged from the `libraryModelView` to `gui.diagramScene`.</span>
+<span class="sd">        </span>
+<span class="sd">        :param event: `QtGui.dragEnterEvent`.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">mimeData</span><span class="p">()</span><span class="o">.</span><span class="n">hasFormat</span><span class="p">(</span><span class="s1">&#39;component/name&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nodeType</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">mimeData</span><span class="p">()</span><span class="o">.</span><span class="n">data</span><span class="p">(</span><span class="s1">&#39;component/name&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">toLower</span><span class="p">()</span>
+            <span class="n">event</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+            
+<div class="viewcode-block" id="EditorGraphicsView.dragMoveEvent"><a class="viewcode-back" href="../../gui_link.html#gui.DiagramEditor.EditorGraphicsView.dragMoveEvent">[docs]</a>    <span class="k">def</span> <span class="nf">dragMoveEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Callback method, when an icon is moved over the `gui.diagramScene`.</span>
+<span class="sd">        </span>
+<span class="sd">        :param event: `QtGui.dragMoveEvent`.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">mimeData</span><span class="p">()</span><span class="o">.</span><span class="n">hasFormat</span><span class="p">(</span><span class="s1">&#39;component/name&#39;</span><span class="p">):</span>
+            <span class="n">event</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+            
+<div class="viewcode-block" id="EditorGraphicsView.dropEvent"><a class="viewcode-back" href="../../gui_link.html#gui.DiagramEditor.EditorGraphicsView.dropEvent">[docs]</a>    <span class="k">def</span> <span class="nf">dropEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Callback method, when an icon is dropped on the `gui.diagramScene`.</span>
+<span class="sd">        </span>
+<span class="sd">        :param event: `QtGui.dropEvent`.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">mimeData</span><span class="p">()</span><span class="o">.</span><span class="n">hasFormat</span><span class="p">(</span><span class="s1">&#39;component/name&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">eventPosition</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">pos</span><span class="p">()</span> 
+            <span class="k">if</span> <span class="s2">&quot;token&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeType</span><span class="p">:</span>     
+                <span class="bp">self</span><span class="o">.</span><span class="n">validDrop</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="s2">&quot;transition&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeType</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">diag</span> <span class="o">=</span> <span class="n">NameDialog</span><span class="p">(</span><span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="o">=</span><span class="s2">&quot;transition&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Enter </span><span class="si">%s</span><span class="s2"> Name&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodeType</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">nodeType</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">accepted</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validDrop</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="s2">&quot;place&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeType</span><span class="p">:</span>        
+                <span class="bp">self</span><span class="o">.</span><span class="n">diag</span> <span class="o">=</span> <span class="n">NameDialog</span><span class="p">(</span><span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="o">=</span><span class="s2">&quot;place&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Enter </span><span class="si">%s</span><span class="s2"> Name&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodeType</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">nodeType</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">accepted</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validDrop</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>    
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">errorString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;no valid target, dropping aborted&quot;</span> <span class="p">)</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">errorString</span> <span class="p">)</span>
+                <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">yellow</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">errorString</span><span class="p">)</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">diag</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">eventPosition</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeType</span>
+                <span class="k">return</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="EditorGraphicsView.wheelEvent"><a class="viewcode-back" href="../../gui_link.html#gui.DiagramEditor.EditorGraphicsView.wheelEvent">[docs]</a>    <span class="k">def</span> <span class="nf">wheelEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Callback method, when the mouse wheel is used.</span>
+<span class="sd">        </span>
+<span class="sd">        :param event: `QtGui.wheelEvent`.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">factor</span> <span class="o">=</span> <span class="mf">0.25</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">modifiers</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ControlModifier</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">delta</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">scaleFactor</span> <span class="o">+=</span> <span class="n">factor</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">lineEdit_2</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;{:3.0f}%&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scaleFactor</span><span class="o">*</span><span class="mi">100</span><span class="p">))</span>    
+                <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">factor</span><span class="p">),</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">factor</span><span class="p">)</span> <span class="p">)</span>         
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaleFactor</span> <span class="o">&gt;</span> <span class="n">factor</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">scaleFactor</span> <span class="o">-=</span> <span class="n">factor</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">lineEdit_2</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;{:3.0f}%&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scaleFactor</span><span class="o">*</span><span class="mi">100</span><span class="p">))</span>    
+                    <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">factor</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">factor</span><span class="p">)</span> <span class="p">)</span>                     
+                
+            <span class="bp">self</span><span class="o">.</span><span class="n">centerOn</span><span class="p">(</span> <span class="n">event</span><span class="o">.</span><span class="n">pos</span><span class="p">()</span> <span class="p">)</span>        
+            
+        <span class="n">QtGui</span><span class="o">.</span><span class="n">QGraphicsView</span><span class="o">.</span><span class="n">wheelEvent</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">event</span> <span class="p">)</span></div>
+    
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+<div class="viewcode-block" id="EditorGraphicsView.validDrop"><a class="viewcode-back" href="../../gui_link.html#gui.DiagramEditor.EditorGraphicsView.validDrop">[docs]</a>    <span class="k">def</span> <span class="nf">validDrop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>       
+        <span class="sd">&#39;&#39;&#39;Callback method, when the drop on `gui.DiagramScene` was valid.&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="s2">&quot;token&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeType</span><span class="p">:</span>     
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">eventPosition</span> <span class="p">):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">PlaceItem</span><span class="p">):</span>
+                    <span class="n">item</span><span class="o">.</span><span class="n">addToken</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="s2">&quot;transition&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeType</span><span class="p">:</span>   
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">checkBox</span><span class="o">.</span><span class="n">checkState</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">subnet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span>
+                <span class="n">substitutionTransition</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">subnet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">subnet</span>
+                <span class="n">substitutionTransition</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">uniqueNameBase</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="c1">#             b1 = TransitionItem( self.parent, self.diag.getName(),self.mapToScene( self.eventPosition ), guardExpression = &quot;True&quot;, substitutionTransition=substitutionTransition, uniqueName=&quot;t%d&quot;%self.parent.mainWindow.simulator.uniqueNameBase)</span>
+            <span class="n">b1</span> <span class="o">=</span> <span class="n">TransitionItem</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getName</span><span class="p">(),</span><span class="bp">self</span><span class="o">.</span><span class="n">mapToScene</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">eventPosition</span> <span class="p">),</span> <span class="n">guardExpression</span> <span class="o">=</span> <span class="s2">&quot;True&quot;</span><span class="p">,</span> <span class="n">substitutionTransition</span><span class="o">=</span><span class="n">substitutionTransition</span><span class="p">,</span> <span class="n">uniqueName</span><span class="o">=</span><span class="s2">&quot;t</span><span class="si">%d</span><span class="s2">&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">uniqueNameBase</span><span class="p">,</span> <span class="n">subnet</span><span class="o">=</span><span class="n">subnet</span><span class="p">)</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">b1</span><span class="p">)</span> 
+        <span class="k">elif</span> <span class="s2">&quot;place&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeType</span><span class="p">:</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">uniqueNameBase</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="c1">#             b1 = PlaceItem( self.parent, self.diag.getName(),self.mapToScene( self.eventPosition ), initMarking = [], uniqueName=&quot;p%d&quot;%self.parent.mainWindow.simulator.uniqueNameBase)</span>
+            <span class="n">b1</span> <span class="o">=</span> <span class="n">PlaceItem</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getName</span><span class="p">(),</span><span class="bp">self</span><span class="o">.</span><span class="n">mapToScene</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">eventPosition</span> <span class="p">),</span> <span class="n">initMarking</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">uniqueName</span><span class="o">=</span><span class="s2">&quot;p</span><span class="si">%d</span><span class="s2">&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">uniqueNameBase</span><span class="p">,</span> <span class="n">subnet</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">subnet</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">b1</span><span class="p">)</span> 
+<span class="c1">#         for place in self.parent.visualPlaces:</span>
+<span class="c1">#             place.findItemsInPlanes() </span>
+<span class="c1">#         for transition in self.parent.visualTransitions:</span>
+<span class="c1">#             transition.findItemsInPlanes()</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">eventPosition</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeType</span></div></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+<span class="c1">#========================================================================================================================</span>
+    
+
+<div class="viewcode-block" id="DiagramEditor"><a class="viewcode-back" href="../../gui_link.html#gui.DiagramEditor.DiagramEditor">[docs]</a><span class="k">class</span> <span class="nc">DiagramEditor</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Editor widget, containing the `libraryModelView`, the `colorSetListView` and the `gui.DiagramScene`.</span>
+<span class="sd">    </span>
+<span class="sd">    :member mainWindow: `gui.MainWindow`. Main application window.  </span>
+<span class="sd">    :member parent: Parent widget.</span>
+<span class="sd">    :member workingDir: Working directory.      </span>
+<span class="sd">    :member subnet: Name of visualized subnet, also window title.</span>
+<span class="sd">    :member colorListItems: Defined colors.</span>
+<span class="sd">    :member libItems: Visual library items, CPN elements.</span>
+<span class="sd">    :member portConnections: List of connections between portClone port places and substitution transitions.</span>
+<span class="sd">    :member visualPlaces: List of all `model.PlaceItem`s shown in this `gui.DiagramScene`.</span>
+<span class="sd">    :member visualTransitions: List of all `model.TransitionItem`s shown in this `gui.DiagramScene`.</span>
+<span class="sd">    :member visualConnectionList: List of all `model.ArcItem`s shown in this `gui.DiagramScene`.</span>
+<span class="sd">    :member libraryModel: Library model for visual CPN elements. </span>
+<span class="sd">    :member mouseScreenPos: Recorded mouse position.</span>
+<span class="sd">    :member diagramScene: Contained `gui.DiagramScene`.</span>
+<span class="sd">    :member diagramView: `gui.DiagramView` controlling `gui.DiagramScene`.</span>
+<span class="sd">    :member startedArc: Status, determining whether the creation of a connection has started.</span>
+<span class="sd">    :member showCanvasInfos: Status variable for activation of the tooltip `model.AbstractItem.DescriptionCanvas` s. </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mainWindow</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">workingDir</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">subnet</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Create editor widget.</span>
+<span class="sd">        </span>
+<span class="sd">        :param mainWindow: `gui.MainWindow`. Main application window.  </span>
+<span class="sd">        :param parent=None:</span>
+<span class="sd">        :param workingDir: Working directory.      </span>
+<span class="sd">        :param subnet: Name of visualized subnet, also window title.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span> <span class="o">=</span> <span class="n">mainWindow</span>         
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">workingDir</span> <span class="o">=</span> <span class="n">workingDir</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">subnet</span> <span class="o">=</span> <span class="n">subnet</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">portConnections</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">visualPlaces</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">visualTransitions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">visualConnectionList</span> <span class="o">=</span> <span class="p">[]</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">mouseScreenPos</span> <span class="o">=</span> <span class="bp">None</span>       
+                
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verticalLayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">libraryBrowserView</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListView</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">libraryBrowserView</span><span class="o">.</span><span class="n">setMinimumSize</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QSize</span><span class="p">(</span><span class="mi">250</span><span class="p">,</span> <span class="mi">75</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">libraryBrowserView</span><span class="o">.</span><span class="n">setMaximumSize</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QSize</span><span class="p">(</span><span class="mi">250</span><span class="p">,</span> <span class="mi">75</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">libraryModel</span> <span class="o">=</span> <span class="n">LibraryModel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">libraryModel</span><span class="o">.</span><span class="n">setColumnCount</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                
+        <span class="bp">self</span><span class="o">.</span><span class="n">libItems</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">libItems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">createIcon</span><span class="p">(</span><span class="s2">&quot;transition&quot;</span><span class="p">)</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">libItems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">createIcon</span><span class="p">(</span><span class="s2">&quot;place&quot;</span><span class="p">)</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">libItems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">createIcon</span><span class="p">(</span><span class="s2">&quot;token&quot;</span><span class="p">)</span> <span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">libItems</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">libraryModel</span><span class="o">.</span><span class="n">appendRow</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">libraryBrowserView</span><span class="o">.</span><span class="n">setModel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">libraryModel</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">libraryBrowserView</span><span class="o">.</span><span class="n">setViewMode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">libraryBrowserView</span><span class="o">.</span><span class="n">IconMode</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">libraryBrowserView</span><span class="o">.</span><span class="n">setDragDropMode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">libraryBrowserView</span><span class="o">.</span><span class="n">DragOnly</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodeLabel</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;Nodes and Tokens&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verticalLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodeLabel</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verticalLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">libraryBrowserView</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">colorListWidget</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidget</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">colorListWidget</span><span class="o">.</span><span class="n">setMinimumSize</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QSize</span><span class="p">(</span><span class="mi">250</span><span class="p">,</span> <span class="mi">250</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">colorListWidget</span><span class="o">.</span><span class="n">setMaximumSize</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QSize</span><span class="p">(</span><span class="mi">250</span><span class="p">,</span> <span class="mi">875</span><span class="p">))</span>
+                
+        <span class="bp">self</span><span class="o">.</span><span class="n">colorListItems</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">colorListItems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s2">&quot;add Color&quot;</span> <span class="p">)</span>        
+        
+        <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">colorListItems</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">colorListWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">token</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">colorListWidget</span><span class="o">.</span><span class="n">setDragDropMode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">colorListWidget</span><span class="o">.</span><span class="n">DragOnly</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">colorListWidget</span><span class="o">.</span><span class="n">itemDoubleClicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">newToken</span> <span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">colorLabel</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;Colors&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verticalLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">colorLabel</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verticalLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">colorListWidget</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">verticalLayout</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">diagramScene</span> <span class="o">=</span> <span class="bp">None</span>
+        
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">diagramScene</span> <span class="o">=</span> <span class="n">DiagramScene</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diagramView</span> <span class="o">=</span> <span class="n">EditorGraphicsView</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diagramView</span><span class="o">.</span><span class="n">setVerticalScrollBarPolicy</span><span class="p">(</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ScrollBarAlwaysOn</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diagramView</span><span class="o">.</span><span class="n">setHorizontalScrollBarPolicy</span><span class="p">(</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ScrollBarAlwaysOn</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diagramView</span><span class="o">.</span><span class="n">setMouseTracking</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">diagramView</span><span class="p">)</span>
+        
+        <span class="n">gridV2</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QGraphicsRectItem</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">gridV2</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">startedArc</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tmpArc</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validArc</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">showCanvasInfos</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="DiagramEditor.setTokenForPlace"><a class="viewcode-back" href="../../gui_link.html#gui.DiagramEditor.DiagramEditor.setTokenForPlace">[docs]</a>    <span class="k">def</span> <span class="nf">setTokenForPlace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">place</span><span class="p">,</span> <span class="n">actualMarking</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Show the tokens contained in place.</span>
+<span class="sd">        </span>
+<span class="sd">        :param place: `model.PlaceItem` to show the `model.TokenItem` for.</span>
+<span class="sd">        :param actualMarking: SNAKES Marking to determine the tokens for `place`.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+<span class="c1">#         logging.debug( &quot;%s %s&quot;%( str( self.subnet ) , str( place.subnet ) ) )</span>
+<span class="c1">#         for vPlace in self.visualPlaces:</span>
+<span class="c1">#             if place == vPlace:    </span>
+<span class="c1">#                 for tok in place.tokens:             </span>
+<span class="c1">#                     self.diagramScene.removeItem( tok ) </span>
+<span class="c1">#                     break       </span>
+
+        <span class="k">for</span> <span class="n">tok</span> <span class="ow">in</span> <span class="n">place</span><span class="o">.</span><span class="n">tokens</span><span class="p">:</span>             
+            <span class="bp">self</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span> <span class="n">tok</span> <span class="p">)</span> 
+            <span class="k">break</span>               
+            
+        <span class="n">place</span><span class="o">.</span><span class="n">tokens</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">place</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span>
+        <span class="n">rect</span> <span class="o">=</span> <span class="n">place</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">actualMarking</span><span class="p">(</span> <span class="n">place</span><span class="o">.</span><span class="n">uniqueName</span> <span class="p">):</span>
+            <span class="k">if</span> <span class="n">token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">place</span><span class="o">.</span><span class="n">tokens</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">TokenItem</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QRectF</span><span class="p">(</span> <span class="n">pos</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">+</span> <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="n">pos</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span> <span class="mf">15.0</span><span class="p">,</span> <span class="mf">15.0</span><span class="p">)</span>  <span class="p">)</span> <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">place</span><span class="o">.</span><span class="n">tokens</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">place</span><span class="o">.</span><span class="n">place</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                    <span class="k">pass</span></div>
+            
+<span class="c1">#             vPlace.tokens = deque()</span>
+<span class="c1">#             pos = vPlace.scenePos()</span>
+<span class="c1">#             rect = vPlace.boundingRect()</span>
+<span class="c1">#             for token in actualMarking( vPlace.uniqueName ):</span>
+<span class="c1">#                 if not &quot;None&quot; in str( token ):</span>
+<span class="c1">#                     vPlace.tokens.append( TokenItem( self, token, 1, QtCore.QRectF( pos.x() + rect.width(), pos.y(), 15.0, 15.0)  ) )</span>
+<span class="c1">#                     self.diagramScene.addItem(vPlace.tokens[-1])</span>
+
+
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+<div class="viewcode-block" id="DiagramEditor.setPortConnection"><a class="viewcode-back" href="../../gui_link.html#gui.DiagramEditor.DiagramEditor.setPortConnection">[docs]</a>    <span class="k">def</span> <span class="nf">setPortConnection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">portPlaceClone</span><span class="p">,</span> <span class="n">transition</span><span class="p">):</span>        
+        <span class="sd">&#39;&#39;&#39;Set a connection between a port place clone and a substitution transition.</span>
+<span class="sd">        </span>
+<span class="sd">        :param portPlaceClone: Port place clone `model.PlaceItem`. </span>
+<span class="sd">        :param transition: Substitutaion transition `model.TransitionItem`.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">portConnection</span> <span class="o">=</span> <span class="n">ArcItem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">portPlaceClone</span><span class="p">,</span> <span class="n">transition</span><span class="p">,</span> <span class="n">isPortConnection</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">portConnection</span><span class="o">.</span><span class="n">setEndPos</span><span class="p">(</span><span class="n">transition</span><span class="o">.</span><span class="n">scenePos</span><span class="p">())</span>  
+        <span class="n">portConnection</span><span class="o">.</span><span class="n">setDestination</span><span class="p">(</span><span class="n">transition</span><span class="p">)</span>   
+        <span class="bp">self</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">portConnection</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">portConnections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">portConnection</span> <span class="p">)</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+<div class="viewcode-block" id="DiagramEditor.setTokens"><a class="viewcode-back" href="../../gui_link.html#gui.DiagramEditor.DiagramEditor.setTokens">[docs]</a>    <span class="k">def</span> <span class="nf">setTokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actualMarking</span><span class="p">):</span> 
+        <span class="sd">&#39;&#39;&#39;Set tokens for `actualMarking`.</span>
+<span class="sd">        </span>
+<span class="sd">        :param actualMarking: SNAKES Marking to determine the tokens for `place`.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">place</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">visualPlaces</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setTokenForPlace</span><span class="p">(</span><span class="n">place</span><span class="p">,</span> <span class="n">actualMarking</span><span class="p">)</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="DiagramEditor.keyPressEvent"><a class="viewcode-back" href="../../gui_link.html#gui.DiagramEditor.DiagramEditor.keyPressEvent">[docs]</a>    <span class="k">def</span> <span class="nf">keyPressEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span> 
+        <span class="sd">&#39;&#39;&#39;Callback method, when a key is pressed on the keyboard.</span>
+<span class="sd">        </span>
+<span class="sd">        :param event: `QtGui.keyPressEvent`.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">modifiers</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ControlModifier</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">key</span><span class="p">()</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_T</span><span class="p">:</span>      
+                <span class="bp">self</span><span class="o">.</span><span class="n">nodeType</span> <span class="o">=</span> <span class="s2">&quot;transition&quot;</span>
+            <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">key</span><span class="p">()</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_P</span><span class="p">:</span>      
+                <span class="bp">self</span><span class="o">.</span><span class="n">nodeType</span> <span class="o">=</span> <span class="s2">&quot;place&quot;</span>
+            <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">key</span><span class="p">()</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_M</span><span class="p">:</span>    
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">showCanvasInfos</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">showCanvasInfos</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">showCanvasInfos</span> <span class="o">=</span> <span class="bp">False</span>
+                              
+                <span class="k">for</span> <span class="n">place</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">visualPlaces</span><span class="p">:</span>
+                    <span class="n">place</span><span class="o">.</span><span class="n">descCanvas</span><span class="o">.</span><span class="n">setVisibility</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">showCanvasInfos</span> <span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">transition</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">visualTransitions</span><span class="p">:</span>
+                    <span class="n">transition</span><span class="o">.</span><span class="n">descCanvas</span><span class="o">.</span><span class="n">setVisibility</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">showCanvasInfos</span> <span class="p">)</span>
+
+                <span class="k">return</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">diag</span> <span class="o">=</span> <span class="n">NameDialog</span><span class="p">(</span><span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="o">=</span><span class="s2">&quot;transition&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Enter </span><span class="si">%s</span><span class="s2"> Name&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodeType</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">nodeType</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+                
+<span class="c1">#             self.diag = NameDialog(parent=self, title=&quot;Enter %s Name&quot; % (self.nodeType[0].upper()+self.nodeType[1:]), default=&quot;unnamed&quot;)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">accepted</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shortcutCreateNode</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">key</span><span class="p">()</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_Delete</span><span class="p">:</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">deleteItems</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">selectedItems</span><span class="p">()</span> <span class="p">)</span>
+            <span class="k">pass</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="DiagramEditor.wheelEvent"><a class="viewcode-back" href="../../gui_link.html#gui.DiagramEditor.DiagramEditor.wheelEvent">[docs]</a>    <span class="k">def</span> <span class="nf">wheelEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Callback method, when the mouse wheel is used.</span>
+<span class="sd">        </span>
+<span class="sd">        :param event: `QtGui.wheelEvent`.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="o">.</span><span class="n">wheelEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span></div>
+    
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+<div class="viewcode-block" id="DiagramEditor.sceneMouseMoveEvent"><a class="viewcode-back" href="../../gui_link.html#gui.DiagramEditor.DiagramEditor.sceneMouseMoveEvent">[docs]</a>    <span class="k">def</span> <span class="nf">sceneMouseMoveEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Catch sceneMouseMoveEvent during arc creation.</span>
+<span class="sd">        </span>
+<span class="sd">        :param event: `QtGui.sceneMouseMoveEvent`.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">startedArc</span><span class="p">:</span>            
+            <span class="bp">self</span><span class="o">.</span><span class="n">startedArc</span><span class="o">.</span><span class="n">setEndPos</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mouseScreenPos</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">screenPos</span><span class="p">()</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+            
+            
+<div class="viewcode-block" id="DiagramEditor.sceneMouseReleaseEvent"><a class="viewcode-back" href="../../gui_link.html#gui.DiagramEditor.DiagramEditor.sceneMouseReleaseEvent">[docs]</a>    <span class="k">def</span> <span class="nf">sceneMouseReleaseEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Catch `QtGui.sceneMouseReleaseEvent` on arc completion.</span>
+<span class="sd">        </span>
+<span class="sd">        :param event: `QtGui.sceneMouseReleaseEvent`.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mouseScreenPos</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">screenPos</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">startedArc</span><span class="p">:</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span>  <span class="bp">self</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">items</span><span class="p">(</span> <span class="n">pos</span> <span class="p">):</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="ow">is</span> <span class="n">Connector</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span> <span class="ow">is</span> <span class="n">TransitionItem</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">startedArc</span><span class="o">.</span><span class="n">srcConnector</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span> <span class="ow">is</span> <span class="n">PlaceItem</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">startedArc</span><span class="o">.</span><span class="n">setDestination</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>                                        
+                        <span class="bp">self</span><span class="o">.</span><span class="n">startedArc</span><span class="o">.</span><span class="n">dstConnector</span><span class="o">.</span><span class="n">connectionArc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">startedArc</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">tmpArc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">startedArc</span>                    
+                        <span class="bp">self</span><span class="o">.</span><span class="n">diag</span> <span class="o">=</span> <span class="n">NameDialog</span><span class="p">(</span><span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="o">=</span><span class="n">item</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Enter Variable for Input Arc&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">accepted</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validConnection</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+                        
+                    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span> <span class="ow">is</span> <span class="n">PlaceItem</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">startedArc</span><span class="o">.</span><span class="n">srcConnector</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span> <span class="ow">is</span> <span class="n">TransitionItem</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">startedArc</span><span class="o">.</span><span class="n">setDestination</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>                                     
+                        <span class="bp">self</span><span class="o">.</span><span class="n">startedArc</span><span class="o">.</span><span class="n">dstConnector</span><span class="o">.</span><span class="n">connectionArc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">startedArc</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">tmpArc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">startedArc</span>                    
+                        <span class="bp">self</span><span class="o">.</span><span class="n">diag</span> <span class="o">=</span> <span class="n">NameDialog</span><span class="p">(</span><span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="o">=</span><span class="n">item</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Enter Variable or Expression for Output Arc&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">accepted</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validConnection</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+                            
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">startedArc</span><span class="o">.</span><span class="n">dstConnector</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">startedArc</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">startedArc</span> <span class="o">=</span> <span class="bp">None</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="DiagramEditor.createIcon"><a class="viewcode-back" href="../../gui_link.html#gui.DiagramEditor.DiagramEditor.createIcon">[docs]</a>    <span class="k">def</span> <span class="nf">createIcon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodeType</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Create Icons for `libraryModel`.</span>
+<span class="sd">        </span>
+<span class="sd">        :param nodeType: Type of icon to create.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">pixmap</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPixmap</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+        <span class="n">pixmap</span><span class="o">.</span><span class="n">fill</span><span class="p">()</span>
+        <span class="n">painter</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPainter</span><span class="p">(</span><span class="n">pixmap</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nodeType</span> <span class="o">==</span> <span class="s2">&quot;transition&quot;</span><span class="p">:</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">white</span><span class="p">)</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">drawRect</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">nodeType</span> <span class="o">==</span> <span class="s2">&quot;place&quot;</span><span class="p">:</span>           
+            <span class="n">painter</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">white</span><span class="p">)</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">drawEllipse</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span> 
+        <span class="k">elif</span> <span class="n">nodeType</span> <span class="o">==</span> <span class="s2">&quot;token&quot;</span><span class="p">:</span>           
+            <span class="n">painter</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">green</span><span class="p">)</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">drawEllipse</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span> 
+
+        <span class="n">painter</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QStandardItem</span><span class="p">(</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QIcon</span><span class="p">(</span><span class="n">pixmap</span><span class="p">),</span> <span class="n">nodeType</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="n">nodeType</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="p">)</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+        
+        
+<div class="viewcode-block" id="DiagramEditor.newToken"><a class="viewcode-back" href="../../gui_link.html#gui.DiagramEditor.DiagramEditor.newToken">[docs]</a>    <span class="k">def</span> <span class="nf">newToken</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Callback method, when `add Token` is clicked in `colorListView`.</span>
+<span class="sd">        </span>
+<span class="sd">        :param item: `colorListView` item.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">colorListWidget</span><span class="o">.</span><span class="n">item</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">colorListWidget</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="o">-</span><span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">diag</span> <span class="o">=</span> <span class="n">NameDialog</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Token&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">accepted</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">defineNewToken</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>  </div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+        
+        
+<div class="viewcode-block" id="DiagramEditor.defineNewToken"><a class="viewcode-back" href="../../gui_link.html#gui.DiagramEditor.DiagramEditor.defineNewToken">[docs]</a>    <span class="k">def</span> <span class="nf">defineNewToken</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Define a new color set.&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">defineNewColour</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="p">)</span>            </div>
+    <span class="c1">#-------------------------------------------------------------------------------------------------</span>
+        
+    
+<div class="viewcode-block" id="DiagramEditor.shortcutCreateNode"><a class="viewcode-back" href="../../gui_link.html#gui.DiagramEditor.DiagramEditor.shortcutCreateNode">[docs]</a>    <span class="k">def</span> <span class="nf">shortcutCreateNode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Create CPN elements with keyboard shortcuts.&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="s2">&quot;transition&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeType</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">checkBox</span><span class="o">.</span><span class="n">checkState</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">subnet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span>
+                <span class="n">substitutionTransition</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">subnet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subnet</span>
+                <span class="n">substitutionTransition</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">uniqueNameBase</span> <span class="o">+=</span> <span class="mi">1</span>
+            
+            <span class="n">b1</span> <span class="o">=</span> <span class="n">TransitionItem</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getName</span><span class="p">(),</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QPointF</span><span class="p">(),</span> <span class="n">guardExpression</span> <span class="o">=</span> <span class="s2">&quot;True&quot;</span><span class="p">,</span> <span class="n">substitutionTransition</span><span class="o">=</span><span class="n">substitutionTransition</span><span class="p">,</span> <span class="n">uniqueName</span><span class="o">=</span><span class="s2">&quot;t</span><span class="si">%d</span><span class="s2">&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">uniqueNameBase</span><span class="p">,</span> <span class="n">subnet</span><span class="o">=</span><span class="n">subnet</span><span class="p">)</span>
+
+<span class="c1">#             b1 = TransitionItem( self, self.diag.getName(), self.mouseScreenPos, net=self.mainWindow.simulator.net, guardExpression = &quot;True&quot;, uniqueName=&quot;t%d&quot;%self.mainWindow.simulator.uniqueNameBase)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">uniqueNameBase</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="s2">&quot;place&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeType</span><span class="p">:</span>            
+            <span class="n">b1</span> <span class="o">=</span> <span class="n">PlaceItem</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getName</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">mouseScreenPos</span><span class="p">,</span> <span class="n">initMarking</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">uniqueName</span><span class="o">=</span><span class="s2">&quot;p</span><span class="si">%d</span><span class="s2">&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">uniqueNameBase</span><span class="p">,</span> <span class="n">subnet</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">subnet</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">uniqueNameBase</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">errorString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;no valid target, dropping aborted&quot;</span> <span class="p">)</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">errorString</span> <span class="p">)</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">yellow</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span> 
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">errorString</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">b1</span><span class="p">)</span> 
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">diag</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeType</span>
+        <span class="k">pass</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+        
+<div class="viewcode-block" id="DiagramEditor.deleteSubnet"><a class="viewcode-back" href="../../gui_link.html#gui.DiagramEditor.DiagramEditor.deleteSubnet">[docs]</a>    <span class="k">def</span> <span class="nf">deleteSubnet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">editor</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Recursivly delete subnet editor and their content.</span>
+<span class="sd">        </span>
+<span class="sd">        :param editor: Root `gui.DiagramEditor` for deletion. </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deleteItems</span><span class="p">(</span> <span class="n">editor</span><span class="p">,</span> <span class="n">editor</span><span class="o">.</span><span class="n">visualTransitions</span> <span class="o">+</span> <span class="n">editor</span><span class="o">.</span><span class="n">visualPlaces</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">connection</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span> <span class="n">editor</span><span class="o">.</span><span class="n">visualConnectionList</span> <span class="p">):</span>
+            <span class="k">if</span> <span class="n">connection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">connectionList</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">connectionList</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span> <span class="n">connection</span> <span class="p">)</span>  
+            <span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span> <span class="n">connection</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span>
+            <span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span> <span class="n">connection</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">arcLine</span> <span class="p">)</span>
+            <span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span> <span class="n">connection</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">arrowPolygonObject</span> <span class="p">)</span>
+            <span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span> <span class="n">connection</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
+            <span class="n">editor</span><span class="o">.</span><span class="n">visualConnectionList</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span> <span class="n">connection</span> <span class="p">)</span> 
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">editors</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">editor</span><span class="p">)</span> </div>
+    <span class="c1">#------------------------------------------------------------------------------------------------    </span>
+        
+<div class="viewcode-block" id="DiagramEditor.deleteTransition"><a class="viewcode-back" href="../../gui_link.html#gui.DiagramEditor.DiagramEditor.deleteTransition">[docs]</a>    <span class="k">def</span> <span class="nf">deleteTransition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">editor</span><span class="p">,</span> <span class="n">transition</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Delete transitions, substitution transitions and their subnets.</span>
+<span class="sd">        </span>
+<span class="sd">        :param editor: `gui.DiagramEditor` containing the `transition`. </span>
+<span class="sd">        :param transition: `model.TransitionItem` for deletion.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">transition</span><span class="o">.</span><span class="n">substitutionTransition</span><span class="p">:</span>
+            <span class="n">tmpList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">editor</span><span class="o">.</span><span class="n">visualConnectionList</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">connection</span> <span class="ow">in</span> <span class="n">tmpList</span><span class="p">:</span>  
+                <span class="k">for</span> <span class="n">srcConnect</span> <span class="ow">in</span> <span class="n">transition</span><span class="o">.</span><span class="n">connectorList</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">connection</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">srcConnect</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">deleteArc</span><span class="p">(</span> <span class="n">editor</span><span class="p">,</span> <span class="n">connection</span> <span class="p">)</span>
+                <span class="k">for</span> <span class="n">dstConnect</span> <span class="ow">in</span> <span class="n">transition</span><span class="o">.</span><span class="n">connectorList</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">dstConnect</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">deleteArc</span><span class="p">(</span> <span class="n">editor</span><span class="p">,</span> <span class="n">connection</span> <span class="p">)</span>
+                         
+            <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">remove_transition</span><span class="p">(</span> <span class="n">transition</span><span class="o">.</span><span class="n">uniqueName</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">transitions</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span> <span class="n">transition</span> <span class="p">)</span> 
+            <span class="n">editor</span><span class="o">.</span><span class="n">visualTransitions</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">transition</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>                            
+            <span class="k">for</span> <span class="n">editor2</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">editors</span> <span class="p">):</span>
+                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span> <span class="n">editor2</span><span class="o">.</span><span class="n">subnet</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span> <span class="n">transition</span><span class="o">.</span><span class="n">name</span> <span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">deleteSubnet</span><span class="p">(</span> <span class="n">editor2</span> <span class="p">)</span>  
+            <span class="n">editor</span><span class="o">.</span><span class="n">visualTransitions</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">transition</span><span class="p">)</span>        
+        <span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span> <span class="n">transition</span> <span class="p">)</span> 
+        <span class="k">del</span> <span class="n">transition</span>        </div>
+        
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+<div class="viewcode-block" id="DiagramEditor.deletePlace"><a class="viewcode-back" href="../../gui_link.html#gui.DiagramEditor.DiagramEditor.deletePlace">[docs]</a>    <span class="k">def</span> <span class="nf">deletePlace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">editor</span><span class="p">,</span> <span class="n">place</span><span class="p">,</span> <span class="n">portClone</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Delete places, port places and port clone places.</span>
+<span class="sd">        </span>
+<span class="sd">        :param editor: `gui.DiagramEditor` containing the `place`. </span>
+<span class="sd">        :param place: `model.PlaceItem` for deletion.</span>
+<span class="sd">        :param portClone: Flag determining whether a port clone place shall be deleted.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">tmpList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">editor</span><span class="o">.</span><span class="n">visualConnectionList</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">connection</span> <span class="ow">in</span> <span class="n">tmpList</span><span class="p">:</span>  
+            <span class="k">for</span> <span class="n">srcConnect</span> <span class="ow">in</span> <span class="n">place</span><span class="o">.</span><span class="n">connectorList</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">connection</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">srcConnect</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">deleteArc</span><span class="p">(</span> <span class="n">editor</span><span class="p">,</span> <span class="n">connection</span> <span class="p">)</span>
+            <span class="k">for</span> <span class="n">dstConnect</span> <span class="ow">in</span> <span class="n">place</span><span class="o">.</span><span class="n">connectorList</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">dstConnect</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">deleteArc</span><span class="p">(</span> <span class="n">editor</span><span class="p">,</span> <span class="n">connection</span> <span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">portClone</span><span class="p">:</span>   
+            <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">place</span><span class="o">.</span><span class="n">tokens</span><span class="p">:</span>
+                <span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span> <span class="n">token</span> <span class="p">)</span>
+                <span class="k">break</span>
+            <span class="n">editor</span><span class="o">.</span><span class="n">visualPlaces</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span> <span class="n">place</span> <span class="p">)</span>      
+            
+            
+            <span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span> <span class="n">place</span> <span class="p">)</span>   
+            
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">place</span><span class="o">.</span><span class="n">port</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">place</span><span class="o">.</span><span class="n">portClone</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">place</span><span class="o">.</span><span class="n">tokens</span><span class="p">:</span>
+                    <span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span> <span class="n">token</span> <span class="p">)</span>
+                    <span class="k">break</span>
+                
+                <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">remove_place</span><span class="p">(</span> <span class="n">place</span><span class="o">.</span><span class="n">uniqueName</span> <span class="p">)</span>   
+                <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">places</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span> <span class="n">place</span> <span class="p">)</span>
+                <span class="n">editor</span><span class="o">.</span><span class="n">visualPlaces</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span> <span class="n">place</span> <span class="p">)</span>      
+                <span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span> <span class="n">place</span> <span class="p">)</span>   
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">place</span><span class="o">.</span><span class="n">portClone</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">editor2</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">editors</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">place</span><span class="o">.</span><span class="n">portClone</span><span class="p">,</span> <span class="n">PlaceItem</span> <span class="p">):</span>
+                            <span class="k">if</span> <span class="nb">str</span><span class="p">(</span> <span class="n">editor2</span><span class="o">.</span><span class="n">subnet</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span> <span class="n">place</span><span class="o">.</span><span class="n">portClone</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">subnet</span> <span class="p">):</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">deletePlace</span><span class="p">(</span> <span class="n">editor2</span><span class="p">,</span> <span class="n">place</span><span class="o">.</span><span class="n">portClone</span><span class="p">,</span> <span class="n">portClone</span><span class="o">=</span><span class="bp">True</span> <span class="p">)</span> 
+                                <span class="k">for</span> <span class="n">connection</span> <span class="ow">in</span> <span class="n">editor2</span><span class="o">.</span><span class="n">portConnections</span><span class="p">:</span>
+                                    <span class="k">if</span> <span class="n">connection</span><span class="o">.</span><span class="n">srcConnector</span><span class="o">.</span><span class="n">parent</span> <span class="o">==</span> <span class="n">place</span><span class="o">.</span><span class="n">portClone</span><span class="p">:</span>
+                                        <span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span> <span class="n">connection</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span>
+                                        <span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span> <span class="n">connection</span><span class="o">.</span><span class="n">arcLine</span> <span class="p">)</span>
+                                        <span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span> <span class="n">connection</span><span class="o">.</span><span class="n">arrowPolygonObject</span> <span class="p">)</span>                                    
+                                        <span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span> <span class="n">connection</span> <span class="p">)</span>  
+                                        <span class="n">editor2</span><span class="o">.</span><span class="n">portConnections</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span> <span class="n">connection</span> <span class="p">)</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">place</span><span class="o">.</span><span class="n">portClone</span><span class="p">,</span> <span class="nb">str</span> <span class="p">):</span>
+                            <span class="k">for</span> <span class="n">editor3</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">editors</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+                                <span class="k">for</span> <span class="n">place2</span> <span class="ow">in</span> <span class="n">editor3</span><span class="o">.</span><span class="n">visualPlaces</span><span class="p">:</span>
+                                    <span class="k">if</span> <span class="nb">str</span><span class="p">(</span> <span class="n">place2</span><span class="o">.</span><span class="n">uniqueName</span> <span class="p">)</span> <span class="o">==</span>  <span class="nb">str</span><span class="p">(</span> <span class="n">place</span><span class="o">.</span><span class="n">portClone</span> <span class="p">):</span>
+                                        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span> <span class="n">editor2</span><span class="o">.</span><span class="n">subnet</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span> <span class="n">place2</span><span class="o">.</span><span class="n">uniqueName</span> <span class="p">):</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">deletePlace</span><span class="p">(</span> <span class="n">editor2</span><span class="p">,</span> <span class="n">place2</span> <span class="p">,</span> <span class="n">portClone</span><span class="o">=</span><span class="bp">True</span> <span class="p">)</span> 
+                                            <span class="k">for</span> <span class="n">connection</span> <span class="ow">in</span> <span class="n">editor2</span><span class="o">.</span><span class="n">portConnections</span><span class="p">:</span>
+                                                <span class="k">if</span> <span class="n">connection</span><span class="o">.</span><span class="n">srcConnector</span><span class="o">.</span><span class="n">parent</span> <span class="o">==</span> <span class="n">place2</span><span class="p">:</span>
+                                                    <span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span> <span class="n">connection</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span>
+                                                    <span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span> <span class="n">connection</span><span class="o">.</span><span class="n">arcLine</span> <span class="p">)</span>
+                                                    <span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span> <span class="n">connection</span><span class="o">.</span><span class="n">arrowPolygonObject</span> <span class="p">)</span>                                    
+                                                    <span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span> <span class="n">connection</span> <span class="p">)</span>  
+                                                    <span class="n">editor2</span><span class="o">.</span><span class="n">portConnections</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span> <span class="n">connection</span> <span class="p">)</span>
+    
+                        <span class="k">for</span> <span class="n">portOrigin</span> <span class="ow">in</span> <span class="n">editor2</span><span class="o">.</span><span class="n">visualPlaces</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="nb">str</span><span class="p">(</span> <span class="n">place</span><span class="o">.</span><span class="n">uniqueName</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span> <span class="n">portOrigin</span><span class="o">.</span><span class="n">uniqueName</span> <span class="p">):</span>
+                                <span class="n">portOrigin</span><span class="o">.</span><span class="n">portClone</span> <span class="o">=</span> <span class="bp">None</span>
+                                           
+                    <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">place</span><span class="o">.</span><span class="n">tokens</span><span class="p">:</span>
+                        <span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span> <span class="n">token</span> <span class="p">)</span>
+                        <span class="k">break</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">remove_place</span><span class="p">(</span> <span class="n">place</span><span class="o">.</span><span class="n">uniqueName</span> <span class="p">)</span> 
+                    <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">places</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span> <span class="n">place</span> <span class="p">)</span>
+                    
+                    <span class="n">editor</span><span class="o">.</span><span class="n">visualPlaces</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span> <span class="n">place</span> <span class="p">)</span>      
+                    <span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span> <span class="n">place</span> <span class="p">)</span>
+                                                 
+        <span class="k">del</span> <span class="n">place</span></div>
+        
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+        
+        
+<div class="viewcode-block" id="DiagramEditor.deleteToken"><a class="viewcode-back" href="../../gui_link.html#gui.DiagramEditor.DiagramEditor.deleteToken">[docs]</a>    <span class="k">def</span> <span class="nf">deleteToken</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">editor</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Delete a token.</span>
+<span class="sd">        </span>
+<span class="sd">        :param editor: `gui.DiagramEditor` containing the `place`. </span>
+<span class="sd">        :param token: `model.TokenItem` for deletion.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">place</span> <span class="ow">in</span> <span class="n">editor</span><span class="o">.</span><span class="n">visualPlaces</span><span class="p">:</span>
+            <span class="n">newDeque</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">tok</span> <span class="ow">in</span> <span class="n">place</span><span class="o">.</span><span class="n">tokens</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">token</span> <span class="o">==</span> <span class="n">tok</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">place</span><span class="o">.</span><span class="n">place</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">place</span><span class="p">(</span> <span class="n">place</span><span class="o">.</span><span class="n">uniqueName</span> <span class="p">)</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span> <span class="n">token</span><span class="o">.</span><span class="n">token</span> <span class="p">)</span>
+<span class="c1">#                     place.tokens.remove( token )</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">getActualMarking</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">get_marking</span><span class="p">()</span> <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">newDeque</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+            <span class="n">place</span><span class="o">.</span><span class="n">tokens</span> <span class="o">=</span> <span class="n">newDeque</span>    </div>
+        
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+        
+        
+<div class="viewcode-block" id="DiagramEditor.deleteItems"><a class="viewcode-back" href="../../gui_link.html#gui.DiagramEditor.DiagramEditor.deleteItems">[docs]</a>    <span class="k">def</span> <span class="nf">deleteItems</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">editor</span><span class="p">,</span> <span class="n">items</span><span class="p">):</span>  
+        <span class="sd">&#39;&#39;&#39;Delete items.</span>
+<span class="sd">        </span>
+<span class="sd">        :param editor: `gui.DiagramEditor` containing the `items`. </span>
+<span class="sd">        :param items: List with items (selection) to delete.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">item</span><span class="p">,</span> <span class="n">TokenItem</span> <span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">deleteToken</span><span class="p">(</span> <span class="n">editor</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span>  
+                
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">item</span><span class="p">,</span> <span class="n">TransitionItem</span> <span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">deleteTransition</span><span class="p">(</span> <span class="n">editor</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span>  
+                    
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">item</span><span class="p">,</span> <span class="n">PlaceItem</span> <span class="p">):</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">deletePlace</span><span class="p">(</span> <span class="n">editor</span><span class="p">,</span> <span class="n">item</span> <span class="p">)</span>
+                
+            <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="ow">is</span> <span class="n">LineItem</span><span class="p">:</span>   
+                <span class="n">tmpList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">visualConnectionList</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">connection</span> <span class="ow">in</span> <span class="n">tmpList</span><span class="p">:</span>  
+                    <span class="k">if</span> <span class="n">connection</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">item</span><span class="o">.</span><span class="n">parent</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">deleteArc</span><span class="p">(</span> <span class="n">editor</span><span class="p">,</span> <span class="n">connection</span> <span class="p">)</span>                </div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="DiagramEditor.deleteArc"><a class="viewcode-back" href="../../gui_link.html#gui.DiagramEditor.DiagramEditor.deleteArc">[docs]</a>    <span class="k">def</span> <span class="nf">deleteArc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">editor</span><span class="p">,</span> <span class="n">connection</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Delete arc.</span>
+<span class="sd">        </span>
+<span class="sd">        :param editor: `gui.DiagramEditor` containing the `connection`. </span>
+<span class="sd">        :param connection: `model.ArcItem` for deletion.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">connectionList</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="n">connection</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">connectionList</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span> <span class="n">connection</span> <span class="p">)</span>  
+        <span class="n">editor</span><span class="o">.</span><span class="n">visualConnectionList</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span> <span class="n">connection</span> <span class="p">)</span>  
+        
+        <span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span> <span class="n">connection</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span>
+        <span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span> <span class="n">connection</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">arcLine</span> <span class="p">)</span>
+        <span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span> <span class="n">connection</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">arrowPolygonObject</span> <span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="n">TransitionItem</span> <span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">remove_input</span><span class="p">(</span> <span class="n">connection</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">uniqueName</span> <span class="p">,</span> <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">uniqueName</span> <span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="n">PlaceItem</span> <span class="p">):</span>     
+                <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">remove_output</span><span class="p">(</span> <span class="n">connection</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">uniqueName</span> <span class="p">,</span> <span class="n">connection</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">uniqueName</span> <span class="p">)</span>
+            <span class="n">editor</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span> <span class="n">connection</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
+             
+        <span class="k">except</span> <span class="n">snakes</span><span class="o">.</span><span class="n">ConstraintError</span><span class="p">:</span>
+            <span class="n">errorString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;Constraint Error: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="p">))</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">errorString</span> <span class="p">)</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span> 
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">errorString</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">snakes</span><span class="o">.</span><span class="n">NodeError</span><span class="p">:</span>
+            <span class="n">errorString</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="s2">&quot;Node Error: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="p">))</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span> <span class="n">errorString</span> <span class="p">)</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">setTextColor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">logWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span> <span class="n">item</span> <span class="p">)</span> 
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">errorString</span><span class="p">)</span></div>
+        
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="DiagramEditor.startArc"><a class="viewcode-back" href="../../gui_link.html#gui.DiagramEditor.DiagramEditor.startArc">[docs]</a>    <span class="k">def</span> <span class="nf">startArc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodeItem</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Start an arc conneciton.</span>
+<span class="sd">        </span>
+<span class="sd">        :param nodeItem: `model.AbstractItem` source element.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">startedArc</span> <span class="o">=</span> <span class="n">ArcItem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodeItem</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+    
+<div class="viewcode-block" id="DiagramEditor.validConnection"><a class="viewcode-back" href="../../gui_link.html#gui.DiagramEditor.DiagramEditor.validConnection">[docs]</a>    <span class="k">def</span> <span class="nf">validConnection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Callback method, when a valid arc connection was created.&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getItem</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span> <span class="ow">is</span> <span class="n">TransitionItem</span><span class="p">:</span>          
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmpArc</span><span class="o">.</span><span class="n">setArcAnnotation</span><span class="p">(</span> <span class="n">annotationText</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="p">)</span>    <span class="p">:</span>   
+                <span class="bp">self</span><span class="o">.</span><span class="n">tmpArc</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="p">)</span>  
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmpArc</span><span class="p">)</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmpArc</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getItem</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span> <span class="ow">is</span> <span class="n">PlaceItem</span><span class="p">:</span>       
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmpArc</span><span class="o">.</span><span class="n">setArcAnnotation</span><span class="p">(</span> <span class="n">annotationText</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="p">):</span>       
+                <span class="bp">self</span><span class="o">.</span><span class="n">tmpArc</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">diag</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="p">)</span> 
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmpArc</span><span class="p">)</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmpArc</span>    
+            
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">diag</span></div></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+<span class="c1">#========================================================================================================================</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Christoph Kuhr.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

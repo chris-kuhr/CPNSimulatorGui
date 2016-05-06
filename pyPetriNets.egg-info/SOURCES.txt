@@ -1,0 +1,7 @@
+README
+setup.py
+pyPetriNets.egg-info/PKG-INFO
+pyPetriNets.egg-info/SOURCES.txt
+pyPetriNets.egg-info/dependency_links.txt
+pyPetriNets.egg-info/requires.txt
+pyPetriNets.egg-info/top_level.txt

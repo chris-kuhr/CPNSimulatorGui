@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>gui.DiagramScene &mdash; Colored Petrinets Simulator Gui alpha 2 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     'alpha 2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Colored Petrinets Simulator Gui alpha 2 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for gui.DiagramScene</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">PyQt4</span> <span class="kn">import</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtCore</span>
+<span class="kn">from</span> <span class="nn">PyQt4.QtGui</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">PyQt4.QtCore</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">model.AbstractItem</span> <span class="kn">import</span> <span class="n">Connector</span>
+
+<div class="viewcode-block" id="DiagramScene"><a class="viewcode-back" href="../../gui_link.html#gui.DiagramScene.DiagramScene">[docs]</a><span class="k">class</span> <span class="nc">DiagramScene</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QGraphicsScene</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Drawing Area.</span>
+<span class="sd">    </span>
+<span class="sd">    :member editor: Parent `gui.DiagramEditor`.</span>
+<span class="sd">    :member hovering: Flag determining, whether hovering is happening. (Workaround, since hovering is not forwarded).</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Create Diagram Scene.</span>
+<span class="sd">        </span>
+<span class="sd">        :param parent: Parent `gui.DiagramEditor`.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DiagramScene</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">=</span><span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hovering</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+<div class="viewcode-block" id="DiagramScene.mouseMoveEvent"><a class="viewcode-back" href="../../gui_link.html#gui.DiagramScene.DiagramScene.mouseMoveEvent">[docs]</a>    <span class="k">def</span> <span class="nf">mouseMoveEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Forward mouseMoveEvent during arc creation and reimplement hovering of `model.AbstractItem.Connector`.</span>
+<span class="sd">        </span>
+<span class="sd">        :param event: `QtGui.mouseMoveEvent`.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">hovering</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">(</span> <span class="n">event</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span> <span class="p">):</span>
+            <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">__class__</span><span class="p">,</span> <span class="n">Connector</span><span class="p">):</span>
+                <span class="n">hovering</span> <span class="o">=</span> <span class="n">item</span>
+        <span class="c1"># Left</span>
+        <span class="k">if</span> <span class="n">hovering</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">hovering</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="c1"># Emit hoverLeave on self.slotHover</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hovering</span><span class="o">.</span><span class="n">hoverLeaveEvent</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+        <span class="c1"># Entered</span>
+        <span class="k">if</span> <span class="n">hovering</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">hovering</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="c1"># Emit hoverEvent on hoverslot</span>
+            <span class="n">hovering</span><span class="o">.</span><span class="n">hoverEnterEvent</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">hovering</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">hovering</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hovering</span><span class="o">.</span><span class="n">hoverLeaveEvent</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+            <span class="n">hovering</span><span class="o">.</span><span class="n">hoverEnterEvent</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+                        
+        <span class="c1"># Save for next move</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hovering</span> <span class="o">=</span> <span class="n">hovering</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">sceneMouseMoveEvent</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DiagramScene</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">mouseMoveEvent</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+<span class="c1">#     def wheelEvent(self, event):</span>
+<span class="c1">#         QtGui.QGraphicsScene.wheelEvent(self, event)</span>
+<span class="c1">#     #------------------------------------------------------------------------------------------------</span>
+    
+<div class="viewcode-block" id="DiagramScene.mouseReleaseEvent"><a class="viewcode-back" href="../../gui_link.html#gui.DiagramScene.DiagramScene.mouseReleaseEvent">[docs]</a>    <span class="k">def</span> <span class="nf">mouseReleaseEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Forward mouseReleaseEvent during arc creation.</span>
+<span class="sd">        </span>
+<span class="sd">        :param event: `QtGui.mouseReleaseEvent`.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">sceneMouseReleaseEvent</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DiagramScene</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">mouseReleaseEvent</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></div></div>
+    <span class="c1">#------------------------------------------------------------------------------------------------</span>
+    
+<span class="c1">#     def mouseDoubleClickEvent (self, event):</span>
+<span class="c1">#         QtGui.QGraphicsScene.mouseDoubleClickEvent(self, event)</span>
+<span class="c1">#     #-----------------------------------------------------------------------------------------------</span>
+    
+    
+<span class="c1">#========================================================================================================================</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Christoph Kuhr.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

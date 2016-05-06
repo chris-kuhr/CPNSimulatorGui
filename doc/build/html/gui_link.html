@@ -1,0 +1,1094 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>gui &mdash; Colored Petrinets Simulator Gui alpha 2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     'alpha 2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Colored Petrinets Simulator Gui alpha 2 documentation" href="index.html" />
+    <link rel="next" title="model" href="model_link.html" />
+    <link rel="prev" title="Welcome to Colored Petrinets Simulator Gui’s documentation!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-gui.MainWindow">
+<span id="gui"></span><h1>gui<a class="headerlink" href="#module-gui.MainWindow" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="gui.MainWindow.MainWindow">
+<em class="property">class </em><code class="descclassname">gui.MainWindow.</code><code class="descname">MainWindow</code><span class="sig-paren">(</span><em>workingDir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/MainWindow.html#MainWindow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MainWindow.MainWindow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QMainWindow</span></code></p>
+<p>The MainWindow is loaded by the application main loop.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Member workingDir:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">Working directory.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Member editors:</th><td class="field-body">List of all editors: <cite>gui.DiagramEditor</cite>.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Member editorwidgets:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">List of all editor widgets.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member logWidget:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">Log widget.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Member tabWidget:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">Widget containing <cite>editors[0]</cite>, and the <cite>logWidget</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member simulator:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><cite>model.CPNSimulator</cite> instance.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Member timer:</th><td class="field-body">Simulation timer.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="gui.MainWindow.MainWindow.addSubnetEditor">
+<code class="descname">addSubnetEditor</code><span class="sig-paren">(</span><em>subnet</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/MainWindow.html#MainWindow.addSubnetEditor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MainWindow.MainWindow.addSubnetEditor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a subnet editor.</p>
+<p>&#64;param subnet: The string name of the substitution transition, name of the subnet</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.MainWindow.MainWindow.closeEvent">
+<code class="descname">closeEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/MainWindow.html#MainWindow.closeEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MainWindow.MainWindow.closeEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close window event.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; <cite>QtGui.closeEvent</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.MainWindow.MainWindow.createItemsAssignToEditor">
+<code class="descname">createItemsAssignToEditor</code><span class="sig-paren">(</span><em>editor</em>, <em>subnet</em>, <em>tmpSubnets</em>, <em>importSubnet=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/MainWindow.html#MainWindow.createItemsAssignToEditor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MainWindow.MainWindow.createItemsAssignToEditor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assign places, transition and connections to subnet editors</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>editor</strong> &#8211; <cite>gui.DiagramEditor</cite> subnet.</li>
+<li><strong>subnet</strong> &#8211; Subnet string name.</li>
+<li><strong>tmpSubnets</strong> &#8211; List of subnet names and corresponding items [&#8220;subnet&#8221;,[items]].</li>
+<li><strong>importSubnet</strong> &#8211; Flag determining, whethera new net is loaded or a subnet is imported.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Return subnetConnections:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><p class="first last">List of connection in subnet for later inter subnet processing.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.MainWindow.MainWindow.createSubnetItemLists">
+<code class="descname">createSubnetItemLists</code><span class="sig-paren">(</span><em>tmpSubnets</em>, <em>serPlaces</em>, <em>serTransitions</em>, <em>serConnections</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/MainWindow.html#MainWindow.createSubnetItemLists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MainWindow.MainWindow.createSubnetItemLists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assign subnet to items.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>tmpSubnets</strong> &#8211; List of subnet names</li>
+<li><strong>serPlaces</strong> &#8211; List with parameters for the Place generation: [[uniqueName, name, portClone, port, [pos], [initMarking]],...].</li>
+<li><strong>serTransitions</strong> &#8211; List with parameters for the Transition generation: [[uniqueName, name, [pos], guardExpression, subnet],...].</li>
+<li><strong>serConnections</strong> &#8211; List with parameters for the Connection generation: [[uniqueNameSRC, uniqueNameDST, name, sourceConnector, destinationConnector],...].</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Return newTmpSubnets:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><p class="first last">List of subnet names and corresponding items [&#8220;subnet&#8221;,[items]].</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.MainWindow.MainWindow.export_Step_as_SVG">
+<code class="descname">export_Step_as_SVG</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/MainWindow.html#MainWindow.export_Step_as_SVG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MainWindow.MainWindow.export_Step_as_SVG" title="Permalink to this definition">¶</a></dt>
+<dd><p>Export Petrinet and subnets to seperate SVG files</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.MainWindow.MainWindow.importSubnet">
+<code class="descname">importSubnet</code><span class="sig-paren">(</span><em>transition</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/MainWindow.html#MainWindow.importSubnet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MainWindow.MainWindow.importSubnet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Import subnet into editor.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>transition</strong> &#8211; Substitution transition <cite>model.TransitionItem</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.MainWindow.MainWindow.initNetFromFile">
+<code class="descname">initNetFromFile</code><span class="sig-paren">(</span><em>editor</em>, <em>subnetList</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/MainWindow.html#MainWindow.initNetFromFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MainWindow.MainWindow.initNetFromFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create all items for a subnet.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>editor</strong> &#8211; <cite>gui.DiagramEditor</cite> subnet.</li>
+<li><strong>subnetList</strong> &#8211; &#8220;subnet&#8221;,[items].</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Return places, transitions, connectionsInSubnet:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><p class="first last">List of visual places, List of visual Transitions, list of visualk connections.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.MainWindow.MainWindow.loadNet">
+<code class="descname">loadNet</code><span class="sig-paren">(</span><em>editor=None</em>, <em>filename=None</em>, <em>subnet=None</em>, <em>importSubnet=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/MainWindow.html#MainWindow.loadNet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MainWindow.MainWindow.loadNet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a net with subnets or import subnets from file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>editor</strong> &#8211; <cite>gui.DiagramEditor</cite> to fill with the subnet. <cite>editors[0]</cite> if editor=none</li>
+<li><strong>filename</strong> &#8211; The filename that is used when a new net is loaded.</li>
+<li><strong>subnet</strong> &#8211; Subnet string name.</li>
+<li><strong>importSubnet</strong> &#8211; Flag determining, whethera new net is loaded or a subnet is imported.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.MainWindow.MainWindow.lookupSubstitutionConnectors">
+<code class="descname">lookupSubstitutionConnectors</code><span class="sig-paren">(</span><em>subnetConnections</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/MainWindow.html#MainWindow.lookupSubstitutionConnectors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MainWindow.MainWindow.lookupSubstitutionConnectors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lookup and substitute connectors.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>subnetConnections</strong> &#8211; List of connection in subnet for inter subnet processing.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.MainWindow.MainWindow.newNet">
+<code class="descname">newNet</code><span class="sig-paren">(</span><em>init=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/MainWindow.html#MainWindow.newNet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MainWindow.MainWindow.newNet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new Petrinet.</p>
+<p>This method resets the main editor widget. It deletes 
+the previously loaded Petrinet, as well as any hierarchical subnet.</p>
+<p>&#64;param init: Load on startup?</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.MainWindow.MainWindow.openSubnet">
+<code class="descname">openSubnet</code><span class="sig-paren">(</span><em>transition</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/MainWindow.html#MainWindow.openSubnet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MainWindow.MainWindow.openSubnet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open subnet editor.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>transition</strong> &#8211; Substitution transition <cite>model.TransitionItem</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.MainWindow.MainWindow.saveNet">
+<code class="descname">saveNet</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/MainWindow.html#MainWindow.saveNet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MainWindow.MainWindow.saveNet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save Petrinet with respect to subnets to XML file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.MainWindow.MainWindow.setArc">
+<code class="descname">setArc</code><span class="sig-paren">(</span><em>editor</em>, <em>srcConnector</em>, <em>dstConnector</em>, <em>itemName</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/MainWindow.html#MainWindow.setArc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MainWindow.MainWindow.setArc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create arcs based on new uniqueNames.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>editor</strong> &#8211; <cite>gui.DiagramEditor</cite> subnet.</li>
+<li><strong>srcConnector</strong> &#8211; Source <cite>model.AbstractItem.Connector</cite>.</li>
+<li><strong>dstConnector</strong> &#8211; Destination <cite>model.AbstractItem.Connector</cite>.</li>
+<li><strong>itemName</strong> &#8211; Annotation text.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return newArc:</th><td class="field-body"><p class="first last">Newly created <cite>model.ArcItem</cite>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="gui.MainWindow.bin_">
+<code class="descclassname">gui.MainWindow.</code><code class="descname">bin_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#gui.MainWindow.bin_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="gui.MainWindow.hex_">
+<code class="descclassname">gui.MainWindow.</code><code class="descname">hex_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#gui.MainWindow.hex_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="gui.MainWindow.oct_">
+<code class="descclassname">gui.MainWindow.</code><code class="descname">oct_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#gui.MainWindow.oct_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<span class="target" id="module-gui.DiagramEditor"></span><dl class="class">
+<dt id="gui.DiagramEditor.DiagramEditor">
+<em class="property">class </em><code class="descclassname">gui.DiagramEditor.</code><code class="descname">DiagramEditor</code><span class="sig-paren">(</span><em>mainWindow=None</em>, <em>parent=None</em>, <em>workingDir=''</em>, <em>subnet=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/DiagramEditor.html#DiagramEditor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DiagramEditor.DiagramEditor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QWidget</span></code></p>
+<p>Editor widget, containing the <cite>libraryModelView</cite>, the <cite>colorSetListView</cite> and the <cite>gui.DiagramScene</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Member mainWindow:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><cite>gui.MainWindow</cite>. Main application window.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Member parent:</th><td class="field-body">Parent widget.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Member workingDir:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">Working directory.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Member subnet:</th><td class="field-body">Name of visualized subnet, also window title.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Member colorListItems:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">Defined colors.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member libItems:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">Visual library items, CPN elements.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Member portConnections:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">List of connections between portClone port places and substitution transitions.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member visualPlaces:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">List of all <cite>model.PlaceItem`s shown in this `gui.DiagramScene</cite>.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Member visualTransitions:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">List of all <cite>model.TransitionItem`s shown in this `gui.DiagramScene</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member visualConnectionList:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">List of all <cite>model.ArcItem`s shown in this `gui.DiagramScene</cite>.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Member libraryModel:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">Library model for visual CPN elements.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member mouseScreenPos:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">Recorded mouse position.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Member diagramScene:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">Contained <cite>gui.DiagramScene</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member diagramView:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><cite>gui.DiagramView</cite> controlling <cite>gui.DiagramScene</cite>.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Member startedArc:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">Status, determining whether the creation of a connection has started.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member showCanvasInfos:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">Status variable for activation of the tooltip <cite>model.AbstractItem.DescriptionCanvas</cite> s.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="gui.DiagramEditor.DiagramEditor.createIcon">
+<code class="descname">createIcon</code><span class="sig-paren">(</span><em>nodeType</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/DiagramEditor.html#DiagramEditor.createIcon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DiagramEditor.DiagramEditor.createIcon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create Icons for <cite>libraryModel</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>nodeType</strong> &#8211; Type of icon to create.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.DiagramEditor.DiagramEditor.defineNewToken">
+<code class="descname">defineNewToken</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/DiagramEditor.html#DiagramEditor.defineNewToken"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DiagramEditor.DiagramEditor.defineNewToken" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define a new color set.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.DiagramEditor.DiagramEditor.deleteArc">
+<code class="descname">deleteArc</code><span class="sig-paren">(</span><em>editor</em>, <em>connection</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/DiagramEditor.html#DiagramEditor.deleteArc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DiagramEditor.DiagramEditor.deleteArc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete arc.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>editor</strong> &#8211; <cite>gui.DiagramEditor</cite> containing the <cite>connection</cite>.</li>
+<li><strong>connection</strong> &#8211; <cite>model.ArcItem</cite> for deletion.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.DiagramEditor.DiagramEditor.deleteItems">
+<code class="descname">deleteItems</code><span class="sig-paren">(</span><em>editor</em>, <em>items</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/DiagramEditor.html#DiagramEditor.deleteItems"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DiagramEditor.DiagramEditor.deleteItems" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete items.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>editor</strong> &#8211; <cite>gui.DiagramEditor</cite> containing the <cite>items</cite>.</li>
+<li><strong>items</strong> &#8211; List with items (selection) to delete.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.DiagramEditor.DiagramEditor.deletePlace">
+<code class="descname">deletePlace</code><span class="sig-paren">(</span><em>editor</em>, <em>place</em>, <em>portClone=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/DiagramEditor.html#DiagramEditor.deletePlace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DiagramEditor.DiagramEditor.deletePlace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete places, port places and port clone places.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>editor</strong> &#8211; <cite>gui.DiagramEditor</cite> containing the <cite>place</cite>.</li>
+<li><strong>place</strong> &#8211; <cite>model.PlaceItem</cite> for deletion.</li>
+<li><strong>portClone</strong> &#8211; Flag determining whether a port clone place shall be deleted.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.DiagramEditor.DiagramEditor.deleteSubnet">
+<code class="descname">deleteSubnet</code><span class="sig-paren">(</span><em>editor</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/DiagramEditor.html#DiagramEditor.deleteSubnet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DiagramEditor.DiagramEditor.deleteSubnet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursivly delete subnet editor and their content.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>editor</strong> &#8211; Root <cite>gui.DiagramEditor</cite> for deletion.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.DiagramEditor.DiagramEditor.deleteToken">
+<code class="descname">deleteToken</code><span class="sig-paren">(</span><em>editor</em>, <em>token</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/DiagramEditor.html#DiagramEditor.deleteToken"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DiagramEditor.DiagramEditor.deleteToken" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a token.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>editor</strong> &#8211; <cite>gui.DiagramEditor</cite> containing the <cite>place</cite>.</li>
+<li><strong>token</strong> &#8211; <cite>model.TokenItem</cite> for deletion.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.DiagramEditor.DiagramEditor.deleteTransition">
+<code class="descname">deleteTransition</code><span class="sig-paren">(</span><em>editor</em>, <em>transition</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/DiagramEditor.html#DiagramEditor.deleteTransition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DiagramEditor.DiagramEditor.deleteTransition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete transitions, substitution transitions and their subnets.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>editor</strong> &#8211; <cite>gui.DiagramEditor</cite> containing the <cite>transition</cite>.</li>
+<li><strong>transition</strong> &#8211; <cite>model.TransitionItem</cite> for deletion.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.DiagramEditor.DiagramEditor.keyPressEvent">
+<code class="descname">keyPressEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/DiagramEditor.html#DiagramEditor.keyPressEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DiagramEditor.DiagramEditor.keyPressEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback method, when a key is pressed on the keyboard.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; <cite>QtGui.keyPressEvent</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.DiagramEditor.DiagramEditor.newToken">
+<code class="descname">newToken</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/DiagramEditor.html#DiagramEditor.newToken"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DiagramEditor.DiagramEditor.newToken" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback method, when <cite>add Token</cite> is clicked in <cite>colorListView</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>item</strong> &#8211; <cite>colorListView</cite> item.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.DiagramEditor.DiagramEditor.sceneMouseMoveEvent">
+<code class="descname">sceneMouseMoveEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/DiagramEditor.html#DiagramEditor.sceneMouseMoveEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DiagramEditor.DiagramEditor.sceneMouseMoveEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Catch sceneMouseMoveEvent during arc creation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; <cite>QtGui.sceneMouseMoveEvent</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.DiagramEditor.DiagramEditor.sceneMouseReleaseEvent">
+<code class="descname">sceneMouseReleaseEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/DiagramEditor.html#DiagramEditor.sceneMouseReleaseEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DiagramEditor.DiagramEditor.sceneMouseReleaseEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Catch <cite>QtGui.sceneMouseReleaseEvent</cite> on arc completion.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; <cite>QtGui.sceneMouseReleaseEvent</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.DiagramEditor.DiagramEditor.setPortConnection">
+<code class="descname">setPortConnection</code><span class="sig-paren">(</span><em>portPlaceClone</em>, <em>transition</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/DiagramEditor.html#DiagramEditor.setPortConnection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DiagramEditor.DiagramEditor.setPortConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set a connection between a port place clone and a substitution transition.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>portPlaceClone</strong> &#8211; Port place clone <cite>model.PlaceItem</cite>.</li>
+<li><strong>transition</strong> &#8211; Substitutaion transition <cite>model.TransitionItem</cite>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.DiagramEditor.DiagramEditor.setTokenForPlace">
+<code class="descname">setTokenForPlace</code><span class="sig-paren">(</span><em>place</em>, <em>actualMarking</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/DiagramEditor.html#DiagramEditor.setTokenForPlace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DiagramEditor.DiagramEditor.setTokenForPlace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show the tokens contained in place.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>place</strong> &#8211; <cite>model.PlaceItem</cite> to show the <cite>model.TokenItem</cite> for.</li>
+<li><strong>actualMarking</strong> &#8211; SNAKES Marking to determine the tokens for <cite>place</cite>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.DiagramEditor.DiagramEditor.setTokens">
+<code class="descname">setTokens</code><span class="sig-paren">(</span><em>actualMarking</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/DiagramEditor.html#DiagramEditor.setTokens"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DiagramEditor.DiagramEditor.setTokens" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set tokens for <cite>actualMarking</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>actualMarking</strong> &#8211; SNAKES Marking to determine the tokens for <cite>place</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.DiagramEditor.DiagramEditor.shortcutCreateNode">
+<code class="descname">shortcutCreateNode</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/DiagramEditor.html#DiagramEditor.shortcutCreateNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DiagramEditor.DiagramEditor.shortcutCreateNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create CPN elements with keyboard shortcuts.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.DiagramEditor.DiagramEditor.startArc">
+<code class="descname">startArc</code><span class="sig-paren">(</span><em>nodeItem</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/DiagramEditor.html#DiagramEditor.startArc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DiagramEditor.DiagramEditor.startArc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start an arc conneciton.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>nodeItem</strong> &#8211; <cite>model.AbstractItem</cite> source element.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.DiagramEditor.DiagramEditor.validConnection">
+<code class="descname">validConnection</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/DiagramEditor.html#DiagramEditor.validConnection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DiagramEditor.DiagramEditor.validConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback method, when a valid arc connection was created.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.DiagramEditor.DiagramEditor.wheelEvent">
+<code class="descname">wheelEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/DiagramEditor.html#DiagramEditor.wheelEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DiagramEditor.DiagramEditor.wheelEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback method, when the mouse wheel is used.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; <cite>QtGui.wheelEvent</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gui.DiagramEditor.EditorGraphicsView">
+<em class="property">class </em><code class="descclassname">gui.DiagramEditor.</code><code class="descname">EditorGraphicsView</code><span class="sig-paren">(</span><em>parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/DiagramEditor.html#EditorGraphicsView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DiagramEditor.EditorGraphicsView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QGraphicsView</span></code></p>
+<p>Viewport for the <cite>gui.DiagramScene</cite> s.</p>
+<p>It controls the zooming feature and drag and drop operations from the item library.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Member parent:</th><td class="field-body">Parent editor widget.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member scaleFactor:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">Zooming factor.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="gui.DiagramEditor.EditorGraphicsView.dragEnterEvent">
+<code class="descname">dragEnterEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/DiagramEditor.html#EditorGraphicsView.dragEnterEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DiagramEditor.EditorGraphicsView.dragEnterEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback method, when an icon is dragged from the <cite>libraryModelView</cite> to <cite>gui.diagramScene</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; <cite>QtGui.dragEnterEvent</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.DiagramEditor.EditorGraphicsView.dragMoveEvent">
+<code class="descname">dragMoveEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/DiagramEditor.html#EditorGraphicsView.dragMoveEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DiagramEditor.EditorGraphicsView.dragMoveEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback method, when an icon is moved over the <cite>gui.diagramScene</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; <cite>QtGui.dragMoveEvent</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.DiagramEditor.EditorGraphicsView.dropEvent">
+<code class="descname">dropEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/DiagramEditor.html#EditorGraphicsView.dropEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DiagramEditor.EditorGraphicsView.dropEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback method, when an icon is dropped on the <cite>gui.diagramScene</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; <cite>QtGui.dropEvent</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.DiagramEditor.EditorGraphicsView.validDrop">
+<code class="descname">validDrop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/DiagramEditor.html#EditorGraphicsView.validDrop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DiagramEditor.EditorGraphicsView.validDrop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback method, when the drop on <cite>gui.DiagramScene</cite> was valid.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.DiagramEditor.EditorGraphicsView.wheelEvent">
+<code class="descname">wheelEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/DiagramEditor.html#EditorGraphicsView.wheelEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DiagramEditor.EditorGraphicsView.wheelEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback method, when the mouse wheel is used.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; <cite>QtGui.wheelEvent</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="gui.DiagramEditor.bin_">
+<code class="descclassname">gui.DiagramEditor.</code><code class="descname">bin_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#gui.DiagramEditor.bin_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="gui.DiagramEditor.hex_">
+<code class="descclassname">gui.DiagramEditor.</code><code class="descname">hex_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#gui.DiagramEditor.hex_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="gui.DiagramEditor.oct_">
+<code class="descclassname">gui.DiagramEditor.</code><code class="descname">oct_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#gui.DiagramEditor.oct_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<span class="target" id="module-gui.DiagramScene"></span><dl class="class">
+<dt id="gui.DiagramScene.DiagramScene">
+<em class="property">class </em><code class="descclassname">gui.DiagramScene.</code><code class="descname">DiagramScene</code><span class="sig-paren">(</span><em>parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/DiagramScene.html#DiagramScene"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DiagramScene.DiagramScene" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QGraphicsScene</span></code></p>
+<p>Drawing Area.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Member editor:</th><td class="field-body">Parent <cite>gui.DiagramEditor</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member hovering:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">Flag determining, whether hovering is happening. (Workaround, since hovering is not forwarded).</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="gui.DiagramScene.DiagramScene.mouseMoveEvent">
+<code class="descname">mouseMoveEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/DiagramScene.html#DiagramScene.mouseMoveEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DiagramScene.DiagramScene.mouseMoveEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward mouseMoveEvent during arc creation and reimplement hovering of <cite>model.AbstractItem.Connector</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; <cite>QtGui.mouseMoveEvent</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.DiagramScene.DiagramScene.mouseReleaseEvent">
+<code class="descname">mouseReleaseEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/DiagramScene.html#DiagramScene.mouseReleaseEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DiagramScene.DiagramScene.mouseReleaseEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward mouseReleaseEvent during arc creation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; <cite>QtGui.mouseReleaseEvent</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="gui.DiagramScene.bin_">
+<code class="descclassname">gui.DiagramScene.</code><code class="descname">bin_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#gui.DiagramScene.bin_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="gui.DiagramScene.hex_">
+<code class="descclassname">gui.DiagramScene.</code><code class="descname">hex_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#gui.DiagramScene.hex_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="gui.DiagramScene.oct_">
+<code class="descclassname">gui.DiagramScene.</code><code class="descname">oct_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#gui.DiagramScene.oct_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<span class="target" id="module-gui.LibraryModel"></span><dl class="class">
+<dt id="gui.LibraryModel.LibraryModel">
+<em class="property">class </em><code class="descclassname">gui.LibraryModel.</code><code class="descname">LibraryModel</code><span class="sig-paren">(</span><em>parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/LibraryModel.html#LibraryModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.LibraryModel.LibraryModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QStandardItemModel</span></code></p>
+<p>Abstract class for drag and drop support</p>
+<dl class="method">
+<dt id="gui.LibraryModel.LibraryModel.mimeData">
+<code class="descname">mimeData</code><span class="sig-paren">(</span><em>idxs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/LibraryModel.html#LibraryModel.mimeData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.LibraryModel.LibraryModel.mimeData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gui.LibraryModel.LibraryModel.mimeTypes">
+<code class="descname">mimeTypes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/LibraryModel.html#LibraryModel.mimeTypes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.LibraryModel.LibraryModel.mimeTypes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="gui.LibraryModel.bin_">
+<code class="descclassname">gui.LibraryModel.</code><code class="descname">bin_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#gui.LibraryModel.bin_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="gui.LibraryModel.hex_">
+<code class="descclassname">gui.LibraryModel.</code><code class="descname">hex_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#gui.LibraryModel.hex_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="gui.LibraryModel.oct_">
+<code class="descclassname">gui.LibraryModel.</code><code class="descname">oct_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#gui.LibraryModel.oct_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<span class="target" id="module-gui.NameDialog"></span><dl class="class">
+<dt id="gui.NameDialog.NameDialog">
+<em class="property">class </em><code class="descclassname">gui.NameDialog.</code><code class="descname">NameDialog</code><span class="sig-paren">(</span><em>parent=None</em>, <em>item=None</em>, <em>title='Unnamed'</em>, <em>default='a'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/NameDialog.html#NameDialog"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.NameDialog.NameDialog" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QDialog</span></code></p>
+<dl class="method">
+<dt id="gui.NameDialog.NameDialog.cancel">
+<code class="descname">cancel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/NameDialog.html#NameDialog.cancel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.NameDialog.NameDialog.cancel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gui.NameDialog.NameDialog.getItem">
+<code class="descname">getItem</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/NameDialog.html#NameDialog.getItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.NameDialog.NameDialog.getItem" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Return self.item:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.NameDialog.NameDialog.getName">
+<code class="descname">getName</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/NameDialog.html#NameDialog.getName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.NameDialog.NameDialog.getName" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Return self.lineEdit.text():</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.NameDialog.NameDialog.ok">
+<code class="descname">ok</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/NameDialog.html#NameDialog.ok"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.NameDialog.NameDialog.ok" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="gui.NameDialog.bin_">
+<code class="descclassname">gui.NameDialog.</code><code class="descname">bin_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#gui.NameDialog.bin_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="gui.NameDialog.hex_">
+<code class="descclassname">gui.NameDialog.</code><code class="descname">hex_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#gui.NameDialog.hex_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="gui.NameDialog.oct_">
+<code class="descclassname">gui.NameDialog.</code><code class="descname">oct_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#gui.NameDialog.oct_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<span class="target" id="module-gui.ParameterDialog"></span><dl class="class">
+<dt id="gui.ParameterDialog.ParameterDialog">
+<em class="property">class </em><code class="descclassname">gui.ParameterDialog.</code><code class="descname">ParameterDialog</code><span class="sig-paren">(</span><em>node</em>, <em>parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/ParameterDialog.html#ParameterDialog"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.ParameterDialog.ParameterDialog" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QDialog</span></code></p>
+<dl class="method">
+<dt id="gui.ParameterDialog.ParameterDialog.OK">
+<code class="descname">OK</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/ParameterDialog.html#ParameterDialog.OK"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.ParameterDialog.ParameterDialog.OK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="gui.ParameterDialog.bin_">
+<code class="descclassname">gui.ParameterDialog.</code><code class="descname">bin_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#gui.ParameterDialog.bin_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="gui.ParameterDialog.hex_">
+<code class="descclassname">gui.ParameterDialog.</code><code class="descname">hex_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#gui.ParameterDialog.hex_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="gui.ParameterDialog.oct_">
+<code class="descclassname">gui.ParameterDialog.</code><code class="descname">oct_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#gui.ParameterDialog.oct_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<span class="target" id="module-gui.SubnetDialog"></span><dl class="class">
+<dt id="gui.SubnetDialog.SubnetDialog">
+<em class="property">class </em><code class="descclassname">gui.SubnetDialog.</code><code class="descname">SubnetDialog</code><span class="sig-paren">(</span><em>mainWindow</em>, <em>parent=None</em>, <em>superNet=None</em>, <em>subnet=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/SubnetDialog.html#SubnetDialog"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.SubnetDialog.SubnetDialog" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QDialog</span></code></p>
+<p>Dialog for subnet creation</p>
+<dl class="method">
+<dt id="gui.SubnetDialog.SubnetDialog.cancel">
+<code class="descname">cancel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/SubnetDialog.html#SubnetDialog.cancel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.SubnetDialog.SubnetDialog.cancel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gui.SubnetDialog.SubnetDialog.closeEvent">
+<code class="descname">closeEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/SubnetDialog.html#SubnetDialog.closeEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.SubnetDialog.SubnetDialog.closeEvent" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="gui.SubnetDialog.bin_">
+<code class="descclassname">gui.SubnetDialog.</code><code class="descname">bin_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#gui.SubnetDialog.bin_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="gui.SubnetDialog.hex_">
+<code class="descclassname">gui.SubnetDialog.</code><code class="descname">hex_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#gui.SubnetDialog.hex_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="gui.SubnetDialog.oct_">
+<code class="descclassname">gui.SubnetDialog.</code><code class="descname">oct_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#gui.SubnetDialog.oct_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<span class="target" id="module-gui.TokenDialog"></span><dl class="class">
+<dt id="gui.TokenDialog.TokenDialog">
+<em class="property">class </em><code class="descclassname">gui.TokenDialog.</code><code class="descname">TokenDialog</code><span class="sig-paren">(</span><em>parent=None</em>, <em>title='Choose Colour and Amount of the Token'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/TokenDialog.html#TokenDialog"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.TokenDialog.TokenDialog" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QDialog</span></code></p>
+<p>Dialog to choose a color for new token</p>
+<dl class="method">
+<dt id="gui.TokenDialog.TokenDialog.cancel">
+<code class="descname">cancel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/TokenDialog.html#TokenDialog.cancel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.TokenDialog.TokenDialog.cancel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gui.TokenDialog.TokenDialog.getCountToken">
+<code class="descname">getCountToken</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/TokenDialog.html#TokenDialog.getCountToken"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.TokenDialog.TokenDialog.getCountToken" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Return self.countToken:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.TokenDialog.TokenDialog.getInitMarking">
+<code class="descname">getInitMarking</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/TokenDialog.html#TokenDialog.getInitMarking"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.TokenDialog.TokenDialog.getInitMarking" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Return self.initMarking:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.TokenDialog.TokenDialog.getListEntry">
+<code class="descname">getListEntry</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/TokenDialog.html#TokenDialog.getListEntry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.TokenDialog.TokenDialog.getListEntry" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Return self.listEntry:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.TokenDialog.TokenDialog.ok">
+<code class="descname">ok</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/TokenDialog.html#TokenDialog.ok"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.TokenDialog.TokenDialog.ok" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gui.TokenDialog.TokenDialog.setCountToken">
+<code class="descname">setCountToken</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/TokenDialog.html#TokenDialog.setCountToken"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.TokenDialog.TokenDialog.setCountToken" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set token count.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> &#8211; </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.TokenDialog.TokenDialog.setInitMarking">
+<code class="descname">setInitMarking</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/TokenDialog.html#TokenDialog.setInitMarking"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.TokenDialog.TokenDialog.setInitMarking" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set initial Marking.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> &#8211; </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.TokenDialog.TokenDialog.setListEntry">
+<code class="descname">setListEntry</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui/TokenDialog.html#TokenDialog.setListEntry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.TokenDialog.TokenDialog.setListEntry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add new color to list.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="gui.TokenDialog.bin_">
+<code class="descclassname">gui.TokenDialog.</code><code class="descname">bin_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#gui.TokenDialog.bin_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="gui.TokenDialog.hex_">
+<code class="descclassname">gui.TokenDialog.</code><code class="descname">hex_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#gui.TokenDialog.hex_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="gui.TokenDialog.oct_">
+<code class="descclassname">gui.TokenDialog.</code><code class="descname">oct_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#gui.TokenDialog.oct_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to Colored Petrinets Simulator Gui&#8217;s documentation!</a></li>
+      <li>Next: <a href="model_link.html" title="next chapter">model</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/gui_link.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Christoph Kuhr.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="_sources/gui_link.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

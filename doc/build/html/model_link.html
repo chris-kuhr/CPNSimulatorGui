@@ -1,0 +1,1551 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>model &mdash; Colored Petrinets Simulator Gui alpha 2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     'alpha 2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Colored Petrinets Simulator Gui alpha 2 documentation" href="index.html" />
+    <link rel="next" title="inout" href="inout_link.html" />
+    <link rel="prev" title="gui" href="gui_link.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-model.CPNSimulator">
+<span id="model"></span><h1>model<a class="headerlink" href="#module-model.CPNSimulator" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="model.CPNSimulator.CPNSimulator">
+<em class="property">class </em><code class="descclassname">model.CPNSimulator.</code><code class="descname">CPNSimulator</code><span class="sig-paren">(</span><em>mainWindow</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/CPNSimulator.html#CPNSimulator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.CPNSimulator.CPNSimulator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>CPN Simulator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Member mainWindow:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><cite>gui.MainWindow</cite>. Main application window.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Member net:</th><td class="field-body">SNAKES Colored Petrinet.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Member markingHistory:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">SNAKES Marking stored for every ` simulationStep`.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member simulationStep:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">Steps calculated for the Petrinet <cite>net</cite></td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Member displayStep:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">Step displayed in editors.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member simulatorSpeed:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">The speed with which the simulator progresses.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Member enabledTransitions:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">Number of enabled transitions.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member uniqueNameBase:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">Unique integer for the creation of new CPN elements.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Member initialMarking:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">SNAKES Marking at step 0.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member colourSets:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">Set of defined string colors.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Member connectionList:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">List of all <cite>model.ArcItem</cite> s, except port substitution transition connections.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member transitions:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">All <cite>model.TransitionItem</cite> except substitution transitions.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Member places:</th><td class="field-body">All <cite>model.PlaceItem</cite> except port places.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Member subnets:</th><td class="field-body">List of all subnets.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="model.CPNSimulator.CPNSimulator.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>mainWindow</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/CPNSimulator.html#CPNSimulator.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.CPNSimulator.CPNSimulator.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create CPN Simulator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mainWindow</strong> &#8211; <cite>gui.MainWindow</cite>. Main application window.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.CPNSimulator.CPNSimulator.back2beginning">
+<code class="descname">back2beginning</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/CPNSimulator.html#CPNSimulator.back2beginning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.CPNSimulator.CPNSimulator.back2beginning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return to step 0.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.CPNSimulator.CPNSimulator.backStep">
+<code class="descname">backStep</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/CPNSimulator.html#CPNSimulator.backStep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.CPNSimulator.CPNSimulator.backStep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Go one step back in history.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.CPNSimulator.CPNSimulator.checkTranistionActivation">
+<code class="descname">checkTranistionActivation</code><span class="sig-paren">(</span><em>transition</em>, <em>mode</em>, <em>currentStep</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/CPNSimulator.html#CPNSimulator.checkTranistionActivation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.CPNSimulator.CPNSimulator.checkTranistionActivation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether a SNAKES transition is activated.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>transition</strong> &#8211; SNAKES transition to check.</li>
+<li><strong>mode</strong> &#8211; SNAKES mode to check for activation.</li>
+<li><strong>currentStep</strong> &#8211; Step for which to calculate the activation</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Return activated:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><p class="first last">Activated True or False.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.CPNSimulator.CPNSimulator.checkTransitionEnabled">
+<code class="descname">checkTransitionEnabled</code><span class="sig-paren">(</span><em>transition</em>, <em>mode</em>, <em>currentStep</em>, <em>activated</em>, <em>transitions2Fire</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/CPNSimulator.html#CPNSimulator.checkTransitionEnabled"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.CPNSimulator.CPNSimulator.checkTransitionEnabled" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether a SNAKES transition is enabled.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>transition</strong> &#8211; SNAKES transition to check.</li>
+<li><strong>mode</strong> &#8211; SNAKES mode to check for activation.</li>
+<li><strong>currentStep</strong> &#8211; Step for which to calculate the enabling.</li>
+<li><strong>activated</strong> &#8211; Flag that determines, whether <cite>transition</cite> is activated.</li>
+<li><strong>transitions2Fire</strong> &#8211; List of SNAKES transitions enabled to fire.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return enabled:</th><td class="field-body"><p class="first last">Enabled True or False.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.CPNSimulator.CPNSimulator.defineNewColour">
+<code class="descname">defineNewColour</code><span class="sig-paren">(</span><em>colName</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/CPNSimulator.html#CPNSimulator.defineNewColour"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.CPNSimulator.CPNSimulator.defineNewColour" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define a new Color.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>colName</strong> &#8211; String color.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.CPNSimulator.CPNSimulator.fireEnabledTransitions">
+<code class="descname">fireEnabledTransitions</code><span class="sig-paren">(</span><em>currentStep</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/CPNSimulator.html#CPNSimulator.fireEnabledTransitions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.CPNSimulator.CPNSimulator.fireEnabledTransitions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fire transitions in list <cite>transitions2Fire</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>currentStep</strong> &#8211; Step for which to calculate the firing.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.CPNSimulator.CPNSimulator.forward2lastStep">
+<code class="descname">forward2lastStep</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/CPNSimulator.html#CPNSimulator.forward2lastStep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.CPNSimulator.CPNSimulator.forward2lastStep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Go forward to last step in history, given at ` simulationStep`.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.CPNSimulator.CPNSimulator.forwardStep">
+<code class="descname">forwardStep</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/CPNSimulator.html#CPNSimulator.forwardStep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.CPNSimulator.CPNSimulator.forwardStep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Go step forward in history or claculate new step.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.CPNSimulator.CPNSimulator.getActualMarking">
+<code class="descname">getActualMarking</code><span class="sig-paren">(</span><em>actualMarking</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/CPNSimulator.html#CPNSimulator.getActualMarking"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.CPNSimulator.CPNSimulator.getActualMarking" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process status of visual net, depending on <cite>actualMarking</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>actualMarking</strong> &#8211; SNAKES Marking.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.CPNSimulator.CPNSimulator.resetSimulator">
+<code class="descname">resetSimulator</code><span class="sig-paren">(</span><em>init=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/CPNSimulator.html#CPNSimulator.resetSimulator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.CPNSimulator.CPNSimulator.resetSimulator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset simulator history to step 0.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>init</strong> &#8211; Initialization on startup/load</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.CPNSimulator.CPNSimulator.setNetName">
+<code class="descname">setNetName</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/CPNSimulator.html#CPNSimulator.setNetName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.CPNSimulator.CPNSimulator.setNetName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the name of the <cite>net</cite>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.CPNSimulator.CPNSimulator.startSim">
+<code class="descname">startSim</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/CPNSimulator.html#CPNSimulator.startSim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.CPNSimulator.CPNSimulator.startSim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start simulator with the speed chosen with the radio edit.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.CPNSimulator.CPNSimulator.stopSim">
+<code class="descname">stopSim</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/CPNSimulator.html#CPNSimulator.stopSim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.CPNSimulator.CPNSimulator.stopSim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop simulator.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.CPNSimulator.CPNSimulator.tokenAdded">
+<code class="descname">tokenAdded</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/CPNSimulator.html#CPNSimulator.tokenAdded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.CPNSimulator.CPNSimulator.tokenAdded" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when a <cite>model.TokenItem</cite> was added to the <cite>net</cite>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="model.CPNSimulator.bin_">
+<code class="descclassname">model.CPNSimulator.</code><code class="descname">bin_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#model.CPNSimulator.bin_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="model.CPNSimulator.hex_">
+<code class="descclassname">model.CPNSimulator.</code><code class="descname">hex_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#model.CPNSimulator.hex_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="model.CPNSimulator.oct_">
+<code class="descclassname">model.CPNSimulator.</code><code class="descname">oct_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#model.CPNSimulator.oct_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<span class="target" id="module-model.AbstractItem"></span><dl class="class">
+<dt id="model.AbstractItem.AbstractItem">
+<em class="property">class </em><code class="descclassname">model.AbstractItem.</code><code class="descname">AbstractItem</code><span class="sig-paren">(</span><em>parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/AbstractItem.html#AbstractItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.AbstractItem.AbstractItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QGraphicsItem</span></code></p>
+<p>Base class of the CPN elements transition and place.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Member parent:</th><td class="field-body"><cite>gui.DiagramEditor</cite>. Editor to show in.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Member tokens:</th><td class="field-body">List of <cite>model.TokenItem</cite> s, if inheriting class is <cite>model.PlaceItem</cite> else None</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Member name:</th><td class="field-body">Name of the CPN element.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member posCallbacks:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">List of callback functions, to calculate position changes.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Member connectorList:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">List of 20 <cite>Connector</cite> s</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member planeMap:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">Dictionary-&gt;Set(), mapping the relative orientation of an any other <cite>model.AbstractItem</cite> in the containing editor.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Member connectorMap:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">Dictionary-&gt;List(), mapping the relative orientation of the 20 <cite>model.AbstractItem.Connector</cite> s.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member nodeType:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">Determining the type of the item at creation time.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Member superNet:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">The super net is used to determine the editor for port place clones.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Member label:</th><td class="field-body"><cite>QtGui.QGraphicsTextItem</cite>, visual representation of the <cite>model.AbstractItem</cite> s name.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Member descCanvas:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><cite>gui.AbstractItem.DescriptionCanvas</cite>, showing detailed information.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="model.AbstractItem.AbstractItem.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/AbstractItem.html#AbstractItem.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.AbstractItem.AbstractItem.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create abstract item.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parent</strong> &#8211; <cite>gui.DiagramEditor</cite>. Editor to show in.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.AbstractItem.AbstractItem.checkItem">
+<code class="descname">checkItem</code><span class="sig-paren">(</span><em>item</em>, <em>orientation</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/AbstractItem.html#AbstractItem.checkItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.AbstractItem.AbstractItem.checkItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check <cite>item</cite> is of propper type.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>item</strong> &#8211; <cite>model.AbstractItem</cite> to lookup.</li>
+<li><strong>orientation</strong> &#8211; Orientation to assign, if type check is passed.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.AbstractItem.AbstractItem.createItem">
+<code class="descname">createItem</code><span class="sig-paren">(</span><em>editor</em>, <em>name='Untitled'</em>, <em>nodeType='undefined'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/AbstractItem.html#AbstractItem.createItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.AbstractItem.AbstractItem.createItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the typed item.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>editor</strong> &#8211; <cite>gui.DiagramEditor</cite>. Editor to show in.</li>
+<li><strong>name</strong> &#8211; Name of the CPN element.</li>
+<li><strong>nodeType</strong> &#8211; Determining the type of the item at creation time.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return w, h:</th><td class="field-body"><p class="first last">Width and height of CPN element, depending on the label length.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.AbstractItem.AbstractItem.deleteItemLocal">
+<code class="descname">deleteItemLocal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/AbstractItem.html#AbstractItem.deleteItemLocal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.AbstractItem.AbstractItem.deleteItemLocal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Capture delete event and call editor delete function.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.AbstractItem.AbstractItem.findItemsInPlanes">
+<code class="descname">findItemsInPlanes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/AbstractItem.html#AbstractItem.findItemsInPlanes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.AbstractItem.AbstractItem.findItemsInPlanes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the orientation of any other item in the <cite>gui.DiagramScene</cite>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.AbstractItem.AbstractItem.mouseDoubleClickEvent">
+<code class="descname">mouseDoubleClickEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/AbstractItem.html#AbstractItem.mouseDoubleClickEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.AbstractItem.AbstractItem.mouseDoubleClickEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Edit visual name on <cite>QtGui.mouseDoubleClickEvent</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; <cite>QtGui.mouseDoubleClickEvent</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.AbstractItem.AbstractItem.renameElement">
+<code class="descname">renameElement</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/AbstractItem.html#AbstractItem.renameElement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.AbstractItem.AbstractItem.renameElement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Capture rename event and call virtual function of <cite>model.PlaceItem</cite> or <cite>model.TrasnitionItem</cite>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="model.AbstractItem.Connector">
+<em class="property">class </em><code class="descclassname">model.AbstractItem.</code><code class="descname">Connector</code><span class="sig-paren">(</span><em>parent</em>, <em>idx</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/AbstractItem.html#Connector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.AbstractItem.Connector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QGraphicsRectItem</span></code></p>
+<p>Connector for visual arcs.</p>
+<p>A connector is a socket, to or from which a visual arc may be connected.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Member parent:</th><td class="field-body">Parent port place.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member orientation:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">Orientation relative to its parent: &#8220;N&#8221;,&#8221;NE&#8221;,&#8221;E&#8221;,&#8221;SE&#8221;,&#8221;S&#8221;,&#8221;SW&#8221;,&#8221;W&#8221;,&#8221;NW&#8221;.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Member idx:</th><td class="field-body">Index assinged from parent.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member connectionArc:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">Reference to the arc connected to this Connector.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Member posCallbacks:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">List of callback functions, to calculate position changes.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member position:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">Position relative to parent.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="model.AbstractItem.Connector.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>parent</em>, <em>idx</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/AbstractItem.html#Connector.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.AbstractItem.Connector.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a connector.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>parent</strong> &#8211; Parent AbstractItem.</li>
+<li><strong>idx</strong> &#8211; Absolut number in the parent list of connectors.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.AbstractItem.Connector.hoverEnterEvent">
+<code class="descname">hoverEnterEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/AbstractItem.html#Connector.hoverEnterEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.AbstractItem.Connector.hoverEnterEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make connector visible on hoverEnterEvent.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; hoverEnterEvent</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.AbstractItem.Connector.hoverLeaveEvent">
+<code class="descname">hoverLeaveEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/AbstractItem.html#Connector.hoverLeaveEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.AbstractItem.Connector.hoverLeaveEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make connector invisible on hoverLeaveEvent.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; hoverLeaveEvent</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.AbstractItem.Connector.itemChange">
+<code class="descname">itemChange</code><span class="sig-paren">(</span><em>change</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/AbstractItem.html#Connector.itemChange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.AbstractItem.Connector.itemChange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Item position has changed, calculate new position.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>change</strong> &#8211; Change event.</li>
+<li><strong>value</strong> &#8211; QtCore.QPointF().</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return value:</th><td class="field-body"><p class="first last">QtCore.QPointF(x, y) or super(Connector, self).itemChange(change, value).</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.AbstractItem.Connector.mousePressEvent">
+<code class="descname">mousePressEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/AbstractItem.html#Connector.mousePressEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.AbstractItem.Connector.mousePressEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Capture QtGui.mousePressEvent with <strong>Shift-Key</strong> modifier.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; QtGui.mousePressEvent</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="model.AbstractItem.DescriptionCanvas">
+<em class="property">class </em><code class="descclassname">model.AbstractItem.</code><code class="descname">DescriptionCanvas</code><span class="sig-paren">(</span><em>parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/AbstractItem.html#DescriptionCanvas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.AbstractItem.DescriptionCanvas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QGraphicsRectItem</span></code></p>
+<p>Description area for tokens, exceptions and modes. Toggle with <strong>Ctrl**+**M</strong>.</p>
+<p>In this canvas label, detailed information about the CPN element is shown.
+Firstly the unique name used by the simulator is shown, followed by the visual name, 
+that is assigned by the user. The latter does not have to be unique.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Member parent:</th><td class="field-body">Parent CPN element.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Member label:</th><td class="field-body">Visual representation of the information about the CPN element.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Member text:</th><td class="field-body">Unique name of parent CPN element.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member visibility:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">Switch for the visibility of the description canvas.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="model.AbstractItem.DescriptionCanvas.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/AbstractItem.html#DescriptionCanvas.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.AbstractItem.DescriptionCanvas.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create description canvas.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parent</strong> &#8211; Abstract CPN element.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.AbstractItem.DescriptionCanvas.setCanvasString">
+<code class="descname">setCanvasString</code><span class="sig-paren">(</span><em>infoString</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/AbstractItem.html#DescriptionCanvas.setCanvasString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.AbstractItem.DescriptionCanvas.setCanvasString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set info string, that appended to the first line.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>infoString</strong> &#8211; Info string, may contain line breaks.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.AbstractItem.DescriptionCanvas.setVisibility">
+<code class="descname">setVisibility</code><span class="sig-paren">(</span><em>visible</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/AbstractItem.html#DescriptionCanvas.setVisibility"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.AbstractItem.DescriptionCanvas.setVisibility" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set visibility of DescriptionCanvas.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>visible</strong> &#8211; True if visible, False if invisible.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="model.AbstractItem.bin_">
+<code class="descclassname">model.AbstractItem.</code><code class="descname">bin_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#model.AbstractItem.bin_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="model.AbstractItem.hex_">
+<code class="descclassname">model.AbstractItem.</code><code class="descname">hex_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#model.AbstractItem.hex_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="model.AbstractItem.oct_">
+<code class="descclassname">model.AbstractItem.</code><code class="descname">oct_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#model.AbstractItem.oct_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<span class="target" id="module-model.PlaceItem"></span><dl class="class">
+<dt id="model.PlaceItem.PlaceItem">
+<em class="property">class </em><code class="descclassname">model.PlaceItem.</code><code class="descname">PlaceItem</code><span class="sig-paren">(</span><em>editor</em>, <em>name</em>, <em>position</em>, <em>initMarking=[]</em>, <em>uniqueName='p0'</em>, <em>port=None</em>, <em>loadFromFile=False</em>, <em>portDirection=None</em>, <em>portClone=None</em>, <em>superNet=None</em>, <em>subnet=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/PlaceItem.html#PlaceItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.PlaceItem.PlaceItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QGraphicsEllipseItem</span></code>, <a class="reference internal" href="#model.AbstractItem.AbstractItem" title="model.AbstractItem.AbstractItem"><code class="xref py py-class docutils literal"><span class="pre">model.AbstractItem.AbstractItem</span></code></a></p>
+<p>CPN Transition element.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Member editor:</th><td class="field-body"><cite>gui.DiagramEditor</cite>. Editor to show in.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Member name:</th><td class="field-body">Name of the CPN element assigned by the user.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Member subnet:</th><td class="field-body">Name of the subnet this transition is contained in.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member position:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">Position of this item in the <cite>gui.DiagramScene</cite>.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Member port:</th><td class="field-body"><cite>model.PortItem</cite> if this is a port place, else None.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member portClone:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">A port place in the super net or None.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Member portDirection:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">Direction of the port, if this is a port place.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member uniqueName:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">Unique name of this transition used by the simulator.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Member place:</th><td class="field-body">SNAKES place node with id <cite>uniqueName</cite>, except portClones.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member initMarking:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">List of initial tokens present in this place.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Member tokens:</th><td class="field-body">List ( deque ) of <cite>model.TokenItem</cite> s in this place.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member toolTipString:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">Information string containing the tokens present in this place.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="model.PlaceItem.PlaceItem.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>editor</em>, <em>name</em>, <em>position</em>, <em>initMarking=[]</em>, <em>uniqueName='p0'</em>, <em>port=None</em>, <em>loadFromFile=False</em>, <em>portDirection=None</em>, <em>portClone=None</em>, <em>superNet=None</em>, <em>subnet=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/PlaceItem.html#PlaceItem.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.PlaceItem.PlaceItem.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create and initialize place item.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>editor</strong> &#8211; <cite>gui.DiagramEditor</cite>. Editor to show in.</li>
+<li><strong>name</strong> &#8211; Name of the CPN element assigned by the user.</li>
+<li><strong>position</strong> &#8211; Position of this item in the <cite>gui.DiagramScene</cite>.</li>
+<li><strong>initMarking</strong> &#8211; List of initial tokens present in this place.</li>
+<li><strong>uniqueName</strong> &#8211; Unique name of this transition used by the simulator.</li>
+<li><strong>port</strong> &#8211; <cite>model.PortItem</cite> if this is a port place, else None.</li>
+<li><strong>loadFromFile</strong> &#8211; Flag determining, whether the place is loaded from file.</li>
+<li><strong>portDirection</strong> &#8211; Direction of the port, if this is a port place.</li>
+<li><strong>portClone</strong> &#8211; A port place in the super net or None.</li>
+<li><strong>superNe</strong> &#8211; The super net is used to determine the editor for port place clones.</li>
+<li><strong>subnet</strong> &#8211; Name of the subnet this transition is contained in.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.PlaceItem.PlaceItem.addToken">
+<code class="descname">addToken</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/PlaceItem.html#PlaceItem.addToken"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.PlaceItem.PlaceItem.addToken" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to add a <cite>model.TokenItem</cite> to this place</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.PlaceItem.PlaceItem.contextMenuEvent">
+<code class="descname">contextMenuEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/PlaceItem.html#PlaceItem.contextMenuEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.PlaceItem.PlaceItem.contextMenuEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate Context menu on context menu event.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; QContextMenuEvent.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.PlaceItem.PlaceItem.deleteItemLocal">
+<code class="descname">deleteItemLocal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/PlaceItem.html#PlaceItem.deleteItemLocal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.PlaceItem.PlaceItem.deleteItemLocal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Capture delete event and call editor delete function.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.PlaceItem.PlaceItem.mouseMoveEvent">
+<code class="descname">mouseMoveEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/PlaceItem.html#PlaceItem.mouseMoveEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.PlaceItem.PlaceItem.mouseMoveEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prevents the movement of this item, when connections are drawn.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; <cite>QtGui.mouseMoveEvent</cite></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.PlaceItem.PlaceItem.mousePressEvent">
+<code class="descname">mousePressEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/PlaceItem.html#PlaceItem.mousePressEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.PlaceItem.PlaceItem.mousePressEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prevents the movement of this item, when connections are drawn.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; <cite>QtGui.mousePressEvent</cite></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.PlaceItem.PlaceItem.mouseReleaseEvent">
+<code class="descname">mouseReleaseEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/PlaceItem.html#PlaceItem.mouseReleaseEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.PlaceItem.PlaceItem.mouseReleaseEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward <cite>QtGui.mouseReleaseEvent</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; <cite>QtGui.mouseReleaseEvent</cite></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.PlaceItem.PlaceItem.newTokenValue">
+<code class="descname">newTokenValue</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/PlaceItem.html#PlaceItem.newTokenValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.PlaceItem.PlaceItem.newTokenValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accept new token.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.PlaceItem.PlaceItem.renameModifications">
+<code class="descname">renameModifications</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/PlaceItem.html#PlaceItem.renameModifications"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.PlaceItem.PlaceItem.renameModifications" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make neccessary modification and renaming.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> &#8211; Name of the CPN element assigned by the user.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.PlaceItem.PlaceItem.setPort">
+<code class="descname">setPort</code><span class="sig-paren">(</span><em>loadFromFile=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/PlaceItem.html#PlaceItem.setPort"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.PlaceItem.PlaceItem.setPort" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new <cite>model.PortItem</cite> or edit the existing port.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>loadFromFile</strong> &#8211; Flag determining, whether the place is loaded from file.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.PlaceItem.PlaceItem.setPortDiag">
+<code class="descname">setPortDiag</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/PlaceItem.html#PlaceItem.setPortDiag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.PlaceItem.PlaceItem.setPortDiag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback function to modify the port.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.PlaceItem.PlaceItem.stackTokens">
+<code class="descname">stackTokens</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/PlaceItem.html#PlaceItem.stackTokens"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.PlaceItem.PlaceItem.stackTokens" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to order the visual stacking of different tokens.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="model.PlaceItem.bin_">
+<code class="descclassname">model.PlaceItem.</code><code class="descname">bin_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#model.PlaceItem.bin_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="model.PlaceItem.hex_">
+<code class="descclassname">model.PlaceItem.</code><code class="descname">hex_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#model.PlaceItem.hex_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="model.PlaceItem.oct_">
+<code class="descclassname">model.PlaceItem.</code><code class="descname">oct_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#model.PlaceItem.oct_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<span class="target" id="module-model.TransitionItem"></span><dl class="class">
+<dt id="model.TransitionItem.TransitionItem">
+<em class="property">class </em><code class="descclassname">model.TransitionItem.</code><code class="descname">TransitionItem</code><span class="sig-paren">(</span><em>editor</em>, <em>name</em>, <em>position</em>, <em>guardExpression=None</em>, <em>uniqueName='t0'</em>, <em>loadFromFile=False</em>, <em>substitutionTransition=False</em>, <em>subnet=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/TransitionItem.html#TransitionItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.TransitionItem.TransitionItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QGraphicsRectItem</span></code>, <a class="reference internal" href="#model.AbstractItem.AbstractItem" title="model.AbstractItem.AbstractItem"><code class="xref py py-class docutils literal"><span class="pre">model.AbstractItem.AbstractItem</span></code></a></p>
+<p>CPN Transition element.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Member editor:</th><td class="field-body"><cite>gui.DiagramEditor</cite>. Editor to show in.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Member name:</th><td class="field-body">Name of the CPN element assigned by the user.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Member substitutionTransition:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">Flag indication a substitutaion transition.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member uniqueName:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">Unique name of this transition used by the simulator.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Member transition:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">SNAKES transition node with id <cite>uniqueName</cite>, only if <cite>substitutionTransition</cite> is <cite>False</cite> else None.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Member subnet:</th><td class="field-body">Name of the subnet this transition is contained in.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Member position:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">Position of this item in the <cite>gui.DiagramScene</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Member enabled:</th><td class="field-body">Flag determining if this transition is enabled.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Member guardExpression:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">The guard expression for this transition.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member subnetBorder:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">Second border indicating a substitution transition.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Member exceptionString:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">Exception string containing simulator errors.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member modeString:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">Mode string containing the enabled modes for this transition</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="model.TransitionItem.TransitionItem.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>editor</em>, <em>name</em>, <em>position</em>, <em>guardExpression=None</em>, <em>uniqueName='t0'</em>, <em>loadFromFile=False</em>, <em>substitutionTransition=False</em>, <em>subnet=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/TransitionItem.html#TransitionItem.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.TransitionItem.TransitionItem.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create transition item.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>editor</strong> &#8211; <cite>gui.DiagramEditor</cite>. Editor to show in.</li>
+<li><strong>name</strong> &#8211; Name of the CPN element assigned by the user.</li>
+<li><strong>position</strong> &#8211; Position of this item in the <cite>gui.DiagramScene</cite>.</li>
+<li><strong>guardExpression</strong> &#8211; The guard expression for this transition.</li>
+<li><strong>uniqueName</strong> &#8211; Unique name of this transition used by the simulator.</li>
+<li><strong>loadFromFile</strong> &#8211; Flag determining, whether the transition is loaded from file.</li>
+<li><strong>substitutionTransition</strong> &#8211; Flag indication a substitutaion transition.</li>
+<li><strong>subnet</strong> &#8211; Name of the subnet this transition is contained in.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.TransitionItem.TransitionItem.acceptEditGuard">
+<code class="descname">acceptEditGuard</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/TransitionItem.html#TransitionItem.acceptEditGuard"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.TransitionItem.TransitionItem.acceptEditGuard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply modified guard expression, after <cite>gui.NameDialog</cite>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.TransitionItem.TransitionItem.contextMenuEvent">
+<code class="descname">contextMenuEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/TransitionItem.html#TransitionItem.contextMenuEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.TransitionItem.TransitionItem.contextMenuEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate Context menu on context menu event.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; QContextMenuEvent.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.TransitionItem.TransitionItem.deleteItemLocal">
+<code class="descname">deleteItemLocal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/TransitionItem.html#TransitionItem.deleteItemLocal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.TransitionItem.TransitionItem.deleteItemLocal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Capture delete event and call editor delete function.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.TransitionItem.TransitionItem.editGuard">
+<code class="descname">editGuard</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/TransitionItem.html#TransitionItem.editGuard"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.TransitionItem.TransitionItem.editGuard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback function to modify the guard expression.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.TransitionItem.TransitionItem.importSubnet">
+<code class="descname">importSubnet</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/TransitionItem.html#TransitionItem.importSubnet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.TransitionItem.TransitionItem.importSubnet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward menu action <cite>Import Subnet</cite> to <cite>gui.DiagramEditor</cite>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.TransitionItem.TransitionItem.initTransition">
+<code class="descname">initTransition</code><span class="sig-paren">(</span><em>loadFromFile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/TransitionItem.html#TransitionItem.initTransition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.TransitionItem.TransitionItem.initTransition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize transition.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>loadFromFile</strong> &#8211; Flag determining, whether the transition is loaded from file.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.TransitionItem.TransitionItem.mouseMoveEvent">
+<code class="descname">mouseMoveEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/TransitionItem.html#TransitionItem.mouseMoveEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.TransitionItem.TransitionItem.mouseMoveEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prevents the movement of this item, when connections are drawn.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; <cite>QtGui.mouseMoveEvent</cite></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.TransitionItem.TransitionItem.mousePressEvent">
+<code class="descname">mousePressEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/TransitionItem.html#TransitionItem.mousePressEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.TransitionItem.TransitionItem.mousePressEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prevents the movement of this item, when connections are drawn.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; <cite>QtGui.mousePressEvent</cite></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.TransitionItem.TransitionItem.mouseReleaseEvent">
+<code class="descname">mouseReleaseEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/TransitionItem.html#TransitionItem.mouseReleaseEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.TransitionItem.TransitionItem.mouseReleaseEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward <cite>QtGui.mouseReleaseEvent</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; <cite>QtGui.mouseReleaseEvent</cite></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.TransitionItem.TransitionItem.openSubnet">
+<code class="descname">openSubnet</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/TransitionItem.html#TransitionItem.openSubnet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.TransitionItem.TransitionItem.openSubnet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward menu action <cite>Open Subnet</cite> to <cite>gui.DiagramEditor</cite>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.TransitionItem.TransitionItem.renameModifications">
+<code class="descname">renameModifications</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/TransitionItem.html#TransitionItem.renameModifications"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.TransitionItem.TransitionItem.renameModifications" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make neccessary modification and renaming.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> &#8211; Name of the CPN element assigned by the user.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.TransitionItem.TransitionItem.setInfoString">
+<code class="descname">setInfoString</code><span class="sig-paren">(</span><em>stringInfo</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/TransitionItem.html#TransitionItem.setInfoString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.TransitionItem.TransitionItem.setInfoString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the string for the <cite>gui.AbstractItem.DescritionCanvas</cite></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>stringInfo</strong> &#8211; String appended to the first line of its <cite>gui.AbstractItem.DescritionCanvas</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="model.TransitionItem.bin_">
+<code class="descclassname">model.TransitionItem.</code><code class="descname">bin_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#model.TransitionItem.bin_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="model.TransitionItem.hex_">
+<code class="descclassname">model.TransitionItem.</code><code class="descname">hex_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#model.TransitionItem.hex_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="model.TransitionItem.oct_">
+<code class="descclassname">model.TransitionItem.</code><code class="descname">oct_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#model.TransitionItem.oct_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<span class="target" id="module-model.ArcItem"></span><dl class="class">
+<dt id="model.ArcItem.ArcItem">
+<em class="property">class </em><code class="descclassname">model.ArcItem.</code><code class="descname">ArcItem</code><span class="sig-paren">(</span><em>editor</em>, <em>srcConnector</em>, <em>dstConnector</em>, <em>name='undefined'</em>, <em>isPortConnection=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/ArcItem.html#ArcItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.ArcItem.ArcItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QGraphicsItem</span></code></p>
+<p>CPN arc connection element.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Member editor:</th><td class="field-body"><cite>gui.DiagramEditor</cite>. Editor to show in.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member srcConnector:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">Source <cite>model.AbstractItem.Connector</cite>.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Member dstConnector:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">Destination <cite>model.AbstractItem.Connector</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member isPortConnection:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">Flag that determines, whether the arc represents the connection between a substitution transition and a port place..</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Member name:</th><td class="field-body">Expression of the CPN arc assigned by the user.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member arcDefined:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">Flag that determines, whether an arc creation was successful (internal).</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Member variable:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">SNAKES Variable.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member expression:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">SNAKES Expression.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Member pos1:</th><td class="field-body">Point of origin of the arc.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Member pos2:</th><td class="field-body">Point of destination of the arc.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Member arrowPolygon:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><cite>QtGui.QPolygonF</cite> showing the direction of the arc.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="model.ArcItem.ArcItem.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>editor</em>, <em>srcConnector</em>, <em>dstConnector</em>, <em>name='undefined'</em>, <em>isPortConnection=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/ArcItem.html#ArcItem.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.ArcItem.ArcItem.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>editor</strong> &#8211; <cite>gui.DiagramEditor</cite>. Editor to show in.</li>
+<li><strong>srcConnector</strong> &#8211; Source <cite>model.AbstractItem.Connector</cite>.</li>
+<li><strong>dstConnector</strong> &#8211; Destination <cite>model.AbstractItem.Connector</cite>.</li>
+<li><strong>name</strong> &#8211; Expression of the CPN arc assigned by the user.</li>
+<li><strong>isPortConnection</strong> &#8211; Flag that determines, whether the arc represents the connection between a substitution transition and a port place..</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.ArcItem.ArcItem.checkForExpression">
+<code class="descname">checkForExpression</code><span class="sig-paren">(</span><em>text</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/ArcItem.html#ArcItem.checkForExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.ArcItem.ArcItem.checkForExpression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether the annotation is intended to be an expression or a variable.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>text</strong> &#8211; Annotation text.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return ret:</th><td class="field-body">True/False.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.ArcItem.ArcItem.deleteItemLocal">
+<code class="descname">deleteItemLocal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/ArcItem.html#ArcItem.deleteItemLocal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.ArcItem.ArcItem.deleteItemLocal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Capture delete event and call editor delete function.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.ArcItem.ArcItem.getName">
+<code class="descname">getName</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/ArcItem.html#ArcItem.getName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.ArcItem.ArcItem.getName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the annotation of this arc.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.ArcItem.ArcItem.multiInput">
+<code class="descname">multiInput</code><span class="sig-paren">(</span><em>multiArcAnnotations</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/ArcItem.html#ArcItem.multiInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.ArcItem.ArcItem.multiInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register a multi input arc in the simulator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>multiArcAnnotations</strong> &#8211; SNAKES MultiArc annotation.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.ArcItem.ArcItem.rename">
+<code class="descname">rename</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/ArcItem.html#ArcItem.rename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.ArcItem.ArcItem.rename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rename arc and apply changes to simulator and visual representation.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.ArcItem.ArcItem.setArcAnnotation">
+<code class="descname">setArcAnnotation</code><span class="sig-paren">(</span><em>annotationText=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/ArcItem.html#ArcItem.setArcAnnotation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.ArcItem.ArcItem.setArcAnnotation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finalize arc creation and set annotation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>annotationText</strong> &#8211; String arc annotation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Return self.arcDefined:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">Flag that determines, whether an arc creation was successful (internal).</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.ArcItem.ArcItem.setBeginPos">
+<code class="descname">setBeginPos</code><span class="sig-paren">(</span><em>pos1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/ArcItem.html#ArcItem.setBeginPos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.ArcItem.ArcItem.setBeginPos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback method to keep <cite>pos1</cite> up to date.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pos1</strong> &#8211; <cite>QtCore.QPointF()</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.ArcItem.ArcItem.setDestination">
+<code class="descname">setDestination</code><span class="sig-paren">(</span><em>dstConnector</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/ArcItem.html#ArcItem.setDestination"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.ArcItem.ArcItem.setDestination" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the destination <cite>model.AbstractItem.Connector</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dstConnector</strong> &#8211; Destination <cite>model.AbstractItem.Connector</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.ArcItem.ArcItem.setEndPos">
+<code class="descname">setEndPos</code><span class="sig-paren">(</span><em>endpos</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/ArcItem.html#ArcItem.setEndPos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.ArcItem.ArcItem.setEndPos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback method to keep <cite>pos2</cite> up to date.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>endpos</strong> &#8211; <cite>QtCore.QPointF()</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.ArcItem.ArcItem.setName">
+<code class="descname">setName</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/ArcItem.html#ArcItem.setName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.ArcItem.ArcItem.setName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the annotation of this arc.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> &#8211; New annotation.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.ArcItem.ArcItem.setPolygon">
+<code class="descname">setPolygon</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/ArcItem.html#ArcItem.setPolygon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.ArcItem.ArcItem.setPolygon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate position and rotation of the arc arrow head.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.ArcItem.ArcItem.singleInput">
+<code class="descname">singleInput</code><span class="sig-paren">(</span><em>variableExpression</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/ArcItem.html#ArcItem.singleInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.ArcItem.ArcItem.singleInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register a single input arc in the simulator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variableExpression</strong> &#8211; SNAKES Variable or Expression.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.ArcItem.ArcItem.singleOutput">
+<code class="descname">singleOutput</code><span class="sig-paren">(</span><em>variableExpression</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/ArcItem.html#ArcItem.singleOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.ArcItem.ArcItem.singleOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register a multi input arc in the simulator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variableExpression</strong> &#8211; SNAKES Variable or Expression.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="model.ArcItem.LineItem">
+<em class="property">class </em><code class="descclassname">model.ArcItem.</code><code class="descname">LineItem</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/ArcItem.html#LineItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.ArcItem.LineItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QGraphicsLineItem</span></code></p>
+<p>Visual representation of the line itself.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Member parent:</th><td class="field-body">Parent <cite>model.ArcItem</cite>.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="model.ArcItem.LineItem.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/ArcItem.html#LineItem.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.ArcItem.LineItem.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create line.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parent</strong> &#8211; Parent <cite>model.ArcItem</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.ArcItem.LineItem.mouseDoubleClickEvent">
+<code class="descname">mouseDoubleClickEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/ArcItem.html#LineItem.mouseDoubleClickEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.ArcItem.LineItem.mouseDoubleClickEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Edit arc annotation on <cite>QtGui.mouseDoubleClickEvent</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; <cite>QtGui.mouseDoubleClickEvent</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="model.ArcItem.bin_">
+<code class="descclassname">model.ArcItem.</code><code class="descname">bin_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#model.ArcItem.bin_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="model.ArcItem.hex_">
+<code class="descclassname">model.ArcItem.</code><code class="descname">hex_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#model.ArcItem.hex_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="model.ArcItem.oct_">
+<code class="descclassname">model.ArcItem.</code><code class="descname">oct_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#model.ArcItem.oct_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<span class="target" id="module-model.TokenItem"></span><dl class="class">
+<dt id="model.TokenItem.TokenItem">
+<em class="property">class </em><code class="descclassname">model.TokenItem.</code><code class="descname">TokenItem</code><span class="sig-paren">(</span><em>editor</em>, <em>token</em>, <em>count</em>, <em>qpos</em>, <em>parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/TokenItem.html#TokenItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.TokenItem.TokenItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QGraphicsEllipseItem</span></code></p>
+<p>A String Token.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Member editor:</th><td class="field-body">Referenced editor.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Member countToken:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">Number of tokens.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Member countTokenLabel:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">Visible representation of the number of tokens.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Member token:</th><td class="field-body">String value of token, shown in tooltip</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="model.TokenItem.TokenItem.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>editor</em>, <em>token</em>, <em>count</em>, <em>qpos</em>, <em>parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/TokenItem.html#TokenItem.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.TokenItem.TokenItem.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a token.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>editor</strong> &#8211; DiagramEditor. Editor to show in.</li>
+<li><strong>token</strong> &#8211; Token value.</li>
+<li><strong>count</strong> &#8211; Number of Tokens to create.</li>
+<li><strong>qpos</strong> &#8211; Parent top right position.</li>
+<li><strong>parent=None</strong> &#8211; Parent Place Element</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.TokenItem.TokenItem.contextMenuEvent">
+<code class="descname">contextMenuEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/TokenItem.html#TokenItem.contextMenuEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.TokenItem.TokenItem.contextMenuEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate Context menu on context menu event.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; QContextMenuEvent.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.TokenItem.TokenItem.deleteItemLocal">
+<code class="descname">deleteItemLocal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/TokenItem.html#TokenItem.deleteItemLocal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.TokenItem.TokenItem.deleteItemLocal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Capture delete event and call editor delete function.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.TokenItem.TokenItem.setCountToken">
+<code class="descname">setCountToken</code><span class="sig-paren">(</span><em>count</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/TokenItem.html#TokenItem.setCountToken"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.TokenItem.TokenItem.setCountToken" title="Permalink to this definition">¶</a></dt>
+<dd><p>Token count, shown in green circle.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>count</strong> &#8211; Number to show.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="model.TokenItem.bin_">
+<code class="descclassname">model.TokenItem.</code><code class="descname">bin_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#model.TokenItem.bin_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="model.TokenItem.hex_">
+<code class="descclassname">model.TokenItem.</code><code class="descname">hex_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#model.TokenItem.hex_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="model.TokenItem.oct_">
+<code class="descclassname">model.TokenItem.</code><code class="descname">oct_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#model.TokenItem.oct_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<span class="target" id="module-model.PortItem"></span><dl class="class">
+<dt id="model.PortItem.PortItem">
+<em class="property">class </em><code class="descclassname">model.PortItem.</code><code class="descname">PortItem</code><span class="sig-paren">(</span><em>direction</em>, <em>parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/PortItem.html#PortItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.PortItem.PortItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QGraphicsEllipseItem</span></code></p>
+<p>Port place indicator.</p>
+<p>The label indicates the port direction of the port place.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Member direction:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">Port direction: (i)nput, (o)utput, (io) bidirectional.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Member parent:</th><td class="field-body">Parent port place.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Member label:</th><td class="field-body">Visual representation of direction.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="model.PortItem.PortItem.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>direction</em>, <em>parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/PortItem.html#PortItem.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.PortItem.PortItem.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a port</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>direction</strong> &#8211; Port direction: (i)nput, (o)utput, (io) bidirectional.</li>
+<li><strong>parent</strong> &#8211; Parent port place.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.PortItem.PortItem.contextMenuEvent">
+<code class="descname">contextMenuEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/PortItem.html#PortItem.contextMenuEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.PortItem.PortItem.contextMenuEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate Context menu on context menu event.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; QContextMenuEvent.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.PortItem.PortItem.editPort">
+<code class="descname">editPort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/PortItem.html#PortItem.editPort"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.PortItem.PortItem.editPort" title="Permalink to this definition">¶</a></dt>
+<dd><p>Edit port direction.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.PortItem.PortItem.getDirection">
+<code class="descname">getDirection</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/PortItem.html#PortItem.getDirection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.PortItem.PortItem.getDirection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return direction of the port: &#8220;i&#8221;, &#8220;o&#8221;, &#8220;io&#8221;.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.PortItem.PortItem.itemChange">
+<code class="descname">itemChange</code><span class="sig-paren">(</span><em>change</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/PortItem.html#PortItem.itemChange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.PortItem.PortItem.itemChange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Item position has changed, calculate new position.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>change</strong> &#8211; Change value.</li>
+<li><strong>value</strong> &#8211; QtCore.QPointF().</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return value:</th><td class="field-body"><p class="first last">QtCore.QPointF(x, y) or super(PortItem, self).itemChange(change, value).</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.PortItem.PortItem.setDirection">
+<code class="descname">setDirection</code><span class="sig-paren">(</span><em>direction</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/PortItem.html#PortItem.setDirection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.PortItem.PortItem.setDirection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set direction of the port.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>direction</strong> &#8211; Direction of port: &#8220;i&#8221;, &#8220;o&#8221;, &#8220;io&#8221;.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.PortItem.PortItem.setPort">
+<code class="descname">setPort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/PortItem.html#PortItem.setPort"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.PortItem.PortItem.setPort" title="Permalink to this definition">¶</a></dt>
+<dd><p>Is this really neccessary?</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="model.PortItem.bin_">
+<code class="descclassname">model.PortItem.</code><code class="descname">bin_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#model.PortItem.bin_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="model.PortItem.hex_">
+<code class="descclassname">model.PortItem.</code><code class="descname">hex_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#model.PortItem.hex_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="model.PortItem.oct_">
+<code class="descclassname">model.PortItem.</code><code class="descname">oct_</code><span class="sig-paren">(</span><em>QTextStream</em><span class="sig-paren">)</span> &rarr; QTextStream<a class="headerlink" href="#model.PortItem.oct_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="gui_link.html" title="previous chapter">gui</a></li>
+      <li>Next: <a href="inout_link.html" title="next chapter">inout</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/model_link.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Christoph Kuhr.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="_sources/model_link.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
