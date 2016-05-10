@@ -208,10 +208,50 @@ class DescriptionCanvas(QtGui.QGraphicsRectItem):
         
         :param infoString: Info string, may contain line breaks.
         '''
-#         self.parent.editor.diagramScene.removeItem(self.label)
-        self.label.setPlainText( "%s: %s\n%s"%(self.parent.uniqueName, self.parent.name, infoString))  
-#         self.label.setFlag(self.ItemIsMovable, True)
-#         self.parent.editor.diagramScene.addItem(self.label)
+        
+        
+        
+        
+        
+        
+#         self.label.setPlainText( "%s: %s\n%s"%(self.parent.uniqueName, self.parent.name, infoString))  
+
+        newInfoString = ""
+        if "p" in self.parent.uniqueName:
+            if self.parent.replaceExpression is not None:
+                for line in infoString.split("\n"):
+                    newLineString = ""
+                    for idx, hexBlock in enumerate( line.split(" ") ):
+                        if len( self.parent.replaceExpression ) > 1:
+                            if idx == self.parent.replaceExpression[0] + 1:
+                                newLineString += "<b>%s "%(hexBlock)                            
+                            elif idx == self.parent.replaceExpression[1]:
+                                    newLineString += "%s</b> "%(hexBlock)
+                            else:
+                                newLineString += "%s "%(hexBlock)
+                        else:
+                            if idx == self.parent.replaceExpression[0]:
+                                    newLineString += "<b>%s</b> "%(hexBlock)
+                            else:
+                                newLineString += "%s "%(hexBlock)
+                    newInfoString += newLineString + "<br>"
+            else:                
+                newInfoString = infoString
+        else:            
+            newInfoString = infoString
+                
+                    
+                
+            
+
+        self.label.setHtml( "<html><body><p>%s: %s\n%s</p></body></html>"%(self.parent.uniqueName, self.parent.name, newInfoString) )
+
+
+
+
+
+
+
         rect = self.label.boundingRect()
         pos = self.parent.scenePos()
         self.setRect(pos.x() + 30, pos.y() + 20, rect.width(), rect.height()) 

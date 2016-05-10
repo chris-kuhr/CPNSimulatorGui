@@ -83,6 +83,7 @@ class ArcItem(QtGui.QGraphicsItem):
         self.pos1 = None
         self.pos2 = None
         self.arrowPolygon = None
+        self.replaceExpression = None
 #         self.subnet = subnet
         self.setZValue(12)
         
@@ -225,8 +226,17 @@ class ArcItem(QtGui.QGraphicsItem):
             pass
         elif " else " in text:
             pass
+        elif ".split(" in text:
+            pass
         else:
             return False
+        
+        if ".replace(" in text:
+            """str(a).replace(" ".join( str(a).split(" ")[27:31] ) , " ".join( str(a).split(" ")[31:34] ) )"""
+            self.replaceExpression = text.split(".join(")[1].split("[")[1].split("]")[0].split(":") 
+            for idx, strIndex in enumerate( self.replaceExpression ):
+                self.replaceExpression[idx] = int( strIndex )
+                print( self.replaceExpression[idx] )
         return True
     #------------------------------------------------------------------------------------------------
     
@@ -371,6 +381,9 @@ class ArcItem(QtGui.QGraphicsItem):
         '''
         try:           
             self.editor.mainWindow.simulator.net.add_output( self.dstConnector.parent.uniqueName, self.srcConnector.parent.uniqueName, variableExpression)
+            if self.replaceExpression is not None:
+                self.dstConnector.parent.replaceExpression = self.replaceExpression 
+                
             self.arcLine.setPen(QtGui.QPen(QtCore.Qt.black,2))
         except ValueError:
             errorString = str( "ValueError: %s" %(sys.exc_info()[1]) )
@@ -410,7 +423,7 @@ class ArcItem(QtGui.QGraphicsItem):
             multiArc = False
             text = annotationText
             if text is not None:
-                if "(" in text and  "," in text and  ")" in text:
+                if "(" in text and  "," in text and  ")" in text and not".replace(" in text:
                     multiArc = True
                     multiArcAnnotations = text.replace("(", "").replace(")", "").split(",")
             if type(self.dstConnector.parent) is TransitionItem:

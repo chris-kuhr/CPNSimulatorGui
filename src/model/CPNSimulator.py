@@ -281,7 +281,7 @@ class CPNSimulator():
             
             if enabled:
                 if not [transition.uniqueName, mode] in transitions2Fire: 
-                    transitions2Fire.append( [transition.uniqueName, mode] )
+                    transitions2Fire.append( [transition, mode] )
         return enabled
     #-------------------------------------------------------------------
         
@@ -333,29 +333,35 @@ class CPNSimulator():
                 pass                
                          
         for transFire in self.transitions2Fire:
-            item = QtGui.QListWidgetItem( str( "FIRE transition %s for Substitution %s"%(transFire[0], transFire[1]) ) )
+            item = QtGui.QListWidgetItem( str( "FIRE transition %s for Substitution %s"%(transFire[0].uniqueName, transFire[1]) ) )
             item.setTextColor(QtCore.Qt.green)
             self.mainWindow.logWidget.addItem( item )
             exceptionString = ""
             try:
-                self.net.transition( transFire[0] ).fire( transFire[1] )
+                self.net.transition( transFire[0].uniqueName ).fire( transFire[1] )
             except snakes.DomainError: 
-                exceptionString = "Step %d FIRE Domain Error transition %s activated %s"%( currentStep, transFire[0],  sys.exc_info()[1])
+                exceptionString = "Step %d FIRE %s Domain Error activated %s"%( currentStep, transFire[0].uniqueName,  sys.exc_info()[1])
                 item = QtGui.QListWidgetItem( str( exceptionString ) )
                 item.setTextColor(QtCore.Qt.red)
                 self.mainWindow.logWidget.addItem( item )
+                transFire[0].exceptionString = exceptionString
+                transFire[0].setPen(QtGui.QPen(QtCore.Qt.red, 4))
                 pass        
             except TypeError: 
-                exceptionString = "Step %d FIRE Type Error transition %s activated %s"%( currentStep, transFire[0],  sys.exc_info()[1])
+                exceptionString = "Step %d FIRE %s Type Error activated %s"%( currentStep, transFire[0].uniqueName,  sys.exc_info()[1])
                 item = QtGui.QListWidgetItem( str( exceptionString ) )
                 item.setTextColor(QtCore.Qt.red)
                 self.mainWindow.logWidget.addItem( item )
+                transFire[0].exceptionString = exceptionString
+                transFire[0].setPen(QtGui.QPen(QtCore.Qt.red, 4))
                 pass
             except ValueError: 
-                exceptionString = "Step %d FIRE Value Error transition %s not enabled for %s"%( currentStep, transFire[0],  sys.exc_info()[1])
+                exceptionString = "Step %d FIRE %s Value Error not enabled for %s"%( currentStep, transFire[0].uniqueName,  sys.exc_info()[1])
                 item = QtGui.QListWidgetItem( str( exceptionString ) )
                 item.setTextColor(QtCore.Qt.red)
                 self.mainWindow.logWidget.addItem( item )
+                transFire[0].exceptionString = exceptionString
+                transFire[0].setPen(QtGui.QPen(QtCore.Qt.red, 4))
              
         for place in self.places:
             for token in place.tokens:
@@ -422,20 +428,10 @@ class CPNSimulator():
             
             for place in subnetEditor.visualPlaces:
                 place.stackTokens()
-                place.findItemsInPlanes()
+#                 place.findItemsInPlanes()
                 
         self.enabledTransitions = 0
-        
-#         substitutions = []
-#         for connection in self.connectionList: 
-#             if isinstance(connection[0], TransitionItem):  
-#                 inputConnection = self.checkForEmptyness(connection)
-#                 if inputConnection is not None:
-#                     substitutions.append( [ inputConnection, connection] )
-#                 print( substitutions )
-                
-                
-                
+                       
         for connection in self.connectionList: 
 #             logging.debug( "%s %s %s"%(connection[0], connection[1], connection[2] ) )
             if isinstance(connection[2], TransitionItem):
@@ -451,23 +447,6 @@ class CPNSimulator():
                         
                         connection[2].exceptionString = ""
                         
-#                         for sub in substitutions:                            
-#                             if connection[2] == sub[0][0][2]:
-#                                 print( "Check transition", connection[2].uniqueName, sub[0][0][2].uniqueName )
-#                                 removedInput = sub  
-#                                 
-#                                 print("PRE remove input", removedInput[0][0][0].uniqueName, self.net.transition( removedInput[0][0][2].uniqueName ).input() )
-#                                 self.net.transition( removedInput[0][0][2].uniqueName ).remove_input( removedInput[0][0][0].place )
-#                                 print("POST remove input", removedInput[0][0][0].uniqueName, self.net.transition( removedInput[0][0][2].uniqueName ).input() )
-#                                 
-#                                 print("PRE remove output1", self.net.transition( removedInput[0][0][2].uniqueName ).output() )
-#                                 self.net.transition( removedInput[0][0][2].uniqueName ).remove_output(removedInput[1][2].place)   
-#                                 print("POST remove output1", self.net.transition( removedInput[0][0][2].uniqueName ).output() )
-#                                 
-#                                 print("PRE remove output2", removedInput[1][2].uniqueName, removedInput[0][1], self.net.transition( removedInput[0][0][2].uniqueName ).output() )
-#                                 self.net.transition( removedInput[0][0][2].uniqueName ).add_output(removedInput[1][2].place, removedInput[0][1])
-#                                 print("POST remove output2", removedInput[1][2].uniqueName, removedInput[0][1], self.net.transition( removedInput[0][0][2].uniqueName ).output() )
-                                
                                 
                         try:
                             connection[2].modeString = ""
@@ -504,9 +483,6 @@ class CPNSimulator():
                             connection[2].setPen(QtGui.QPen(QtCore.Qt.red, 4))
                             pass
                         
-#                         if removedInput is not None:
-#                             connection[2].add_input( removedInput[0][0].dstConnector.parent, removedInput[1] )
-#                             print("add input again", connection[2].input() )
                         
                         if enabled:
                             self.enabledTransitions += 1

@@ -402,7 +402,7 @@ class DiagramEditor(QtGui.QWidget):
                         self.diag.show()
                             
             if self.startedArc.dstConnector == None:
-                self.startedArc.delete()
+                self.deleteItems(self, [self.startedArc])
             
             self.startedArc = None
     #------------------------------------------------------------------------------------------------
@@ -613,17 +613,19 @@ class DiagramEditor(QtGui.QWidget):
         :param editor: `gui.DiagramEditor` containing the `place`. 
         :param token: `model.TokenItem` for deletion.
         '''
-        for place in editor.visualPlaces:
+        for idx, place in enumerate( editor.visualPlaces ):
             newDeque = deque()
             for tok in place.tokens:
+                print( place.name, place.place, tok.token, token.token )
                 if token == tok:
                     if place.place is not None:
-                        self.mainWindow.simulator.net.place( place.uniqueName ).remove( token.token )
+                        if not self.mainWindow.simulator.net.place( place.uniqueName ).is_empty():
+                            self.mainWindow.simulator.net.place( place.uniqueName ).remove( token.token )
 #                     place.tokens.remove( token )
                     self.mainWindow.simulator.getActualMarking( self.mainWindow.simulator.net.get_marking() )
                 else:
                     newDeque.append(token)
-            place.tokens = newDeque    
+            editor.visualPlaces[idx].tokens = newDeque    
         
     #------------------------------------------------------------------------------------------------
         
@@ -648,7 +650,8 @@ class DiagramEditor(QtGui.QWidget):
                 tmpList = list(self.visualConnectionList)
                 for connection in tmpList:  
                     if connection[1] == item.parent:
-                        self.deleteArc( editor, connection )                
+                        self.deleteArc( editor, connection )   
+        editor.diagramScene.clearSelection()             
     #------------------------------------------------------------------------------------------------
     
     

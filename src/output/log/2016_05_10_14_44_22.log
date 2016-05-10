@@ -1,0 +1,230 @@
+DEBUG:PyQt4.uic.uiparser:UI version is 4.0
+DEBUG:PyQt4.uic.uiparser:uiname is MainWindow
+DEBUG:PyQt4.uic.uiparser:toplevel widget is MainWindow
+DEBUG:PyQt4.uic.properties:setting property geometry
+DEBUG:PyQt4.uic.properties:setting property windowTitle
+DEBUG:PyQt4.uic.uiparser:push MainWindow MainWindow
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.uiparser:push QWidget centralwidget
+DEBUG:PyQt4.uic.properties:setting property geometry
+DEBUG:PyQt4.uic.uiparser:push QWidget verticalLayoutWidget
+DEBUG:PyQt4.uic.properties:setting property margin
+DEBUG:PyQt4.uic.uiparser:push QVBoxLayout verticalLayout
+DEBUG:PyQt4.uic.properties:setting property sizeConstraint
+DEBUG:PyQt4.uic.uiparser:push QHBoxLayout horizontalLayout_2
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:push QRadioButton radioButton
+DEBUG:PyQt4.uic.uiparser:pop widget QRadioButton radioButton
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fc6b6a97af8>
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:push QRadioButton radioButton_2
+DEBUG:PyQt4.uic.uiparser:pop widget QRadioButton radioButton_2
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fc6b6a97af8>
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:push QRadioButton radioButton_3
+DEBUG:PyQt4.uic.uiparser:pop widget QRadioButton radioButton_3
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fc6b6a97af8>
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.uiparser:push QLineEdit lineEdit
+DEBUG:PyQt4.uic.uiparser:pop widget QLineEdit lineEdit
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fc6b6a97af8>
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.uiparser:push QLineEdit lineEdit_2
+DEBUG:PyQt4.uic.uiparser:pop widget QLineEdit lineEdit_2
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fc6b6a97af8>
+DEBUG:PyQt4.uic.uiparser:pop layout QHBoxLayout horizontalLayout_2
+DEBUG:PyQt4.uic.uiparser:push QHBoxLayout horizontalLayout
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:push QPushButton pushButton
+DEBUG:PyQt4.uic.uiparser:pop widget QPushButton pushButton
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fc6b6a97af8>
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:push QPushButton pushButton_2
+DEBUG:PyQt4.uic.uiparser:pop widget QPushButton pushButton_2
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fc6b6a97af8>
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:push QPushButton pushButton_7
+DEBUG:PyQt4.uic.uiparser:pop widget QPushButton pushButton_7
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fc6b6a97af8>
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:push QPushButton pushButton_3
+DEBUG:PyQt4.uic.uiparser:pop widget QPushButton pushButton_3
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fc6b6a97af8>
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:push QPushButton pushButton_4
+DEBUG:PyQt4.uic.uiparser:pop widget QPushButton pushButton_4
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fc6b6a97af8>
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:push QPushButton pushButton_5
+DEBUG:PyQt4.uic.uiparser:pop widget QPushButton pushButton_5
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fc6b6a97af8>
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:push QPushButton pushButton_6
+DEBUG:PyQt4.uic.uiparser:pop widget QPushButton pushButton_6
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fc6b6a97af8>
+DEBUG:PyQt4.uic.uiparser:pop layout QHBoxLayout horizontalLayout
+DEBUG:PyQt4.uic.uiparser:pop layout QVBoxLayout verticalLayout
+DEBUG:PyQt4.uic.uiparser:pop widget QWidget verticalLayoutWidget
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fc6b6a97b88>
+DEBUG:PyQt4.uic.uiparser:pop widget QWidget centralwidget
+DEBUG:PyQt4.uic.uiparser:new topwidget <gui.MainWindow.MainWindow object at 0x7fc6b817bf78>
+DEBUG:PyQt4.uic.properties:setting property geometry
+DEBUG:PyQt4.uic.uiparser:push QMenuBar menubar
+DEBUG:PyQt4.uic.properties:setting property title
+DEBUG:PyQt4.uic.uiparser:push QMenu menuFile
+DEBUG:PyQt4.uic.uiparser:pop widget QMenu menuFile
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QMenuBar object at 0x7fc6b6aaeee8>
+DEBUG:PyQt4.uic.properties:setting property title
+DEBUG:PyQt4.uic.uiparser:push QMenu menuView
+DEBUG:PyQt4.uic.uiparser:pop widget QMenu menuView
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QMenuBar object at 0x7fc6b6aaeee8>
+DEBUG:PyQt4.uic.uiparser:pop widget QMenuBar menubar
+DEBUG:PyQt4.uic.uiparser:new topwidget <gui.MainWindow.MainWindow object at 0x7fc6b817bf78>
+DEBUG:PyQt4.uic.uiparser:push QStatusBar statusbar
+DEBUG:PyQt4.uic.uiparser:pop widget QStatusBar statusbar
+DEBUG:PyQt4.uic.uiparser:new topwidget <gui.MainWindow.MainWindow object at 0x7fc6b817bf78>
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property shortcut
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property shortcut
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property shortcut
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:pop widget MainWindow MainWindow
+DEBUG:PyQt4.uic.uiparser:new topwidget None
+DEBUG:PyQt4.uic.uiparser:add action actionNew_Net to menuFile
+DEBUG:PyQt4.uic.uiparser:add action actionOpen_Net to menuFile
+DEBUG:PyQt4.uic.uiparser:add action actionSave_Net to menuFile
+DEBUG:PyQt4.uic.uiparser:add action actionExport_Step_as_SVG to menuFile
+DEBUG:PyQt4.uic.uiparser:add action actionExport_to_Gif to menuFile
+DEBUG:PyQt4.uic.uiparser:add action actionExit to menuFile
+DEBUG:PyQt4.uic.uiparser:add action actionZoom_In_2 to menuView
+DEBUG:PyQt4.uic.uiparser:add action actionZoom_Out_2 to menuView
+DEBUG:PyQt4.uic.uiparser:add action actionZoom_1_2 to menuView
+DEBUG:PyQt4.uic.uiparser:add action menuFile to menubar
+DEBUG:PyQt4.uic.uiparser:add action menuView to menubar
+DEBUG:root:-------Create----Transition-------------------t14544910---------sdfg----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fc6a9e058b8> position PyQt4.QtCore.QPointF(-523.0, -153.0) Guard Expression True
+DEBUG:root:loadFromFile False substitution Transition True subnet sdfg
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544911---------Client Send----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fc6a9e20558> position PyQt4.QtCore.QPointF(-1373.0, -593.0) initMarking deque(['24 65 11 f6 cd 55 ac 9e 17 4e 7e 41 08 00 45 00 00 54 33 a0 40 00 40 01 51 ed c0 a8 bc 43 52 a5 e5 8a 08 00 b4 9d 18 3b 00 01 ae 98 31 57 00 00 00 00 86 63 06 00 00 00 00 00 10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1f 20 21 22 23 24 25 26 27 28 29 2a 2b 2c 2d 2e 2f 30 31 32 33 34 35 36 37'])
+DEBUG:root:port None loadFromFile True portDirection None portClone None superNet None subnet sdfg
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544912---------Client Receive----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fc6a9e20558> position PyQt4.QtCore.QPointF(-1369.0, -51.0) initMarking deque([])
+DEBUG:root:port None loadFromFile True portDirection None portClone None superNet None subnet sdfg
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544913---------Input Buffer LAN----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fc6a9e20558> position PyQt4.QtCore.QPointF(-866.0, -442.0) initMarking deque([])
+DEBUG:root:port None loadFromFile True portDirection i portClone None superNet None subnet sdfg
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544913---------Input Buffer LAN----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fc6a9e058b8> position PyQt4.QtCore.QPointF(-523.0, -253.0) initMarking deque([])
+DEBUG:root:port <model.PortItem.PortItem object at 0x7fc6a9e3ce58> loadFromFile False portDirection i portClone None superNet None subnet None
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544914---------Output Buffer WAN----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fc6a9e20558> position PyQt4.QtCore.QPointF(-750.0, -225.0) initMarking deque([])
+DEBUG:root:port None loadFromFile True portDirection o portClone None superNet None subnet sdfg
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544914---------Output Buffer WAN----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fc6a9e058b8> position PyQt4.QtCore.QPointF(-523.0, -53.0) initMarking deque([])
+DEBUG:root:port <model.PortItem.PortItem object at 0x7fc6a8c5ee58> loadFromFile False portDirection o portClone None superNet None subnet None
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544915---------Input Buffer WAN----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fc6a9e20558> position PyQt4.QtCore.QPointF(-572.0, -146.0) initMarking deque([])
+DEBUG:root:port None loadFromFile True portDirection i portClone None superNet None subnet sdfg
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544915---------Input Buffer WAN----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fc6a9e058b8> position PyQt4.QtCore.QPointF(-523.0, -253.0) initMarking deque([])
+DEBUG:root:port <model.PortItem.PortItem object at 0x7fc6a8c65e58> loadFromFile False portDirection i portClone None superNet None subnet None
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544916---------Output Buffer LAN----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fc6a9e20558> position PyQt4.QtCore.QPointF(-750.0, -225.0) initMarking deque([])
+DEBUG:root:port None loadFromFile True portDirection o portClone None superNet None subnet sdfg
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544916---------Output Buffer LAN----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fc6a9e058b8> position PyQt4.QtCore.QPointF(-523.0, -53.0) initMarking deque([])
+DEBUG:root:port <model.PortItem.PortItem object at 0x7fc6a8c6ce58> loadFromFile False portDirection o portClone None superNet None subnet None
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544917---------Server Receive----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fc6a9e20558> position PyQt4.QtCore.QPointF(-111.0, -436.0) initMarking deque([])
+DEBUG:root:port None loadFromFile True portDirection i portClone None superNet None subnet sdfg
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544917---------Server Receive----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fc6a9e058b8> position PyQt4.QtCore.QPointF(-523.0, -253.0) initMarking deque([])
+DEBUG:root:port <model.PortItem.PortItem object at 0x7fc6a8c72e58> loadFromFile False portDirection i portClone None superNet None subnet None
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544918---------Server Send----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fc6a9e20558> position PyQt4.QtCore.QPointF(-111.0, -236.0) initMarking deque([])
+DEBUG:root:port None loadFromFile True portDirection o portClone None superNet None subnet sdfg
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544918---------Server Send----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fc6a9e058b8> position PyQt4.QtCore.QPointF(-523.0, -53.0) initMarking deque([])
+DEBUG:root:port <model.PortItem.PortItem object at 0x7fc6a8c7ae58> loadFromFile False portDirection o portClone None superNet None subnet None
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Transition-------------------t14544944---------transmit to Router----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fc6a9e20558> position PyQt4.QtCore.QPointF(-1149.0, -581.0) Guard Expression True
+DEBUG:root:loadFromFile True substitution Transition False subnet sdfg
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Transition-------------------t14544945---------receive from Router----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fc6a9e20558> position PyQt4.QtCore.QPointF(-1154.0, -55.0) Guard Expression True
+DEBUG:root:loadFromFile True substitution Transition False subnet sdfg
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Transition-------------------t14544946---------receive from Web----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fc6a9e20558> position PyQt4.QtCore.QPointF(-307.0, -555.0) Guard Expression True
+DEBUG:root:loadFromFile True substitution Transition False subnet sdfg
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Transition-------------------t14544947---------transmit to Web----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fc6a9e20558> position PyQt4.QtCore.QPointF(-303.0, -97.0) Guard Expression True
+DEBUG:root:loadFromFile True substitution Transition False subnet sdfg
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Transition-------------------t14544948---------Network Address Translation----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fc6a9e20558> position PyQt4.QtCore.QPointF(-750.0, -325.0) Guard Expression None
+DEBUG:root:loadFromFile True substitution Transition True subnet Network Address Translation
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Transition-------------------t14544949---------Server Subnet----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fc6a9e20558> position PyQt4.QtCore.QPointF(-111.0, -336.0) Guard Expression None
+DEBUG:root:loadFromFile True substitution Transition True subnet Server Subnet
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:[Place('p14544911', MultiSet(['24 65 11 f6 cd 55 ac 9e 17 4e 7e 41 08 00 45 00 00 54 33 a0 40 00 40 01 51 ed c0 a8 bc 43 52 a5 e5 8a 08 00 b4 9d 18 3b 00 01 ae 98 31 57 00 00 00 00 86 63 06 00 00 00 00 00 10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1f 20 21 22 23 24 25 26 27 28 29 2a 2b 2c 2d 2e 2f 30 31 32 33 34 35 36 37']), tAll), Place('p14544912', MultiSet([]), tAll), Place('p14544913', MultiSet([]), tAll), Place('p14544915', MultiSet([]), tAll), Place('p14544914', MultiSet([]), tAll), Place('p14544918', MultiSet([]), tAll), Place('p14544916', MultiSet([]), tAll), Place('p14544917', MultiSet([]), tAll)]
+DEBUG:root:[Transition('t14544945', Expression('True')), Transition('t14544946', Expression('True')), Transition('t14544944', Expression('True')), Transition('t14544947', Expression('True'))]
+DEBUG:root:['t14544945', 'p14544912', 'IPpriv1', '17', '7']
+DEBUG:root:['t14544944', 'p14544913', 'IPpriv1', '10', '18']
+DEBUG:root:['p14544914', 't14544946', 'Request', '4', '15']
+DEBUG:root:['t14544947', 'p14544915', 'Response', '0', '11']
+DEBUG:root:['p14544916', 't14544945', 'IPpriv1', '14', '6']
+DEBUG:root:['p14544911', 't14544944', 'IPpriv1', '8', '18']
+DEBUG:root:['t14544946', 'p14544917', 'Request', '10', '0']
+DEBUG:root:['p14544918', 't14544947', 'Response', '15', '5']

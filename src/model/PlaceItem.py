@@ -36,6 +36,7 @@ class PlaceItem(QtGui.QGraphicsEllipseItem, AbstractItem):
         :member initMarking: List of initial tokens present in this place.
         :member tokens: List ( deque ) of `model.TokenItem` s in this place.
         :member toolTipString: Information string containing the tokens present in this place.
+        :member replaceExpression: Range or index in information string, that shall be bold.
     '''
     def __init__(self, editor, name, position, initMarking = [], uniqueName="p0", port=None, loadFromFile=False, portDirection=None, portClone=None, superNet=None, subnet=None):
         '''Create and initialize place item.
@@ -51,6 +52,7 @@ class PlaceItem(QtGui.QGraphicsEllipseItem, AbstractItem):
         :param portClone: A port place in the super net or None.   
         :param superNe: The super net is used to determine the editor for port place clones.
         :param subnet: Name of the subnet this transition is contained in.
+        
         '''
         super(PlaceItem, self).__init__(None)
         self.initMarking = initMarking
@@ -62,6 +64,7 @@ class PlaceItem(QtGui.QGraphicsEllipseItem, AbstractItem):
         self.portClone = portClone 
         self.portDirection = portDirection
         self.toolTipString = ""
+        self.replaceExpression = None
         self.tokens = deque()
         self.place = None
         self.setZValue(10)
@@ -200,12 +203,13 @@ class PlaceItem(QtGui.QGraphicsEllipseItem, AbstractItem):
         tokens = list( self.tokens )
         for idx in range(0, lenTok):
             token = tokens.pop()
-            self.toolTipString += "%s' %s ++\n" %(token.countTokenLabel.toPlainText(), token.token)
             token.setPos( QtCore.QPointF( rect.x()  + (lenTok - idx)*10 , rect.y() - (lenTok - idx)*10 ) )
-            self.setToolTip( self.toolTipString )
-            self.editor.diagramScene.removeItem( self.descCanvas )
-            self.descCanvas.setCanvasString( self.toolTipString )
-            self.editor.diagramScene.addItem( self.descCanvas )
+            self.toolTipString += "%s' %s ++\n" %(token.countTokenLabel.toPlainText(), token.token)
+            
+        self.setToolTip( self.toolTipString )
+        self.editor.diagramScene.removeItem( self.descCanvas )
+        self.descCanvas.setCanvasString( self.toolTipString )
+        self.editor.diagramScene.addItem( self.descCanvas )
     #------------------------------------------------------------------------------------------------
     
     

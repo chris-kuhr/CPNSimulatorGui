@@ -1,0 +1,400 @@
+DEBUG:PyQt4.uic.uiparser:UI version is 4.0
+DEBUG:PyQt4.uic.uiparser:uiname is MainWindow
+DEBUG:PyQt4.uic.uiparser:toplevel widget is MainWindow
+DEBUG:PyQt4.uic.properties:setting property geometry
+DEBUG:PyQt4.uic.properties:setting property windowTitle
+DEBUG:PyQt4.uic.uiparser:push MainWindow MainWindow
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.uiparser:push QWidget centralwidget
+DEBUG:PyQt4.uic.properties:setting property geometry
+DEBUG:PyQt4.uic.uiparser:push QWidget verticalLayoutWidget
+DEBUG:PyQt4.uic.properties:setting property margin
+DEBUG:PyQt4.uic.uiparser:push QVBoxLayout verticalLayout
+DEBUG:PyQt4.uic.properties:setting property sizeConstraint
+DEBUG:PyQt4.uic.uiparser:push QHBoxLayout horizontalLayout_2
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:push QRadioButton radioButton
+DEBUG:PyQt4.uic.uiparser:pop widget QRadioButton radioButton
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fa98c23faf8>
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:push QRadioButton radioButton_2
+DEBUG:PyQt4.uic.uiparser:pop widget QRadioButton radioButton_2
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fa98c23faf8>
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:push QRadioButton radioButton_3
+DEBUG:PyQt4.uic.uiparser:pop widget QRadioButton radioButton_3
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fa98c23faf8>
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.uiparser:push QLineEdit lineEdit
+DEBUG:PyQt4.uic.uiparser:pop widget QLineEdit lineEdit
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fa98c23faf8>
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.uiparser:push QLineEdit lineEdit_2
+DEBUG:PyQt4.uic.uiparser:pop widget QLineEdit lineEdit_2
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fa98c23faf8>
+DEBUG:PyQt4.uic.uiparser:pop layout QHBoxLayout horizontalLayout_2
+DEBUG:PyQt4.uic.uiparser:push QHBoxLayout horizontalLayout
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:push QPushButton pushButton
+DEBUG:PyQt4.uic.uiparser:pop widget QPushButton pushButton
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fa98c23faf8>
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:push QPushButton pushButton_2
+DEBUG:PyQt4.uic.uiparser:pop widget QPushButton pushButton_2
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fa98c23faf8>
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:push QPushButton pushButton_7
+DEBUG:PyQt4.uic.uiparser:pop widget QPushButton pushButton_7
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fa98c23faf8>
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:push QPushButton pushButton_3
+DEBUG:PyQt4.uic.uiparser:pop widget QPushButton pushButton_3
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fa98c23faf8>
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:push QPushButton pushButton_4
+DEBUG:PyQt4.uic.uiparser:pop widget QPushButton pushButton_4
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fa98c23faf8>
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:push QPushButton pushButton_5
+DEBUG:PyQt4.uic.uiparser:pop widget QPushButton pushButton_5
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fa98c23faf8>
+DEBUG:PyQt4.uic.properties:setting property minimumSize
+DEBUG:PyQt4.uic.properties:setting property maximumSize
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:push QPushButton pushButton_6
+DEBUG:PyQt4.uic.uiparser:pop widget QPushButton pushButton_6
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fa98c23faf8>
+DEBUG:PyQt4.uic.uiparser:pop layout QHBoxLayout horizontalLayout
+DEBUG:PyQt4.uic.uiparser:pop layout QVBoxLayout verticalLayout
+DEBUG:PyQt4.uic.uiparser:pop widget QWidget verticalLayoutWidget
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QWidget object at 0x7fa98c23fb88>
+DEBUG:PyQt4.uic.uiparser:pop widget QWidget centralwidget
+DEBUG:PyQt4.uic.uiparser:new topwidget <gui.MainWindow.MainWindow object at 0x7fa98d923f78>
+DEBUG:PyQt4.uic.properties:setting property geometry
+DEBUG:PyQt4.uic.uiparser:push QMenuBar menubar
+DEBUG:PyQt4.uic.properties:setting property title
+DEBUG:PyQt4.uic.uiparser:push QMenu menuFile
+DEBUG:PyQt4.uic.uiparser:pop widget QMenu menuFile
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QMenuBar object at 0x7fa98c256ee8>
+DEBUG:PyQt4.uic.properties:setting property title
+DEBUG:PyQt4.uic.uiparser:push QMenu menuView
+DEBUG:PyQt4.uic.uiparser:pop widget QMenu menuView
+DEBUG:PyQt4.uic.uiparser:new topwidget <PyQt4.QtGui.QMenuBar object at 0x7fa98c256ee8>
+DEBUG:PyQt4.uic.uiparser:pop widget QMenuBar menubar
+DEBUG:PyQt4.uic.uiparser:new topwidget <gui.MainWindow.MainWindow object at 0x7fa98d923f78>
+DEBUG:PyQt4.uic.uiparser:push QStatusBar statusbar
+DEBUG:PyQt4.uic.uiparser:pop widget QStatusBar statusbar
+DEBUG:PyQt4.uic.uiparser:new topwidget <gui.MainWindow.MainWindow object at 0x7fa98d923f78>
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property shortcut
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property shortcut
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property shortcut
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.properties:setting property text
+DEBUG:PyQt4.uic.uiparser:pop widget MainWindow MainWindow
+DEBUG:PyQt4.uic.uiparser:new topwidget None
+DEBUG:PyQt4.uic.uiparser:add action actionNew_Net to menuFile
+DEBUG:PyQt4.uic.uiparser:add action actionOpen_Net to menuFile
+DEBUG:PyQt4.uic.uiparser:add action actionSave_Net to menuFile
+DEBUG:PyQt4.uic.uiparser:add action actionExport_Step_as_SVG to menuFile
+DEBUG:PyQt4.uic.uiparser:add action actionExport_to_Gif to menuFile
+DEBUG:PyQt4.uic.uiparser:add action actionExit to menuFile
+DEBUG:PyQt4.uic.uiparser:add action actionZoom_In_2 to menuView
+DEBUG:PyQt4.uic.uiparser:add action actionZoom_Out_2 to menuView
+DEBUG:PyQt4.uic.uiparser:add action actionZoom_1_2 to menuView
+DEBUG:PyQt4.uic.uiparser:add action menuFile to menubar
+DEBUG:PyQt4.uic.uiparser:add action menuView to menubar
+DEBUG:root:-------Create----Transition-------------------t14544910---------xgfn----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa9815d58b8> position PyQt4.QtCore.QPointF(-508.0, -136.0) Guard Expression True
+DEBUG:root:loadFromFile False substitution Transition True subnet xgfn
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544911---------Server IP Address----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa9815ef558> position PyQt4.QtCore.QPointF(278.0, -323.0) initMarking deque(['52 a5 e5 8a'])
+DEBUG:root:port None loadFromFile True portDirection None portClone None superNet None subnet xgfn
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544912---------Client IP Address----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa9815ef558> position PyQt4.QtCore.QPointF(398.0, -577.0) initMarking deque([])
+DEBUG:root:port None loadFromFile True portDirection None portClone None superNet None subnet xgfn
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544913---------Server Dump----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa9815ef558> position PyQt4.QtCore.QPointF(-10.0, -588.0) initMarking deque([])
+DEBUG:root:port None loadFromFile True portDirection None portClone None superNet None subnet xgfn
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544914---------Received Request----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa9815ef558> position PyQt4.QtCore.QPointF(-419.0, -71.0) initMarking deque([])
+DEBUG:root:port None loadFromFile True portDirection None portClone None superNet None subnet xgfn
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544915---------Response Header----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa9815ef558> position PyQt4.QtCore.QPointF(749.0, -53.0) initMarking deque(['ac 9e 17 4e 7e 41 24 65 11 f6 cd 55 08 00 45 00 00 54 0f 98 40 00 f8 01 bd f4'])
+DEBUG:root:port None loadFromFile True portDirection None portClone None superNet None subnet xgfn
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544916---------ICMP Msg Received----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa9815ef558> position PyQt4.QtCore.QPointF(-242.0, -585.0) initMarking deque([])
+DEBUG:root:port None loadFromFile True portDirection None portClone None superNet None subnet xgfn
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544917---------Unbound IP Packet----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa9815ef558> position PyQt4.QtCore.QPointF(-586.0, -704.0) initMarking deque([])
+DEBUG:root:port None loadFromFile True portDirection None portClone None superNet None subnet xgfn
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544918---------Server Receive----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa9815ef558> position PyQt4.QtCore.QPointF(-418.0, -450.0) initMarking deque([])
+DEBUG:root:port None loadFromFile True portDirection i portClone None superNet None subnet xgfn
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544918---------Server Receive----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa9815d58b8> position PyQt4.QtCore.QPointF(-508.0, -236.0) initMarking deque([])
+DEBUG:root:port <model.PortItem.PortItem object at 0x7fa97e400438> loadFromFile False portDirection i portClone None superNet None subnet None
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544919---------Server Send----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa9815ef558> position PyQt4.QtCore.QPointF(-403.0, 53.0) initMarking deque([])
+DEBUG:root:port None loadFromFile True portDirection o portClone None superNet None subnet xgfn
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544919---------Server Send----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa9815d58b8> position PyQt4.QtCore.QPointF(-508.0, -36.0) initMarking deque([])
+DEBUG:root:port <model.PortItem.PortItem object at 0x7fa97e40b438> loadFromFile False portDirection o portClone None superNet None subnet None
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Transition-------------------t14544920---------process Request----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa9815ef558> position PyQt4.QtCore.QPointF(-417.0, -334.0) Guard Expression True
+DEBUG:root:loadFromFile True substitution Transition False subnet xgfn
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Transition-------------------t14544921---------generate Response----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa9815ef558> position PyQt4.QtCore.QPointF(346.0, -56.0) Guard Expression True
+DEBUG:root:loadFromFile True substitution Transition False subnet xgfn
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Transition-------------------t14544922---------test ICMP----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa9815ef558> position PyQt4.QtCore.QPointF(-447.0, -582.0) Guard Expression True
+DEBUG:root:loadFromFile True substitution Transition False subnet xgfn
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:[Place('p14544914', MultiSet([]), tAll), Place('p14544915', MultiSet(['ac 9e 17 4e 7e 41 24 65 11 f6 cd 55 08 00 45 00 00 54 0f 98 40 00 f8 01 bd f4']), tAll), Place('p14544912', MultiSet([]), tAll), Place('p14544911', MultiSet(['52 a5 e5 8a']), tAll), Place('p14544916', MultiSet([]), tAll), Place('p14544919', MultiSet([]), tAll), Place('p14544917', MultiSet([]), tAll), Place('p14544918', MultiSet([]), tAll), Place('p14544913', MultiSet([]), tAll)]
+DEBUG:root:[Transition('t14544921', Expression('True')), Transition('t14544922', Expression('True')), Transition('t14544920', Expression('True'))]
+DEBUG:root:['t14544920', 'p14544913', 'Request if " ".join(str(Request).split(" ")[30:34])!=ServerIP else None', '3', '15']
+DEBUG:root:['t14544920', 'p14544914', '" ".join(str(Request).split(" ")[38:]) if " ".join(str(Request).split(" ")[30:34])==ServerIP and not "ICMP Reply" in Request else None', '13', '2']
+DEBUG:root:['p14544912', 't14544921', 'ClientIP', '13', '4']
+DEBUG:root:['t14544920', 'p14544912', '" ".join(str(Request).split(" ")[26:30]) if not "ICMP Reply" in Request else None', '4', '14']
+DEBUG:root:['p14544915', 't14544921', 'prefixHeader', '0', '5']
+DEBUG:root:['t14544921', 'p14544915', 'prefixHeader', '10', '15']
+DEBUG:root:['p14544914', 't14544921', 'Payload', '8', '19']
+DEBUG:root:['p14544911', 't14544921', 'ServerIP', '10', '2']
+DEBUG:root:['t14544921', 'p14544911', 'ServerIP', '0', '12']
+DEBUG:root:['t14544920', 'p14544911', 'ServerIP', '9', '16']
+DEBUG:root:['p14544911', 't14544920', 'ServerIP', '19', '6']
+DEBUG:root:['t14544922', 'p14544918', 'Request', '13', '2']
+DEBUG:root:['p14544918', 't14544920', 'Request', '14', '1']
+DEBUG:root:['t14544920', 'p14544916', 'Request if "ICMP Reply" in Request else None', '2', '14']
+DEBUG:root:['t14544921', 'p14544919', 'prefixHeader+" "+ServerIP+" "+ClientIP+" "+Payload', '15', '7']
+DEBUG:root:['p14544917', 't14544922', 'Request', '10', '1']
+DEBUG:root:-------Create----Transition-------------------t14544924---------fdcygb----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa9815d58b8> position PyQt4.QtCore.QPointF(-678.0, -335.0) Guard Expression True
+DEBUG:root:loadFromFile False substitution Transition True subnet fdcygb
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544925---------ICMP host unreachable----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> position PyQt4.QtCore.QPointF(-1091.25, -664.4375) initMarking deque(['host unreachable'])
+DEBUG:root:port None loadFromFile True portDirection None portClone None superNet None subnet fdcygb
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544926---------ICMP net unreachable----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> position PyQt4.QtCore.QPointF(-1264.0, -664.0) initMarking deque(['net unreachable'])
+DEBUG:root:port None loadFromFile True portDirection None portClone None superNet None subnet fdcygb
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544927---------ICMP protocol unreachable----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> position PyQt4.QtCore.QPointF(-913.0, -664.3125) initMarking deque([])
+DEBUG:root:port None loadFromFile True portDirection None portClone None superNet None subnet fdcygb
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544928---------ICMP port unreachable----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> position PyQt4.QtCore.QPointF(-716.875, -663.75) initMarking deque(['port unreachable'])
+DEBUG:root:port None loadFromFile True portDirection None portClone None superNet None subnet fdcygb
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544929---------ICMP time exceed----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> position PyQt4.QtCore.QPointF(-1261.75, -69.0) initMarking deque(['time exceed'])
+DEBUG:root:port None loadFromFile True portDirection None portClone None superNet None subnet fdcygb
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544930---------ICMP redirect----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> position PyQt4.QtCore.QPointF(-1082.0, -69.0) initMarking deque(['redirect'])
+DEBUG:root:port None loadFromFile True portDirection None portClone None superNet None subnet fdcygb
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544931---------ICMP echo----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> position PyQt4.QtCore.QPointF(-900.0, -69.0) initMarking deque(['echo'])
+DEBUG:root:port None loadFromFile True portDirection None portClone None superNet None subnet fdcygb
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544932---------ICMP echo reply----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> position PyQt4.QtCore.QPointF(-759.0, -68.0) initMarking deque(['echo reply'])
+DEBUG:root:port None loadFromFile True portDirection None portClone None superNet None subnet fdcygb
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544933---------ICMP Type----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> position PyQt4.QtCore.QPointF(-1249.0, -406.0) initMarking deque([])
+DEBUG:root:port None loadFromFile True portDirection i portClone None superNet None subnet fdcygb
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544933---------ICMP Type----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa9815d58b8> position PyQt4.QtCore.QPointF(-678.0, -435.0) initMarking deque([])
+DEBUG:root:port <model.PortItem.PortItem object at 0x7fa97e3c5558> loadFromFile False portDirection i portClone None superNet None subnet None
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544934---------ICMP Message----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> position PyQt4.QtCore.QPointF(-331.25, -268.0) initMarking deque([])
+DEBUG:root:port None loadFromFile True portDirection o portClone None superNet None subnet fdcygb
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544934---------ICMP Message----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa9815d58b8> position PyQt4.QtCore.QPointF(-678.0, -235.0) initMarking deque([])
+DEBUG:root:port <model.PortItem.PortItem object at 0x7fa97e3cc558> loadFromFile False portDirection o portClone None superNet None subnet None
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Place-------------------p14544935---------ICMP Buffer----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> position PyQt4.QtCore.QPointF(-1410.75, -178.5) initMarking deque([])
+DEBUG:root:port None loadFromFile True portDirection None portClone None superNet None subnet fdcygb
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Transition-------------------t14544936---------generate ICMP Message----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> position PyQt4.QtCore.QPointF(-1041.0, -406.0) Guard Expression True
+DEBUG:root:loadFromFile True substitution Transition False subnet fdcygb
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:-------Create----Transition-------------------t14544937---------send ICMP query----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> position PyQt4.QtCore.QPointF(-1389.0, -313.5) Guard Expression True
+DEBUG:root:loadFromFile True substitution Transition False subnet fdcygb
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:[Place('p14544926', MultiSet(['net unreachable']), tAll), Place('p14544927', MultiSet([]), tAll), Place('p14544934', MultiSet([]), tAll), Place('p14544925', MultiSet(['host unreachable']), tAll), Place('p14544932', MultiSet(['echo reply']), tAll), Place('p14544935', MultiSet([]), tAll), Place('p14544928', MultiSet(['port unreachable']), tAll), Place('p14544929', MultiSet(['time exceed']), tAll), Place('p14544931', MultiSet(['echo']), tAll), Place('p14544933', MultiSet([]), tAll), Place('p14544930', MultiSet(['redirect']), tAll)]
+DEBUG:root:[Transition('t14544936', Expression('True')), Transition('t14544937', Expression('True'))]
+DEBUG:root:['p14544933', 't14544936', 'ICMPtype', '7', '18']
+DEBUG:root:['p14544926', 't14544936', 'ICMP1', '13', '0']
+DEBUG:root:['p14544925', 't14544936', 'ICMP2', '13', '1']
+DEBUG:root:['p14544927', 't14544936', 'ICMP3', '13', '2']
+DEBUG:root:['p14544928', 't14544936', 'ICMP4', '13', '4']
+DEBUG:root:['p14544929', 't14544936', 'ICMP5', '2', '15']
+DEBUG:root:['p14544930', 't14544936', 'ICMP6', '2', '14']
+DEBUG:root:['p14544932', 't14544936', 'ICMP8', '2', '11']
+DEBUG:root:['t14544936', 'p14544934', 'ICMP1 if ICMPtype=="1" else ICMP2 if ICMPtype=="2" else ICMP3 if ICMPtype=="3" else ICMP4 if ICMPtype=="4" else ICMP5 if ICMPtype=="5" else ICMP6 if ICMPtype=="6" else ICMP7 if ICMPtype=="7" else ICMP8 if ICMPtype=="8" else None', '7', '18']
+DEBUG:root:['t14544936', 'p14544926', 'ICMP1', '19', '14']
+DEBUG:root:['t14544936', 'p14544925', 'ICMP2', '19', '14']
+DEBUG:root:['t14544936', 'p14544927', 'ICMP3', '3', '12']
+DEBUG:root:['t14544936', 'p14544928', 'ICMP4', '5', '12']
+DEBUG:root:['t14544936', 'p14544929', 'ICMP5', '16', '0']
+DEBUG:root:['t14544936', 'p14544930', 'ICMP6', '17', '1']
+DEBUG:root:['t14544936', 'p14544932', 'ICMP8', '10', '4']
+DEBUG:root:['p14544931', 't14544936', 'ICMP7', '1', '13']
+DEBUG:root:['t14544936', 'p14544931', 'ICMP7', '12', '3']
+DEBUG:root:['t14544937', 'p14544933', 'ICMPtype', '3', '17']
+DEBUG:root:['p14544935', 't14544937', 'ICMPtype', '2', '13']
+DEBUG:root:-------Create----Arc----------------------------ICMPtype----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> Start Pos: PyQt4.QtCore.QPointF(-1164.9388020833335, -388.25) End Pos: PyQt4.QtCore.QPointF(-1034.3580729166667, -388.25) Source p14544933 Destination t14544936
+DEBUG:root:is a Port Connection False Variable None Expression None
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:Found Arc p14544933 <model.ArcItem.ArcItem object at 0x7fa97e3d9a68> t14544936 7 18 
+DEBUG:root:-------Create----Arc----------------------------ICMP1----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> Start Pos: PyQt4.QtCore.QPointF(-1196.3111979166665, -622.75) End Pos: PyQt4.QtCore.QPointF(-1028.4622395833333, -403.25) Source p14544926 Destination t14544936
+DEBUG:root:is a Port Connection False Variable None Expression None
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:Found Arc p14544926 <model.ArcItem.ArcItem object at 0x7fa97e3d9dc8> t14544936 13 0 
+DEBUG:root:-------Create----Arc----------------------------ICMP2----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> Start Pos: PyQt4.QtCore.QPointF(-1020.9765625, -623.1875) End Pos: PyQt4.QtCore.QPointF(-998.7864583333334, -403.25) Source p14544925 Destination t14544936
+DEBUG:root:is a Port Connection False Variable None Expression None
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:Found Arc p14544925 <model.ArcItem.ArcItem object at 0x7fa97e3dd168> t14544936 13 1 
+DEBUG:root:-------Create----Arc----------------------------ICMP3----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> Start Pos: PyQt4.QtCore.QPointF(-833.0325520833333, -623.0625) End Pos: PyQt4.QtCore.QPointF(-967.6888020833333, -403.25) Source p14544927 Destination t14544936
+DEBUG:root:is a Port Connection False Variable None Expression None
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:Found Arc p14544927 <model.ArcItem.ArcItem object at 0x7fa97e3dd4c8> t14544936 13 2 
+DEBUG:root:-------Create----Arc----------------------------ICMP4----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> Start Pos: PyQt4.QtCore.QPointF(-647.1484375, -622.5) End Pos: PyQt4.QtCore.QPointF(-911.4192708333334, -403.25) Source p14544928 Destination t14544936
+DEBUG:root:is a Port Connection False Variable None Expression None
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:Found Arc p14544928 <model.ArcItem.ArcItem object at 0x7fa97e3dd828> t14544936 13 4 
+DEBUG:root:-------Create----Arc----------------------------ICMP5----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> Start Pos: PyQt4.QtCore.QPointF(-1205.40625, -66.25) End Pos: PyQt4.QtCore.QPointF(-1029.53125, -364.75) Source p14544929 Destination t14544936
+DEBUG:root:is a Port Connection False Variable None Expression None
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:Found Arc p14544929 <model.ArcItem.ArcItem object at 0x7fa97e3ddb88> t14544936 2 15 
+DEBUG:root:-------Create----Arc----------------------------ICMP6----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> Start Pos: PyQt4.QtCore.QPointF(-1036.6979166666665, -66.25) End Pos: PyQt4.QtCore.QPointF(-1002.5807291666667, -364.75) Source p14544930 Destination t14544936
+DEBUG:root:is a Port Connection False Variable None Expression None
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:Found Arc p14544930 <model.ArcItem.ArcItem object at 0x7fa97e3ddee8> t14544936 2 14 
+DEBUG:root:-------Create----Arc----------------------------ICMP8----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> Start Pos: PyQt4.QtCore.QPointF(-706.9466145833333, -65.25) End Pos: PyQt4.QtCore.QPointF(-913.75390625, -364.75) Source p14544932 Destination t14544936
+DEBUG:root:is a Port Connection False Variable None Expression None
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:Found Arc p14544932 <model.ArcItem.ArcItem object at 0x7fa97e3de288> t14544936 2 11 
+DEBUG:root:-------Create----Arc----------------------------ICMP1 if ICMPtype=="1" else ICMP2 if ICMPtype=="2" else ICMP3 if ICMPtype=="3" else ICMP4 if ICMPtype=="4" else ICMP5 if ICMPtype=="5" else ICMP6 if ICMPtype=="6" else ICMP7 if ICMPtype=="7" else ICMP8 if ICMPtype=="8" else None----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> Start Pos: PyQt4.QtCore.QPointF(-880.6263020833333, -388.25) End Pos: PyQt4.QtCore.QPointF(-317.6705729166667, -250.25) Source t14544936 Destination p14544934
+DEBUG:root:is a Port Connection False Variable None Expression None
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:Found Arc t14544936 <model.ArcItem.ArcItem object at 0x7fa97e3de5e8> p14544934 7 18 
+DEBUG:root:-------Create----Arc----------------------------ICMP1----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> Start Pos: PyQt4.QtCore.QPointF(-1027.4205729166667, -395.75) End Pos: PyQt4.QtCore.QPointF(-1222.3450520833335, -622.75) Source t14544936 Destination p14544926
+DEBUG:root:is a Port Connection False Variable None Expression None
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:Found Arc t14544936 <model.ArcItem.ArcItem object at 0x7fa97e3de9d8> p14544926 19 14 
+DEBUG:root:-------Create----Arc----------------------------ICMP2----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> Start Pos: PyQt4.QtCore.QPointF(-1027.4205729166667, -395.75) End Pos: PyQt4.QtCore.QPointF(-1048.5611979166667, -623.1875) Source t14544936 Destination p14544925
+DEBUG:root:is a Port Connection False Variable None Expression None
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:Found Arc t14544936 <model.ArcItem.ArcItem object at 0x7fa97e3ded38> p14544925 19 14 
+DEBUG:root:-------Create----Arc----------------------------ICMP3----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> Start Pos: PyQt4.QtCore.QPointF(-939.9440104166666, -403.25) End Pos: PyQt4.QtCore.QPointF(-802.4596354166666, -623.0625) Source t14544936 Destination p14544927
+DEBUG:root:is a Port Connection False Variable None Expression None
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:Found Arc t14544936 <model.ArcItem.ArcItem object at 0x7fa97e3e10d8> p14544927 3 12 
+DEBUG:root:-------Create----Arc----------------------------ICMP4----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> Start Pos: PyQt4.QtCore.QPointF(-881.6263020833333, -403.25) End Pos: PyQt4.QtCore.QPointF(-618.6236979166666, -622.5) Source t14544936 Destination p14544928
+DEBUG:root:is a Port Connection False Variable None Expression None
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:Found Arc t14544936 <model.ArcItem.ArcItem object at 0x7fa97e3e1438> p14544928 5 12 
+DEBUG:root:-------Create----Arc----------------------------ICMP5----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> Start Pos: PyQt4.QtCore.QPointF(-1027.4205729166667, -373.25) End Pos: PyQt4.QtCore.QPointF(-1248.1705729166667, -66.25) Source t14544936 Destination p14544929
+DEBUG:root:is a Port Connection False Variable None Expression None
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:Found Arc t14544936 <model.ArcItem.ArcItem object at 0x7fa97e3e1798> p14544929 16 0 
+DEBUG:root:-------Create----Arc----------------------------ICMP6----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> Start Pos: PyQt4.QtCore.QPointF(-1027.4205729166667, -380.75) End Pos: PyQt4.QtCore.QPointF(-1049.8997395833335, -66.25) Source t14544936 Destination p14544930
+DEBUG:root:is a Port Connection False Variable None Expression None
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:Found Arc t14544936 <model.ArcItem.ArcItem object at 0x7fa97e3e1af8> p14544930 17 1 
+DEBUG:root:-------Create----Arc----------------------------ICMP8----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> Start Pos: PyQt4.QtCore.QPointF(-880.6263020833333, -364.75) End Pos: PyQt4.QtCore.QPointF(-660.53515625, -65.25) Source t14544936 Destination p14544932
+DEBUG:root:is a Port Connection False Variable None Expression None
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:Found Arc t14544936 <model.ArcItem.ArcItem object at 0x7fa97e3e1e58> p14544932 10 4 
+DEBUG:root:-------Create----Arc----------------------------ICMP7----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> Start Pos: PyQt4.QtCore.QPointF(-877.703125, -66.25) End Pos: PyQt4.QtCore.QPointF(-974.9166666666666, -364.75) Source p14544931 Destination t14544936
+DEBUG:root:is a Port Connection False Variable None Expression None
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:Found Arc p14544931 <model.ArcItem.ArcItem object at 0x7fa97e3e31f8> t14544936 1 13 
+DEBUG:root:-------Create----Arc----------------------------ICMP7----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> Start Pos: PyQt4.QtCore.QPointF(-938.9440104166666, -364.75) End Pos: PyQt4.QtCore.QPointF(-839.8268229166666, -66.25) Source t14544936 Destination p14544931
+DEBUG:root:is a Port Connection False Variable None Expression None
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:Found Arc t14544936 <model.ArcItem.ArcItem object at 0x7fa97e3e3558> p14544931 12 3 
+DEBUG:root:-------Create----Arc----------------------------ICMPtype----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> Start Pos: PyQt4.QtCore.QPointF(-1313.2734375, -310.75) End Pos: PyQt4.QtCore.QPointF(-1239.0390625, -380.75) Source t14544937 Destination p14544933
+DEBUG:root:is a Port Connection False Variable None Expression None
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:Found Arc t14544937 <model.ArcItem.ArcItem object at 0x7fa97e3e38b8> p14544933 3 17 
+DEBUG:root:-------Create----Arc----------------------------ICMPtype----------
+DEBUG:root:editor <gui.DiagramEditor.DiagramEditor object at 0x7fa97e423ca8> Start Pos: PyQt4.QtCore.QPointF(-1369.8033854166665, -175.75) End Pos: PyQt4.QtCore.QPointF(-1336.7669270833333, -272.25) Source p14544935 Destination t14544937
+DEBUG:root:is a Port Connection False Variable None Expression None
+DEBUG:root:-----------------------------------------------------------------------------------
+DEBUG:root:Found Arc p14544935 <model.ArcItem.ArcItem object at 0x7fa97e3e3c18> t14544937 2 13 
